@@ -1,0 +1,85 @@
+{
+  "kind": "v2_transport_qualification",
+  "verdict": "FAIL",
+  "ts_started": "2026-09-25T09:15:24.927Z",
+  "ts_finished": "2026-09-25T09:15:27.333Z",
+  "stratum_head": "f2152723606e228ef6d3664d73f15c8f7e784aff",
+  "config": {
+    "model": "z-ai/glm-5.3-flash",
+    "max_tokens": 8192,
+    "temperature": "provider default (unset)",
+    "retries": 0,
+    "fallbacks": "none"
+  },
+  "fixture": {
+    "target": "pkg/QUALIFICATION-TARGET.md",
+    "marker": "V2QUAL-5f404505",
+    "sha256": "5288d10d1088ec2812ab2c290c480d960ca7f61d3986126677c99a18b2029517",
+    "bytes": 128
+  },
+  "provider_turns": [],
+  "loop_result": {
+    "success": false,
+    "turns_taken": 1,
+    "tokens_used": 0,
+    "proposal_value": null,
+    "failure_observation": {
+      "result_transport": "submit-result",
+      "turns_taken": 1,
+      "format_repairs": 0,
+      "result_repairs": 0,
+      "stop_reason": "provider_error",
+      "text_length": 0,
+      "tool_calls": [],
+      "tool_uses": [],
+      "error": "LLM call failed: semantic delta (content/tool_calls) after finish_reason — stream contract violation",
+      "transport_failure": {
+        "duration_ms": 2401,
+        "error_name": "SseParseError"
+      }
+    }
+  },
+  "wall_ms": 2406,
+  "checks": [
+    {
+      "id": "agent_loop_complete",
+      "pass": false,
+      "detail": "FAIL: success=false, failure_observation={\"result_transport\":\"submit-result\",\"turns_taken\":1,\"format_repairs\":0,\"result_repairs\":0,\"stop_reason\":\"provider_error\",\"text_length\":0,\"tool_calls\":[],\"tool_uses\":[],\"error\":\"LLM call failed: semantic delta (content/tool_calls) after finish_reason — stream contract violation\",\"transport_failure\":{\"duration_ms\":2401,\"error_name\":\"SseParseError\"}}"
+    },
+    {
+      "id": "submit_result_decoded",
+      "pass": false,
+      "detail": "FAIL: proposal present=false, value=null"
+    },
+    {
+      "id": "marker_round_trip",
+      "pass": false,
+      "detail": "FAIL: expected=V2QUAL-5f404505, got=null"
+    },
+    {
+      "id": "read_file_sha256",
+      "pass": false,
+      "detail": "FAIL: expected=5288d10d1088ec28…, got=null"
+    },
+    {
+      "id": "streamed_tool_call_assembled",
+      "pass": false,
+      "detail": "FAIL: read_file tool_uses found=false, path=null"
+    },
+    {
+      "id": "finish_reason_mapped",
+      "pass": false,
+      "detail": "FAIL: stop_reasons=[], read_turn=undefined"
+    },
+    {
+      "id": "usage_plausible",
+      "pass": false,
+      "detail": "FAIL: per-turn=[], loop_total=0"
+    },
+    {
+      "id": "sse_multi_turn_completed",
+      "pass": false,
+      "detail": "FAIL: provider turns=0"
+    }
+  ]
+}

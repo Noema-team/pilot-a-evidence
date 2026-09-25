@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-09-25T18:05:42.961Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-09-25T18:05:42.971Z","event":"decision_resolving","decisionId":"87adb30d-0349-40d6-a2ec-c77e5b2823ed","optionId":"approve","rationale":"V2-2 operator approval: charter accepted per protocol §4; treatment frozen, no reactivity to prior runs"}
+[journal] {"ts":"2026-09-25T18:15:47.293Z","event":"decision_resumed","decisionId":"87adb30d-0349-40d6-a2ec-c77e5b2823ed"}
+[journal] {"ts":"2026-09-25T18:15:47.294Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"design","iteration":1}]}

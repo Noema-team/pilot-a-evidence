@@ -1,0 +1,25 @@
+[
+  {
+    "stepExecutionId": "0bf0d4b8-8bd9-4780-8fcb-302479a3f1a5",
+    "workItemId": "wi-define-108-a2",
+    "workflowRunId": "3dd9cc22-97b8-46c9-9f5f-9873cae76d26",
+    "stepId": "__start__",
+    "executor": "stratum-agent",
+    "status": "failed",
+    "iteration": 1,
+    "startedAt": "2026-09-19T14:43:49.621Z",
+    "endedAt": "2026-09-19T14:54:01.966Z",
+    "duration_s": 612.3,
+    "error": {
+      "code": "workflow_error",
+      "message": "LLM call failed: fetch failed"
+    },
+    "precise_transport_failure": {
+      "duration_ms": 301237,
+      "error_name": "TypeError",
+      "cause_name": "HeadersTimeoutError",
+      "cause_code": "UND_ERR_HEADERS_TIMEOUT",
+      "cause_message": "Headers Timeout Error"
+    }
+  }
+]

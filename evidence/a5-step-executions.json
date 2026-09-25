@@ -1,0 +1,13 @@
+[
+  {
+    "stepExecutionId": "3b899f60-730a-4bb3-84fb-64daa70c1222",
+    "workItemId": "wi-define-108-a5",
+    "workflowRunId": "d6aa4207-a51b-4ef3-a0f5-1501677515fb",
+    "status": "failed",
+    "startedAt": "2026-09-21T08:28:11.146Z",
+    "endedAt": "2026-09-21T08:45:01.543Z",
+    "duration_s": 1010.4,
+    "failure": "workflow_error: Agent exhausted max_tokens without producing a result block (turn 19/24, stop_reason max_tokens)",
+    "tokens": "NOT PERSISTED"
+  }
+]

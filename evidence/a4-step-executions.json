@@ -1,0 +1,13 @@
+[
+  {
+    "stepExecutionId": "35859f52-43ad-4ffc-bf5e-0134ca70f535",
+    "workItemId": "wi-define-108-a4",
+    "workflowRunId": "051c2f65-cff7-472e-bda5-a4da12c78b8e",
+    "status": "failed",
+    "startedAt": "2026-09-20T19:20:39.279Z",
+    "endedAt": "2026-09-20T19:49:01.076Z",
+    "duration_s": 1701.8,
+    "failure": "workflow_error: Agent did not produce a result block within 24 turns",
+    "tokens": "NOT PERSISTED"
+  }
+]

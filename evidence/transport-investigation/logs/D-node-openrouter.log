@@ -1,0 +1,7 @@
+2026-09-25T05:58:22.885Z node v22.17.0 undici 6.21.2 — probe start
+2026-09-25T05:58:23.055Z GET /models -> 200, 460 models, 0.2s
+2026-09-25T05:58:24.897Z non-stream small completion -> 200 "undefined", usage_total_tokens=35, 1.8s
+2026-09-25T05:58:25.903Z stream: response status=200 headers at 1.0s
+2026-09-25T05:58:25.904Z stream: FIRST CHUNK at +1.01s
+2026-09-25T05:58:52.868Z stream: COMPLETED chunks=116 bytes=37025 total=28.0s ttft=1.01s largest_inter_chunk_gap=0.28s (at 2026-09-25T05:58:41.746Z)
+2026-09-25T05:58:52.868Z probe end

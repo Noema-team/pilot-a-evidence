@@ -1,0 +1,10 @@
+2026-09-25T05:57:38Z [C-start] openssl s_client to openrouter.ai:443 — POST Content-Length:1000000 never sent, hold 21min
+2026-09-25T05:57:38Z [C] Connecting to 2606:4700::6812:273
+2026-09-25T05:57:38Z [C] depth=2 C=US, O=Google Trust Services LLC, CN=GTS Root R4
+2026-09-25T05:57:38Z [C] verify return:1
+2026-09-25T05:57:38Z [C] depth=1 C=US, O=Google Trust Services, CN=WE1
+2026-09-25T05:57:38Z [C] verify return:1
+2026-09-25T05:57:38Z [C] depth=0 CN=openrouter.ai
+2026-09-25T05:57:38Z [C] verify return:1
+2026-09-25T05:57:53Z [C] read:errno=104
+2026-09-25T06:18:38Z [C-end] finished

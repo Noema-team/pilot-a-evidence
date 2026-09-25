@@ -1,0 +1,68 @@
+{
+  "cycle_id": "b89c4a29-1cbf-491e-9731-3744aaad2718",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-09-21T18:47:49.892Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "synthesize-definition",
+      "status": "failed",
+      "artifacts_written": [],
+      "started_at": "2026-09-21T18:47:49.894Z",
+      "completed_at": "2026-09-21T19:01:37.438Z",
+      "duration_ms": 827543
+    },
+    {
+      "id": "refine-definition",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "definition-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "apply-deferred-gaps",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "post-defer-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "prepare-human-decision",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "human-decision-checkpoint",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "apply-human-decision",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "post-human-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "record-exploration-need",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "commit",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

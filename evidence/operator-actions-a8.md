@@ -1,0 +1,11 @@
+# A8 — Operator/agent action log
+
+**Date:** 2026-09-21. All actions mechanical; no Definition or model output altered.
+
+| # | t (UTC) | Action | Notes |
+| --- | --- | --- | --- |
+| 1 | 14:40:32 | `execute-wi wi-define-108-a8` (frozen driver command) | Created `wi-exec-108` — but the driver AGAIN wrote the stale constant `definitionSource: {workItemId: 'wi-define-108'}` and crashed on the dependency FK. **Root cause: the E17 executeWi patch silently failed to apply** (single-line source formatting vs multi-line pattern; no assert). The seed + lifecycle fixes DID apply (`wi_completed_by_driver` fired). |
+| 2 | 14:41 | **Driver fix completed** (asserted this time): `dependencies: [defineWi]`, `definitionSource: {workItemId: defineWi}`, integrity journal line. **Driver hash deviates from the A8 prereg freeze: `baa18ac7…` → `d9d699c2c4b5ff52a09e4aa23fd31eddd0f311533b3edba4a5dda62671ac6db9`.** Deviation logged; the fix content is exactly the operator-sanctioned E17 correction. A9 must freeze `d9d699c2…`. |
+| 3 | 14:41 | **DB repair** (backup `/tmp/opencode/a8-pre-repair-db-backup.sqlite`): `definitionSource` → `wi-define-108-a8`; dependency edge inserted. Same accepted pattern as A7; before/after recorded. |
+| 4 | 15:06 | Decision `8b79bd7d…` (checkpoint) resolved `approve` — the resume path then FAILED deterministically (`no_scoping_draft`); the decision row remains **pending**, run **halted** at scoping.checkpoint — state preserved, no further mutation attempted. |
+| 5 | — | **Charter materialization deliberately NOT performed.** `scoping.produce`'s model output (12,426 bytes, preserved) declared its own artifact path `.sle/work/wi-define-108-a8/scoping.md` inside the SLE-OUTPUT envelope, while the step runner reports `artifacts_written: ['docs/cycle-charter.md']` (full-build-step-runner.ts:403) — a file nothing wrote. Placing the content would require choosing the path and stripping the envelope — human translation of artifact placement, which H1 forbids. Additionally, the charter's heading style (`## 1. Scope statement`) would fail `ScopingService.approve`'s `^#{1,3}\s*scope\b` validation even if placed — a second, prompt/validator contract mismatch. Both are recorded as findings, not repaired in-session. |

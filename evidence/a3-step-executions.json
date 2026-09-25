@@ -1,0 +1,12 @@
+[
+  {
+    "stepExecutionId": "e9e69433-2810-4fed-b519-f5726bd28da9",
+    "workItemId": "wi-define-108-a3",
+    "workflowRunId": "a1291db0-c410-4b11-921a-24ff59b35fef",
+    "status": "failed",
+    "startedAt": "2026-09-20T15:15:56.365Z",
+    "endedAt": "2026-09-20T15:36:27.477Z",
+    "duration_s": 1231.1,
+    "failure": "workflow_error: result repair exhausted (16 turns, 1 result-repair): facts.13.kind enum violation"
+  }
+]

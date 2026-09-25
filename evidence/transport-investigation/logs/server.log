@@ -1,0 +1,5 @@
+2026-09-25T05:56:43.133Z listening 0.0.0.0:8443
+2026-09-25T05:56:44.101Z REQ tag=selftest delay=5000ms remote=100.107.11.28 path=/delay20?d=5000&tag=selftest
+2026-09-25T05:56:49.127Z RESP tag=selftest held=5026ms -> 200
+2026-09-25T05:57:23.550Z REQ tag=B-curl delay=1200000ms remote=100.107.11.28 path=/delay20?d=1200000&tag=B-curl
+2026-09-25T06:17:23.563Z RESP tag=B-curl held=1200013ms -> 200

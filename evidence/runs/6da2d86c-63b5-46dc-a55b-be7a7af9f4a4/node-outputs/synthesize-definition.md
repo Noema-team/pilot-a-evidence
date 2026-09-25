@@ -1,0 +1,1 @@
+I have verified all the repository reality I need: the worker's failure publish, rag-api's failed branch, the envelope, the sweeper's conforming write, the persisted field contract, the client contract tests, and the workflow rules. Now I'll compose the Definition and submit.

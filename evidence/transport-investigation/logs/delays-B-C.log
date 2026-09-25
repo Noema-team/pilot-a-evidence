@@ -1,0 +1,17 @@
+2026-09-25T05:57:23Z [A-start] curl via FUNNEL (public TLS egress), delay=1200000ms
+A-RESULT code=000 total=0.000092s
+2026-09-25T05:57:23Z [A-end] curl exit=6 
+2026-09-25T05:57:23Z [B-start] curl via TAILNET-DIRECT control, delay=1200000ms
+B-RESULT code=200 total=1200.011080s
+2026-09-25T06:17:23Z [B-end] curl exit=0 ok-after-1200013ms
+2026-09-25T06:17:23Z [C-start] openssl s_client to openrouter.ai:443 — POST with Content-Length: 1000000, body never sent, hold 21min
+2026-09-25T06:17:23Z [C] Connecting to 2606:4700::6812:273
+2026-09-25T06:17:23Z [C] depth=2 C=US, O=Google Trust Services LLC, CN=GTS Root R4
+2026-09-25T06:17:23Z [C] verify return:1
+2026-09-25T06:17:23Z [C] depth=1 C=US, O=Google Trust Services, CN=WE1
+2026-09-25T06:17:23Z [C] verify return:1
+2026-09-25T06:17:23Z [C] depth=0 CN=openrouter.ai
+2026-09-25T06:17:23Z [C] verify return:1
+2026-09-25T06:17:38Z [C] read:errno=104
+2026-09-25T06:17:38Z [C-NOTE] notable line above
+2026-09-25T06:38:23Z [C-end] s_client probe finished

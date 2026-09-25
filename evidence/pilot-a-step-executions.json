@@ -1,0 +1,47 @@
+[
+ {
+  "work_item_id": "wi-define-108",
+  "step_id": "__start__",
+  "state": "failed",
+  "attempt": 1,
+  "failure_json": "{\"code\":\"workflow_error\",\"message\":\"LLM call failed: fetch failed\"}",
+  "started_at": "2026-09-19T09:14:01.005Z",
+  "completed_at": "2026-09-19T09:27:46.920Z"
+ },
+ {
+  "work_item_id": "wi-define-108-r2",
+  "step_id": "__start__",
+  "state": "failed",
+  "attempt": 1,
+  "failure_json": "{\"code\":\"adapter_exception\",\"message\":\"Error: ENOENT: no such file or directory, open '/home/theo/Documents/repos/pilot-a/student-platform/.sle/map.yaml'\"}",
+  "started_at": "2026-09-19T09:35:18.315Z",
+  "completed_at": "2026-09-19T09:47:14.707Z"
+ },
+ {
+  "work_item_id": "wi-define-108-r3",
+  "step_id": "__start__",
+  "state": "failed",
+  "attempt": 1,
+  "failure_json": "{\"code\":\"workflow_error\",\"message\":\"Agent did not produce a result block within 24 turns\"}",
+  "started_at": "2026-09-19T09:49:32.216Z",
+  "completed_at": "2026-09-19T09:58:05.429Z"
+ },
+ {
+  "work_item_id": "wi-define-108-r4",
+  "step_id": "__start__",
+  "state": "failed",
+  "attempt": 1,
+  "failure_json": "{\"code\":\"workflow_error\",\"message\":\"LLM call failed: fetch failed\"}",
+  "started_at": "2026-09-19T09:59:08.714Z",
+  "completed_at": "2026-09-19T10:09:11.142Z"
+ },
+ {
+  "work_item_id": "wi-define-108-r5",
+  "step_id": "__start__",
+  "state": "failed",
+  "attempt": 1,
+  "failure_json": "{\"code\":\"workflow_error\",\"message\":\"Submitted result was rejected by output contract 'definition' and result repair is exhausted (14 provider turn(s), 1 result-repair attempt(s)): Your submitted result was rejected by the output contract for 'definition'. Reason: the submitted result does not match the required semantic shape \u2014 goal: Required\\nRe-submit the complete corrected result in the same required shape. Do not change anything that was not rejected.\"}",
+  "started_at": "2026-09-19T10:11:11.866Z",
+  "completed_at": "2026-09-19T10:24:25.361Z"
+ }
+]

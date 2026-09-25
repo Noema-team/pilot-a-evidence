@@ -1,0 +1,12 @@
+{
+  "rule": "V2 consists of THREE evaluable runs: V2-1, V2-2, V2-3. Censored runs do not consume an evaluable slot. A genuine implementation defect stops the series for review. Otherwise execute all three, then assess the block.",
+  "frozen_before": "V2-2 execution (no optional-stopping decision after seeing V2-2 or V2-3)",
+  "dispositions": {
+    "attempt_19": "model-behavior failure (zero-text/model output) — evaluable",
+    "attempts_20_21": "TRANSPORT-CENSORED — do not consume evaluable slots",
+    "V2-1": "ACCEPTED as valid evaluable result — model-behavior failure at scoping.produce (charter omitted required '## Purpose'); transport healthy, output byte-intact, deterministic validation rejected genuinely incomplete model output. Qualification runs remain qualification evidence only; the fabricated-sha256 observation (run B) is preserved for grounding/tool-design work and does not alter V2-1's classification."
+  },
+  "baseline": "same frozen V2 treatment for V2-2 and V2-3: stratum @ f5734e40023173d5f255829cfc164ed9dbba2d8b, no Stratum changes, no prompt/validator/retry/tool reactions to V2-1",
+  "authorized_by": "operator ruling 2026-09-25",
+  "registered_at": "2026-09-25T17:10:00Z"
+}

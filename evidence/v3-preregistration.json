@@ -1,0 +1,13 @@
+{
+  "series": "V3 'bounded contract recovery'",
+  "baseline": "V2 exact baseline/configuration: stratum @ f5734e40023173d5f255829cfc164ed9dbba2d8b PLUS only the V3 repair mechanism (pending implementation review)",
+  "intervention": "ONE intervention only: when deterministic structural validation rejects an otherwise completed stage output, allow EXACTLY ONE validator-driven repair turn before declaring the stage failed. The repair turn receives: the model's submitted output/current artifact state, the exact deterministic validation errors, the frozen output contract, and an instruction to repair those violations without changing unrelated accepted material. The SAME validator reruns on the repair output: PASS -> stage continues; FAIL -> stage failure.",
+  "forbidden": "whole-agent-loop retries; prompt tuning; relaxed/weakened validation; deterministic auto-insertion of headings or artifacts; special-casing observed V2 failures ('## Purpose', 'docs/architecture.md') in normal generation prompts — the repair mechanism must be generic and validator-derived",
+  "evidence_preservation": "per rejected stage: original invalid output + validator findings + repair output + second validation result are all preserved and never overwritten",
+  "block_rule": "V3 consists of three evaluable runs. A stage receives at most one structural-repair turn following deterministic contract rejection. Censored runs do not consume an evaluable slot. A genuine implementation defect stops the series for review. Otherwise execute all three, then assess the block.",
+  "primary_outcomes_per_run": ["original output passed directly", "repair invoked", "repair passed", "stage ultimately reached", "final run disposition"],
+  "hypotheses": {"H1_shallow_compliance": "the model knows the material and can immediately repair an explicit missing heading/artifact", "H2_deeper_execution": "even when told exactly what deterministic requirement it violated, it still cannot reliably produce the required output"},
+  "attempt19": "left unresolved; revisit TEST/attempt-19 only after the contract-compliance blocker is tested",
+  "gate": "implementation review required before V3 execution",
+  "registered_at": "2026-09-25T19:35:00Z"
+}

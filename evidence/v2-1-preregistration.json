@@ -1,0 +1,20 @@
+{
+  "series": "V2-1",
+  "lineage": "a10 campaign attempts 11-21 (issue 108, H2 phase). Attempts 18/19: completed runs, attempt-19 zero-text TEST finding stands. Attempts 20/21: TRANSPORT-CENSORED (long-idle completion termination, layer unattributed). This series is NOT a continuation of that numbering.",
+  "authorized_change": "TRANSPORT ONLY: non-streaming JSON completions (stratum @ 3cb3ab8, the regime of attempts 11-21) replaced by the merged SSE streaming implementation (stratum @ f5734e40023173d5f255829cfc164ed9dbba2d8b, PR #46, live-qualified PASS 8/8 on real OpenRouter 2026-09-25).",
+  "frozen": {
+    "task_source_snapshot": "student-platform branch pilot-a/issue-108 @ 86ec0871d64ecca (clean tree; worker/main.py 95,897 B sha256 7d7718bc…; rag-api 579b0bdff…)",
+    "authority": "/tmp/opencode/a8-authority/.sle (definition 71f1c39c…, readiness b5a96b17…, db 393f2a5b…); define WI wi-define-108-a8, exec WI wi-exec-108",
+    "model": "z-ai/glm-5.3-flash via OpenRouter (OPENROUTER_API_KEY), provider-default sampling (temperature unset — campaign parity)",
+    "workflow": "A8 frozen Definition; planning_depth minimal; max_iterations 5; on_cap_hit halt; E21 synthesis gate 18/19; E23 compaction 49,152 B newest-first",
+    "budgets": {"define-work/synthesize-definition": 32768, "full-build/design": 32768, "full-build/plan": 32768, "full-build/test": 65536, "full-build/build": 65536},
+    "tools_policies": "standard AGENT_TOOLS + submit_result negotiation; worker-only positive EditPolicy (driver constant ATTEMPT19_EDIT_POLICY); restore-test-artifact from attempt-18 archive (requires exact archived row match)",
+    "rubric_oracle": "unchanged: restored independent suite b3b30497… + runtime behavior; H2 judged against ORIGINAL suite regardless of workflow completion"
+  },
+  "protocol": "AGENT-HANDOFF.md §4 verbatim; no retries, no fallback providers, no timeout-policy changes, no Funnel/network changes, no unrelated Stratum improvements",
+  "endpoint": "scoping -> design -> plan -> TEST finalization -> CONFIRM -> restore-test-artifact -> BUILD; primary observation: whether the streaming transport avoids the long-idle finalization censorship that censored attempts 20/21; secondary: model behavior under the identical task (attempt-19 zero-text finding is the standing comparison point)",
+  "abort_criteria": "any transport-censorship or implementation defect -> STOP, journal, no re-run without ruling; V2-2 only by explicit operator authorization",
+  "authorization": "operator ruling 2026-09-25 (PR #46 merge review): merge -> qualification PASS -> freeze V2 -> preregister V2-1 -> execute -> stop for result review",
+  "stratum_head": "f5734e40023173d5f255829cfc164ed9dbba2d8b",
+  "registered_at": "2026-09-25T12:40:00Z"
+}

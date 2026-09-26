@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-09-26T09:49:11.856Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-09-26T09:49:11.865Z","event":"decision_resolving","decisionId":"e89184f9-41d8-4723-aed0-09d51ddb53ee","optionId":"approve","rationale":"Operator approves cycle charter at scoping.checkpoint (frozen V3 procedure)"}
+[journal] {"ts":"2026-09-26T10:29:02.535Z","event":"decision_resumed","decisionId":"e89184f9-41d8-4723-aed0-09d51ddb53ee"}
+[journal] {"ts":"2026-09-26T10:29:02.539Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"test","iteration":1}]}

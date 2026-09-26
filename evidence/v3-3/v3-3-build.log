@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-09-26T11:07:08.956Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-09-26T11:07:08.966Z","event":"decision_resolving","decisionId":"a59e912b-0deb-4559-bd2a-128cb9edc726","optionId":"approve","rationale":"Operator approves confirm checkpoint (frozen V3 procedure); proceeding to build"}
+[journal] {"ts":"2026-09-26T11:50:34.594Z","event":"decision_resumed","decisionId":"a59e912b-0deb-4559-bd2a-128cb9edc726"}
+[journal] {"ts":"2026-09-26T11:50:34.597Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"build","iteration":1}]}

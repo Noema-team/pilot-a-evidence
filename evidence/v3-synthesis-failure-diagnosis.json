@@ -1,0 +1,75 @@
+{
+  "title": "Offline synthesis-failure diagnosis (V3 block, no model calls)",
+  "baseline_sha": "64cfb5caf314dad35d0d4dd24187e0e841f9fdfb",
+  "derived_entirely_from": ["v3-1/v3-1-sle-archive.tgz", "v3-2/v3-2-sle-archive.tgz", "v3-3/v3-3-sle-archive.tgz"],
+  "failure_class": "Synthesis completion-capacity exhaustion (finish_reason=length / max_tokens)",
+  "common_signature": {
+    "turns_taken": 19,
+    "synthesis_boundary": "E21 gate: tools withdrawn at turn 19 (18/19); turn 19 is the first synthesis completion",
+    "loop_reaction": "AgentLoop maps finish_reason length -> max_tokens and fails the step immediately, before transport parsing",
+    "validator_never_involved": true,
+    "structural_repair_never_eligible": true
+  },
+  "failed_syntheses": [
+    {
+      "run": "V3-1",
+      "run_id": "2aa3a92f-7870-4b0f-9cc8-2cf3447c9a28",
+      "stage": "plan",
+      "note": "CORRECTED ATTRIBUTION: design PASSED and published docs/requirements.md + docs/architecture.md (artifact rows produced-file:design:*, hashes f13f35946993/cdbc6340773f). The failure is at PLAN. The step_executions row labeled 'design' is the resume-dispatch aggregate row closed at run end with the run-terminal failure message — not a per-step engine record.",
+      "requested_max_tokens": 32768,
+      "turn": 19,
+      "partial_visible_bytes": 0,
+      "text_length": 0,
+      "sle_envelope_began": false,
+      "truncation_location": "nothing emitted: zero visible text from the synthesis completion (reasoning-only burn cannot be ruled out; per-completion usage detail not retained)",
+      "sub_signature": "ZERO-TEXT — matches the unresolved attempt-19 TEST signature; now replicated at plan",
+      "e23_compaction": null,
+      "raw_sse_usage_fields": "NOT RETAINED (driver runs the production transport without an SSE tee; only loop totals survive)",
+      "headroom": "not derivable from retained evidence (no per-completion prompt/completion/reasoning split)"
+    },
+    {
+      "run": "V3-2",
+      "run_id": "58232065-c773-4179-bfbd-de9348344b7e",
+      "stage": "test",
+      "requested_max_tokens": 65536,
+      "turn": 19,
+      "partial_visible_bytes": 2447,
+      "sle_envelope_began": false,
+      "truncation_location": "pre-envelope prose (no <<<SLE-OUTPUT>>> marker present in the partial)",
+      "sub_signature": "PARTIAL-TEXT pre-envelope",
+      "e23_compaction": {"phase": "synthesis", "policy": "newest-first", "budget_bytes": 49152, "original_read_result_bytes": 4748, "retained_read_result_bytes": 4748, "elided_result_count": 0, "retained_result_count": 2},
+      "raw_sse_usage_fields": "NOT RETAINED",
+      "headroom": "not derivable"
+    },
+    {
+      "run": "V3-3",
+      "stage": "build",
+      "requested_max_tokens": 65536,
+      "turn": 19,
+      "partial_visible_bytes": 10462,
+      "sle_envelope_began": false,
+      "truncation_location": "pre-envelope prose (no <<<SLE-OUTPUT>>> marker present in the partial)",
+      "sub_signature": "PARTIAL-TEXT pre-envelope",
+      "e23_compaction": {"phase": "synthesis", "policy": "newest-first", "budget_bytes": 49152, "original_read_result_bytes": 270549, "retained_read_result_bytes": 47129, "elided_result_count": 5, "retained_result_count": 4},
+      "raw_sse_usage_fields": "NOT RETAINED",
+      "headroom": "not derivable"
+    }
+  ],
+  "successful_synthesis_reference_point": {
+    "run": "V3-3",
+    "stage": "test",
+    "node_output_bytes": 41742,
+    "sle_envelope": "complete (<<<SLE-OUTPUT>>> ... <<<END-SLE-OUTPUT>>>)",
+    "implication": "the model CAN serialize very large results when a single synthesis completion suffices; ~41.7 KB of output text fit inside the 65536-token test budget"
+  },
+  "causal_statements_allowed": [
+    "3/3 runs failed at the E21-forced synthesis turn with finish_reason mapped to max_tokens",
+    "the loop fails the stage immediately on that terminal state; the E21 turns after 19 are unusable for finishing a truncated artifact",
+    "two of three failures died BEFORE the result envelope began; one emitted no visible text at all"
+  ],
+  "causal_statements_NOT_justified": [
+    "the per-completion cap is 'definitely too small' (no completion/reasoning token split retained)",
+    "any allocation between artifact length vs reasoning burn vs provider limits"
+  ],
+  "v4_hypothesis": "The agent has done sufficient investigation; ONE synthesis completion is insufficient to serialize the result. One bounded continuation of the same synthesis state (no tools, same contract, same validation) converts E21's nominal remaining turns into real capacity. Zero-text syntheses are NOT eligible (nothing meaningful to continue)."
+}

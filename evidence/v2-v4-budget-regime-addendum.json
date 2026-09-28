@@ -1,0 +1,17 @@
+{
+  "addendum": "protocol-qualification: completion-budget regime of V2-V4",
+  "ts": "recorded at V5 preparation; findings discovered by the V4-D1 diagnostic probe (baseline fecfef32, run a001ea0f)",
+  "discovery": "The pilot procedure wrote per-stage completion budgets to student-platform .sle/settings.json as FLAT keys (workflow_max_tokens_define/design/plan/test/build). Stratum's settings contract (E15/A6, AgentRunner.resolveWorkflowBudgetOverridesFromSettings) reads a workflow_max_tokens MAP keyed exactly 'workflowId/stepId'. Flat keys are unknown settings keys — silently ignored by contract (strict reader: absent/invalid map → global budget applies).",
+  "actual_regime": "Every V2, V3, and V4 run (including the V4-D1 probe) executed ALL workflow stages at the driver's global max_tokens = 16384 (pilot-a-driver.ts line 79), for every step including build/test. Wire proof from V4-D1: design synthesis completion_tokens = 16384 exactly, finish_reason length; driver journal 'provider_resolved maxTokens 16384' present in every run.",
+  "consequences": {
+    "historical_evidence": "Historical run evidence, dispositions, and archive records remain UNCHANGED and stand as measured against actual wire behavior.",
+    "comparisons": "V2→V3→V4 comparisons remain valid under a common actual 16,384-token completion regime (uniform across stages), which the blocks were NOT designed around but did in fact share.",
+    "withdrawn_claim": "Any claim that V2/V3/V4 runs exercised the intended 32,768 (define/design/plan) or 65,536 (test/build) per-step budgets is WITHDRAWN.",
+    "attribution": "This is a frozen-PROCEDURE defect (experiment driver/config authoring), NOT a Stratum implementation defect: Stratum's documented fail-closed contract behaved exactly as specified; the procedure never satisfied it."
+  },
+  "rules": [
+    "Do not rewrite old preregistrations (V3/V4 prereg files stay frozen as written).",
+    "This addendum plus the run-journal entry are the correction of record.",
+    "V5 targets the ACTUAL regime: only full-build/design 16384 → 32768 via the real settings map shape."
+  ]
+}

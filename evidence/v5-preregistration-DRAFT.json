@@ -1,0 +1,60 @@
+{
+  "preregistration": "V5 \u2014 DESIGN-only completion-capacity intervention",
+  "status": "DRAFT \u2014 NOT FROZEN (frozen only after operator gate review; baseline SHA bound at freeze)",
+  "proposed_baseline": "merge of PR #51 (feat/v5-budget-preflight, head 19ba3cf64e642b97440daf0de88ecbb7ddef1a8d, test-only) on top of fecfef32; exact merge SHA bound at freeze",
+  "single_intervention": {
+    "what": "full-build/design completion ceiling 16384 \u2192 32768 \u2014 the ONLY change relative to the actual V4 regime",
+    "how": "student-platform .sle/settings.json gains the real map: {\"workflow_max_tokens\": {\"full-build/design\": 32768}}; global runner budget stays 16384",
+    "mechanical_proof": "PR #51 tests V5-PF.1..4 drive the real AgentRunner budget path with a capturing provider: design=32768, plan=16384, flat-key shape NOT mistaken for the override, invalid entries fail closed"
+  },
+  "frozen_unchanged": [
+    "target student-platform @ 86ec0871 pristine procedure",
+    "model z-ai/glm-5.3-flash via OpenRouter (routing untouched)",
+    "temperature/config",
+    "prompts",
+    "tools",
+    "authority wi-define-108-a8 / 71f1c39c\u2026",
+    "E21 synthesis boundary turns 1-18 / first synthesis turn 19",
+    "E23 read-result compaction 49,152 B",
+    "V3 structural repair",
+    "V4 partial-text continuation",
+    "V4-D1 wire observation",
+    "EditPolicy worker-only / Gate B oracle / full-build workflow",
+    "NO reasoning or reasoning_effort request field; NO metadata headers"
+  ],
+  "causal_question": "Does increasing only the first DESIGN synthesis completion capacity from 16,384 to 32,768 convert the repeatable zero-visible-output reasoning-exhaustion class into visible/direct or V4-continuable synthesis?",
+  "runs": {
+    "count": 3,
+    "evaluable_only": true
+  },
+  "per_run_record": [
+    "stage / turn",
+    "requested max_tokens",
+    "finish reason",
+    "content bytes",
+    "reasoning chunks / bytes / fields",
+    "completion tokens",
+    "reasoning tokens (provider counters treated as NON-AUTHORITATIVE when internally inconsistent)",
+    "prompt / total tokens",
+    "stream model/provider identity when supplied (provider null = unknown)",
+    "V4 continuation eligibility / firing / result",
+    "structural-repair invocation / result",
+    "furthest stage",
+    "disposition",
+    "transport health",
+    "target integrity hashes"
+  ],
+  "hypotheses": {
+    "H_capacity": "The 16,384 ceiling was causally limiting; 32,768 produces direct visible synthesis or moves DESIGN into V4's eligible partial-text continuation class.",
+    "H_expand": "Reasoning expands to consume the 32,768 ceiling and DESIGN remains zero-visible-output.",
+    "H_move": "DESIGN clears and the first failure moves downstream.",
+    "H_other": "A different failure class appears."
+  },
+  "carried_rules": [
+    "transport-censored runs do not consume an evaluable slot",
+    "implementation/evidence/procedure defect \u2192 STOP block immediately",
+    "ordinary model/workflow failures consume a slot",
+    "no tuning between evaluable runs",
+    "after exactly three evaluable runs \u2192 STOP for block review"
+  ]
+}

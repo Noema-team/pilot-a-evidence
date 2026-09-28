@@ -1,0 +1,59 @@
+{
+  "preregistration": "V4 — bounded synthesis continuation (frozen before first V4 model run)",
+  "frozen_at": "2026-09-28T00:00:00Z",
+  "implementation": {
+    "merge_sha": "e039c73bacb7ac499bab279c825818e3dc4163d1",
+    "pr": 48,
+    "merge_parents": ["64cfb5caf314dad35d0d4dd24187e0e841f9fdfb", "92b9f9926de59fa1ce8fcca979b9978e40367383"],
+    "review": "APPROVED at head 92b9f99 (V4.1–V4.14 suite 14/14; suite 1794/0; tsc clean; CI green)"
+  },
+  "single_intervention": {
+    "definition": "ONE bounded tool-less continuation, available ONLY for a provider result on the FIRST synthesis completion (turn = E21 threshold+1, inside the frozen 24-turn cap) that terminates with stop_reason=max_tokens AND carries NON-EMPTY visible text AND carries ZERO tool requests. The continuation is one direct completeMultiTurn: same synthesis state (history + segment1 as the assistant turn + one frozen mechanism-generic instruction), tools: [], identical budget/sampling. The merged candidate (segment1+segment2, in order) enters the ordinary parse path with unchanged validators.",
+    "fail_closed_on": [
+      "second max_tokens on the continuation",
+      "any non-terminal continuation state, including any tool request (independently of stop_reason)",
+      "continuation transport failure (ordinary transport classification)",
+      "unparseable merged candidate (ordinary format-repair machinery)",
+      "zero-text synthesis truncation (nothing to continue — legacy failure; the attempt-19/V3-1-plan signature)",
+      "truncated first synthesis completion carrying tool requests (mixed state — dedicated diagnostic, no continuation call)",
+      "max_tokens on any LATER synthesis turn (e.g. after an ordinary format repair — legacy failure, never continued)",
+      "steps/turns outside the eligibility predicate or undeclared steps (byte-for-byte legacy)"
+    ],
+    "evidence": "<node>.synthesis-continuation.json persisted for every fired continuation (both segments VERBATIM, per-segment byte counts, continuation terminal state); never overwritten; preserved alongside the ordinary node outputs and archives"
+  },
+  "frozen_configuration": {
+    "stratum_sha": "e039c73bacb7ac499bab279c825818e3dc4163d1",
+    "target": "student-platform @ 86ec0871 + git clean -fdx before each run",
+    "authority": "/tmp/opencode/a8-authority/.sle (A10 instantiate wi-define-108-a8, definition sha256 71f1c39c…)",
+    "model": "z-ai/glm-5.3-flash via OpenRouter (identifier unchanged)",
+    "budgets_workflow_max_tokens": {"define-work/synthesize-definition": 32768, "full-build/design": 32768, "full-build/plan": 32768, "full-build/test": 65536, "full-build/build": 65536},
+    "per_completion_ceiling": "unchanged — the continuation reuses the step's own budget; NO max_tokens raise anywhere",
+    "prompts": "unchanged (normal stage instructions; no new emphasis, no V2/V3 failure-specific guidance, no continuation-specific coaching beyond the frozen mechanism instruction in code)",
+    "tools_policies": "unchanged (E21 gate 18/19, E23 compaction 49152 B newest-first, worker-only positive EditPolicy, planning_depth minimal, max_iterations 5, on_cap_hit halt)",
+    "validators_oracle": "unchanged (charter structure, producer contracts, Gate B, EXEC/validation)",
+    "workflow": "unchanged (full-build; PR #47 structuralRepair declarations unchanged — scoping.produce/design/plan)",
+    "transport": "unchanged streaming regime (PR #46 wiring)",
+    "declared_steps": ["scoping.produce", "design", "plan", "test", "build"]
+  },
+  "runs": {"count": 3, "ids": ["V4-1", "V4-2", "V4-3"], "no_tuning_between_runs": true},
+  "per_run_outcomes_frozen": {
+    "stage_reached": "furthest workflow stage",
+    "truncation_observed": "which stage(s), requested max_tokens, partial visible bytes, zero-text vs partial-text",
+    "continuation_fired": "true/false + ineligibility reason when false (zero-text / later-synthesis-turn / mixed tool state / policy-not-reached)",
+    "continuation_terminal": "end_turn | max_tokens | other | transport_failure",
+    "continuation_adopted": "merged candidate accepted by the ordinary parse+validators, or rejected with the ordinary reason",
+    "structural_repair_invoked": "unchanged V3 mechanism — expected false unless a completed output is structurally rejected (would be its first natural exercise)",
+    "final_disposition": "evaluable (model/workflow failure or success) | censored (per frozen definition) | implementation-defect (STOP)"
+  },
+  "hypotheses": {
+    "H_V4_primary": "The observed 3/3 V3 failure class (synthesis completion-capacity exhaustion at the E21 boundary) is convertible: a single tool-less continuation of a non-empty tool-less truncated first synthesis completion lets the stage complete through the unchanged validators.",
+    "H_V4_discrimination": "Failures that persist under V4 will separate into (a) zero-text truncations (not continuable by design — tests whether the attempt-19 class is capacity or content), (b) second-truncations (one continuation insufficient — evidence for a capacity ceiling), (c) later-stage failures (the bottleneck moved), vs (d) full runs reaching completion."
+  },
+  "stop_rules": {
+    "censoring": "genuinely transport-censored runs are archived/classified censored and do not consume an evaluable slot; continue per the frozen censoring rule",
+    "implementation_defect": "evidence of an actual Stratum/V4 implementation defect STOPs the entire block immediately; preserve all evidence; no patch-and-continue",
+    "model_workflow_failure": "including an invoked-and-failed continuation, is an evaluable result: archive, count, proceed — no tuning",
+    "do_not_stop_between_runs": "interesting/surprising/successful/unsuccessful evaluable results do not pause the block"
+  },
+  "gate": "no V4-1 execution until the operator reviews this preregistration and the recorded merge SHA"
+}

@@ -1,0 +1,103 @@
+{
+  "cycle_id": "b302cb16-8fc1-4d34-8988-2d90726e5040",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-09-28T12:16:52.627Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "scoping.gather",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-09-28T12:16:52.628Z",
+      "completed_at": "2026-09-28T12:16:52.628Z"
+    },
+    {
+      "id": "scoping.produce",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/cycle-charter.md"
+      ],
+      "started_at": "2026-09-28T12:16:52.629Z",
+      "turns_taken": 19,
+      "tool_calls": 20,
+      "completed_at": "2026-09-28T12:21:38.983Z"
+    },
+    {
+      "id": "scoping.checkpoint",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-09-28T12:21:38.986Z",
+      "completed_at": "2026-09-28T12:26:11.456Z"
+    },
+    {
+      "id": "design",
+      "status": "failed",
+      "artifacts_written": [],
+      "started_at": "2026-09-28T12:26:11.462Z",
+      "completed_at": "2026-09-28T12:42:50.636Z",
+      "duration_ms": 999173
+    },
+    {
+      "id": "critique",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "plan",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "test",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "sharding_approval",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "confirm",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "build",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "exec",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "validation_gate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "debug",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "evaluate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "summarise",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "snapshot",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "preregistration": "V5 \u2014 DESIGN-only completion-capacity intervention",
+  "status": "FROZEN \u2014 pre-execution freeze after operator gate package approval",
+  "frozen_at": "2026-09-29T10:03:38.102739+00:00",
+  "implementation_baseline": {
+    "stratum_sha": "cf4926be6ee58d9a3aa077ffc4719f38c6931a32",
+    "merge_parents": [
+      "fecfef32676e5c9e63cb12846d8462446d8bc7e1",
+      "5ec2abff4b7a1e27a5effd29a5b49bc037a7dd08"
+    ],
+    "tree_equivalence": "git diff 5ec2abf\u2026 cf4926be\u2026 is empty \u2014 no merge drift",
+    "preflight_pr": 51
+  },
+  "frozen_configuration": {
+    "target": "student-platform @ 86ec0871 (pristine reset + clean -fdx before each run)",
+    "settings_file_sha256": "8d963b03b7a254778888e725fb5f46ca3b66b9431382648e2a62076d967decc4",
+    "settings_archive": "evidence/v5-frozen-config/settings.json (complete file, not a fragment)",
+    "settings_normalization_note": "Configuration normalization only; the removed flat keys are proven inert by V5-PF.2. The sole effective V5 intervention is addition of workflow_max_tokens[\"full-build/design\"] = 32768.",
+    "model": "z-ai/glm-5.3-flash",
+    "provider_path": "OpenRouter, routing behavior unchanged; no metadata headers",
+    "global_runner_max_tokens": 16384,
+    "design_override": {
+      "workflow_max_tokens": {
+        "full-build/design": 32768
+      }
+    },
+    "effective_budgets": "full-build/design = 32768; all other non-overridden steps = 16384",
+    "temperature": "unchanged",
+    "prompts": "unchanged",
+    "tools": "unchanged",
+    "authority": "wi-define-108-a8 / definition sha256 71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+    "E21": "synthesis boundary turns 1-18 investigation; first synthesis turn = 19",
+    "E23": "read-result compaction budget 49,152 B (newest-first)",
+    "edit_policy": "worker-only (apps/ai-server/rag-worker-service/main.py)",
+    "gate_b": "oracle unchanged (probe 4213/4000, verbatim)",
+    "v3_structural_repair": "unchanged",
+    "v4_continuation": "unchanged (partial-text, tool-less, single)",
+    "v4d1_wire_observation": "present on every completion",
+    "excluded_requests": [
+      "no reasoning field",
+      "no reasoning_effort field",
+      "no routing-metadata request header",
+      "no other budget changes"
+    ]
+  },
+  "mechanical_budget_proof": {
+    "method": "real AgentRunner path (settings reader \u2192 completionBudgetFor \u2192 AgentLoop \u2192 MultiTurnParams) with a capturing provider, against the byte-exact archived settings file, AFTER instantiate + config normalization + execute-wi",
+    "result": {
+      "full-build/design": 32768,
+      "full-build/plan": 16384
+    }
+  },
+  "causal_question": "Does increasing only the first DESIGN synthesis completion capacity from 16,384 to 32,768 convert the repeatable zero-visible-output reasoning-exhaustion class into visible/direct or V4-continuable synthesis?",
+  "hypotheses": {
+    "H_capacity": "Raising DESIGN's request ceiling from 16,384 to 32,768 changes the first DESIGN synthesis from zero-visible-output exhaustion to either a directly completed synthesis or a non-zero partial synthesis eligible for the already-frozen V4 continuation.",
+    "H_expand": "DESIGN again exhausts its completion ceiling with zero or negligible visible synthesis while reasoning activity expands into the increased capacity.",
+    "H_move": "DESIGN clears and the first workflow failure moves downstream.",
+    "H_other": "A materially different failure class occurs.",
+    "interpretation_bound": "No result is phrased as proving necessity or sufficiency beyond what the single-step intervention directly supports."
+  },
+  "runs": {
+    "count": 3,
+    "evaluable_only": true
+  },
+  "accounting_rules": [
+    "transport-censored run \u2192 archive, does not consume a slot",
+    "implementation/evidence/procedure defect \u2192 STOP whole block immediately",
+    "ordinary model/workflow failure \u2192 consumes an evaluable slot",
+    "success \u2192 consumes an evaluable slot",
+    "no tuning or config changes between evaluable runs",
+    "after exactly 3 evaluable runs \u2192 STOP for block review"
+  ],
+  "per_run_evidence": {
+    "identity_config": [
+      "Stratum baseline SHA",
+      "target SHA",
+      "complete settings file + hash",
+      "requested effective budget for each reached step",
+      "run ID"
+    ],
+    "synthesis_completion": [
+      "stage",
+      "turn",
+      "requested max_tokens",
+      "finish reason",
+      "visible content_bytes",
+      "tool-call fragment count",
+      "reasoning chunks",
+      "reasoning bytes",
+      "reasoning fields",
+      "completion tokens",
+      "reasoning tokens",
+      "prompt tokens",
+      "total tokens",
+      "stream id",
+      "model",
+      "provider when supplied"
+    ],
+    "counter_policy": "Provider usage counters are non-authoritative when internally inconsistent; raw bounded values preserved, no forced arithmetic interpretations.",
+    "treatment_evidence": [
+      "V4 continuation eligible?",
+      "continuation fired?",
+      "continuation terminal state",
+      "adopted/rejected",
+      "structural repair invoked/result",
+      "furthest stage reached",
+      "final disposition",
+      "transport health",
+      "Gate B",
+      "target integrity hashes"
+    ],
+    "privacy": "Never persist reasoning payload text \u2014 counts/bytes/usage only."
+  },
+  "supersedes": "evidence/v5-preregistration-DRAFT.json (draft, journal b09fd42) \u2014 H-capacity reworded to the mechanically observable phrasing at operator direction; no other semantic change"
+}

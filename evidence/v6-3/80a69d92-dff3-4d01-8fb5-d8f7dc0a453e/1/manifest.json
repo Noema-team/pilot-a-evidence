@@ -1,0 +1,119 @@
+{
+  "cycle_id": "80a69d92-dff3-4d01-8fb5-d8f7dc0a453e",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-09-30T19:48:57.512Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "scoping.gather",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-09-30T19:48:57.514Z",
+      "completed_at": "2026-09-30T19:48:57.515Z"
+    },
+    {
+      "id": "scoping.produce",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/cycle-charter.md"
+      ],
+      "started_at": "2026-09-30T19:48:57.516Z",
+      "turns_taken": 19,
+      "tool_calls": 26,
+      "completed_at": "2026-09-30T19:54:44.057Z"
+    },
+    {
+      "id": "scoping.checkpoint",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-09-30T19:54:44.060Z",
+      "completed_at": "2026-09-30T19:59:06.593Z"
+    },
+    {
+      "id": "design",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/requirements.md",
+        "docs/architecture.md"
+      ],
+      "started_at": "2026-09-30T19:59:06.599Z",
+      "turns_taken": 20,
+      "tool_calls": 28,
+      "completed_at": "2026-09-30T20:16:46.321Z"
+    },
+    {
+      "id": "critique",
+      "status": "skipped",
+      "artifacts_written": [],
+      "completed_at": "2026-09-30T20:16:46.324Z",
+      "skip_reason": "condition_not_met"
+    },
+    {
+      "id": "plan",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/plan.md",
+        "docs/test-plan.md"
+      ],
+      "started_at": "2026-09-30T20:16:46.325Z",
+      "turns_taken": 19,
+      "tool_calls": 31,
+      "completed_at": "2026-09-30T20:27:22.897Z"
+    },
+    {
+      "id": "test",
+      "status": "failed",
+      "artifacts_written": [],
+      "started_at": "2026-09-30T20:27:22.902Z",
+      "completed_at": "2026-09-30T20:36:39.146Z",
+      "duration_ms": 556243
+    },
+    {
+      "id": "sharding_approval",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "confirm",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "build",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "exec",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "validation_gate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "debug",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "evaluate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "summarise",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "snapshot",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

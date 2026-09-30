@@ -1,0 +1,55 @@
+{
+  "node_id": "scoping.produce",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 4,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": ".",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 1
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 3
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 646,
+    "reasoning_bytes": 29820,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 10070,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 3073,
+    "reasoning_tokens": 1070,
+    "prompt_tokens": 7749,
+    "total_tokens": 10822,
+    "stream_id": "gen-1790794604-i7AXz2AtHBCGNetGYOsS",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

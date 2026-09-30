@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-09-30T19:06:45.143Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-09-30T19:06:45.154Z","event":"decision_resolving","decisionId":"922186dd-98b0-42ed-a298-d8caed272124","optionId":"approve","rationale":"V6-1 preregistered operator checkpoint: charter accepted under frozen preregistration 09ae1777 (baseline cf4926be, plan budget 32768)"}
+[journal] {"ts":"2026-09-30T19:22:50.300Z","event":"decision_resumed","decisionId":"922186dd-98b0-42ed-a298-d8caed272124"}
+[journal] {"ts":"2026-09-30T19:22:50.303Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"test","iteration":1}]}

@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-09-30T13:13:03.780Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-09-30T13:13:03.789Z","event":"decision_resolving","decisionId":"a1f00920-de67-4d8e-8564-f1f15aa5d1b5","optionId":"approve","rationale":"V5-2 preregistered operator confirm checkpoint: proceeding to build under frozen preregistration dccf6f98"}
+[journal] {"ts":"2026-09-30T13:19:15.076Z","event":"decision_resumed","decisionId":"a1f00920-de67-4d8e-8564-f1f15aa5d1b5"}
+[journal] {"ts":"2026-09-30T13:19:15.106Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"build","iteration":1}]}

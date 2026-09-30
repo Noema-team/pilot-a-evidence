@@ -1,0 +1,64 @@
+{
+  "preregistration": "V6 \u2014 PLAN-only completion-capacity intervention (DESIGN 32k retained)",
+  "status": "FROZEN \u2014 pre-execution freeze; STOP before V6-1 for operator approval",
+  "frozen_at": "2026-09-30T17:10:36.356532+00:00",
+  "implementation_baseline": {
+    "stratum_sha": "cf4926be6ee58d9a3aa077ffc4719f38c6931a32",
+    "note": "unchanged from V5 \u2014 V6 is configuration-only; no new stratum code, no new PRs"
+  },
+  "frozen_configuration": {
+    "target": "student-platform @ 86ec0871 (pristine reset + clean -fdx before each run)",
+    "settings_file_sha256": "7c07804a298c2de9ccc9743bd0cb6924f21a353a9040f7d31d345aeff5a52a28",
+    "settings_archive": "evidence/v6-frozen-config/settings.json (complete file)",
+    "effective_budgets": {
+      "full-build/design": 32768,
+      "full-build/plan": 32768,
+      "all other non-overridden steps (incl. test, build)": 16384,
+      "global_runner_max_tokens": 16384
+    },
+    "sole_V6_intervention": "full-build/plan 16384 \u2192 32768 (added alongside the retained V5 design override)",
+    "model": "z-ai/glm-5.3-flash via OpenRouter, routing unchanged, no metadata headers",
+    "temperature_prompts_tools": "unchanged",
+    "authority": "wi-define-108-a8 / 71f1c39c97ec\u2026",
+    "E21": "turns 1-18 investigation, first forced synthesis turn 19 (early natural completion remains legal, as established in V5 review)",
+    "E23": "49,152 B newest-first",
+    "v3_structural_repair": "unchanged (receives its stage's budget: a 32k PLAN gives the repair turn 32k)",
+    "v4_continuation": "unchanged",
+    "v4d1_wire_observation": "present",
+    "excluded": [
+      "no reasoning/reasoning_effort fields",
+      "no other budget changes",
+      "no empty-output retry mechanism",
+      "no BUILD/TEST changes"
+    ]
+  },
+  "mechanical_budget_proof": {
+    "method": "real AgentRunner path with capturing provider against the byte-exact archived V6 settings, after instantiate + config write + execute-wi",
+    "result": {
+      "full-build/design": 32768,
+      "full-build/plan": 32768,
+      "full-build/build": 16384
+    }
+  },
+  "causal_question": "With DESIGN retained at 32,768, does raising PLAN's request ceiling from 16,384 to 32,768 make PLAN a reliable stage \u2014 producing a valid complete contract directly or through the already-frozen structural repair \u2014 and move the stopping frontier downstream?",
+  "hypotheses": {
+    "H_plan_progress": "Adding the 32,768 PLAN budget increases downstream progression relative to V5, with PLAN producing a valid complete contract either directly or through the already-frozen structural repair.",
+    "H_plan_persist": "PLAN still fails through contract incompleteness, empty terminal output, or another non-capacity class despite the larger request ceiling.",
+    "H_move": "PLAN clears and the stopping frontier moves to TEST/BUILD or later.",
+    "H_build_A": "If BUILD is reached at its unchanged 16,384 ceiling, A-class zero-visible-output exhaustion may recur. OBSERVATIONAL ONLY \u2014 explicitly NOT a V6 success/failure criterion; an expected downstream BUILD failure must not be counted against the PLAN intervention."
+  },
+  "runs": {
+    "count": 3,
+    "evaluable_only": true
+  },
+  "accounting_rules": [
+    "transport-censored run \u2192 archive, does not consume a slot",
+    "implementation/evidence/procedure defect \u2192 STOP whole block immediately",
+    "ordinary model/workflow failure or success \u2192 consumes an evaluable slot",
+    "no tuning or config changes between evaluable runs",
+    "after exactly 3 evaluable runs \u2192 STOP for block review",
+    "per-run: requested max_tokens from the actual provider call recorded for every reached synthesis turn"
+  ],
+  "per_run_evidence": "same fields as V5 (identity/config incl. full settings hash; synthesis-completion wire observation; provider counters non-authoritative when internally inconsistent; V4/V3 involvement; furthest stage; disposition; transport health; Gate B; target integrity). Never persist reasoning payload text.",
+  "interpretation_bound": "No result phrased as proving necessity/sufficiency beyond what the single-stage intervention supports; stage-generalization language (not controlled-experiment language) for cross-stage contrasts."
+}

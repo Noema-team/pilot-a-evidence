@@ -1,0 +1,95 @@
+{
+  "cycle_id": "17bb46ec-8c79-43cf-9e1b-886464eba9bb",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-09-30T19:38:01.550Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "scoping.gather",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-09-30T19:38:01.550Z",
+      "completed_at": "2026-09-30T19:38:01.551Z"
+    },
+    {
+      "id": "scoping.produce",
+      "status": "failed",
+      "artifacts_written": [],
+      "started_at": "2026-09-30T19:38:01.551Z",
+      "completed_at": "2026-09-30T19:40:08.886Z",
+      "duration_ms": 127334
+    },
+    {
+      "id": "scoping.checkpoint",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "design",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "critique",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "plan",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "test",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "sharding_approval",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "confirm",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "build",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "exec",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "validation_gate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "debug",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "evaluate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "summarise",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "snapshot",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

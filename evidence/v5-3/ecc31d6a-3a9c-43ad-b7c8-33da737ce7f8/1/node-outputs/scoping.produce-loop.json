@@ -1,0 +1,166 @@
+{
+  "node_id": "scoping.produce",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 19,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": ".",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs/task-management",
+      "turn": 4
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service",
+      "turn": 7
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/exceptions.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/pytest.ini",
+      "turn": 8
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/workers",
+      "turn": 9
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests",
+      "turn": 9
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests/integration",
+      "turn": 10
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 10
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 11
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 11
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 12
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 13
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 14
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 15
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 16
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 17
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/models/resource.py",
+      "turn": 17
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs/archive",
+      "turn": 18
+    }
+  ],
+  "context_compaction": {
+    "phase": "synthesis",
+    "policy": "newest-first",
+    "budget_bytes": 49152,
+    "original_read_result_bytes": 91214,
+    "retained_read_result_bytes": 0,
+    "elided_result_count": 1,
+    "retained_result_count": 0,
+    "elided": [
+      {
+        "path": "apps/ai-server/rag-api-service/main.py",
+        "bytes": 91214,
+        "sha256": "579b0bdfff8f97ee81112251ec7380b392f4aa7c38d216cd56d1782a34ed2744"
+      }
+    ]
+  },
+  "wire_observation": {
+    "reasoning_chunks": 21062,
+    "reasoning_bytes": 794689,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 10953,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 12978,
+    "reasoning_tokens": 10531,
+    "prompt_tokens": 29807,
+    "total_tokens": 42785,
+    "stream_id": "gen-1790774841-WDRbVsicmdWbzzt5yzaT",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Novita"
+  }
+}

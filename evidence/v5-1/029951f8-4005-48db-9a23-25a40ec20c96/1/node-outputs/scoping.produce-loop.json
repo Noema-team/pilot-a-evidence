@@ -1,0 +1,100 @@
+{
+  "node_id": "scoping.produce",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 11,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": ".",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 3
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs/task-management",
+      "turn": 4
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 5
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service",
+      "turn": 6
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 7
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/models/resource.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_file",
+      "path": "AGENTS.md",
+      "turn": 9
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 344,
+    "reasoning_bytes": 15140,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 10845,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 2905,
+    "reasoning_tokens": 478,
+    "prompt_tokens": 56791,
+    "total_tokens": 59696,
+    "stream_id": "gen-1790766943-eT4y0uQQm0dFyCcbVn5f",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

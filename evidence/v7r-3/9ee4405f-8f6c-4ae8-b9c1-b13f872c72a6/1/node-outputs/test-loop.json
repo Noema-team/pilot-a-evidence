@@ -1,0 +1,194 @@
+{
+  "node_id": "test",
+  "failed": true,
+  "result_transport": "textual-sle-output",
+  "turns_taken": 20,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service",
+      "turn": 2
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 4
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests",
+      "turn": 6
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/tests/conftest.py",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests/unit",
+      "turn": 7
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/tests/unit/test_processing_lease.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/models/resource.py",
+      "turn": 9
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/pytest.ini",
+      "turn": 10
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests/integration",
+      "turn": 10
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests/fixtures",
+      "turn": 11
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/exceptions.py",
+      "turn": 11
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 12
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 12
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/.github",
+      "turn": 13
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_chat_pipeline.py",
+      "turn": 13
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/.github/workflows",
+      "turn": 14
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/.github/workflows/deploy.yml",
+      "turn": 15
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/scripts",
+      "turn": 16
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 17
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_search_pipeline.py",
+      "turn": 17
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 18
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 18
+    }
+  ],
+  "stop_reason": "end_turn",
+  "text_length": 1,
+  "wire_observation": {
+    "reasoning_chunks": 32,
+    "reasoning_bytes": 2598,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 1,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 167,
+    "reasoning_tokens": 144,
+    "prompt_tokens": 24152,
+    "total_tokens": 24319,
+    "stream_id": "gen-1790885133-eFHQl5OGpcFHF2mgggB1",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "OpenInference"
+  },
+  "context_compaction": {
+    "phase": "synthesis",
+    "policy": "newest-first",
+    "budget_bytes": 49152,
+    "original_read_result_bytes": 244820,
+    "retained_read_result_bytes": 43552,
+    "elided_result_count": 3,
+    "retained_result_count": 8,
+    "elided": [
+      {
+        "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+        "bytes": 14157,
+        "sha256": "cb073c277ca5bed369e492916e258a24c60b0b01039fad6f65df9c1475bc5ea8"
+      },
+      {
+        "path": "apps/ai-server/rag-api-service/main.py",
+        "bytes": 91214,
+        "sha256": "579b0bdfff8f97ee81112251ec7380b392f4aa7c38d216cd56d1782a34ed2744"
+      },
+      {
+        "path": "apps/ai-server/rag-worker-service/main.py",
+        "bytes": 95897,
+        "sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+      }
+    ]
+  }
+}

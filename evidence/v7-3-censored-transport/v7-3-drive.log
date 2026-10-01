@@ -1,0 +1,17 @@
+[journal] {"ts":"2026-10-01T10:08:02.687Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-01T10:13:08.582Z","event":"tick","round":0,"dispatches":[{"workItemId":"wi-exec-108","outcome":"dispatched","stepExecutionId":"d3321cc7-8269-4515-9583-ba4b604dcccc","workflowRunId":"04d1e224-0ff1-4bd9-8dfe-6ed25afd1df6"}]}
+[journal] {"ts":"2026-10-01T10:13:08.583Z","event":"run_status","runId":"04d1e224-0ff1-4bd9-8dfe-6ed25afd1df6","status":"halted","step":"scoping.checkpoint","iteration":1}
+[journal] {"ts":"2026-10-01T10:13:08.583Z","event":"decision_pending","decisionId":"b8fcb1ec-750b-440d-a561-b59bdcbe54f1","type":"checkpoint","title":"Workflow reached a checkpoint","summary":"Workflow 'full-build' paused at step 'scoping.checkpoint' and requires operator approval to continue.","options":[{"id":"approve","label":"Approve","description":"Accept the cycle charter and begin the cycle"}]}
+{
+  "decisionId": "b8fcb1ec-750b-440d-a561-b59bdcbe54f1",
+  "type": "checkpoint",
+  "title": "Workflow reached a checkpoint",
+  "summary": "Workflow 'full-build' paused at step 'scoping.checkpoint' and requires operator approval to continue.",
+  "options": [
+    {
+      "id": "approve",
+      "label": "Approve",
+      "description": "Accept the cycle charter and begin the cycle"
+    }
+  ]
+}

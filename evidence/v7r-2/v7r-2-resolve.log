@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-10-01T18:48:52.464Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-01T18:48:52.470Z","event":"decision_resolving","decisionId":"17b11eac-17f4-4748-ac1d-f667f8e6eed0","optionId":"approve","rationale":"V7R-2 preregistered operator checkpoint: charter accepted under frozen preregistration 107475cc (baseline cf4926be, opportunity-conditioned sampling)"}
+[journal] {"ts":"2026-10-01T19:09:30.128Z","event":"decision_resumed","decisionId":"17b11eac-17f4-4748-ac1d-f667f8e6eed0"}
+[journal] {"ts":"2026-10-01T19:09:30.133Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"test","iteration":1}]}

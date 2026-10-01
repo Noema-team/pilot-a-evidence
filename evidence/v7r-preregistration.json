@@ -1,0 +1,62 @@
+{
+  "preregistration": "V7-R \u2014 TEST-only completion-capacity intervention, RETRY with opportunity-conditioned sampling",
+  "status": "FROZEN \u2014 pre-execution freeze; STOP before first V7-R run for operator approval",
+  "frozen_at": "2026-10-01T13:02:52.019393+00:00",
+  "relationship_to_v7": "V7 is frozen TREATMENT-UNEXPOSED / EFFICACY UNOBSERVED (TEST reached 0/3). V7-R asks the SAME causal question with the SAME runtime treatment and a sampling rule that cannot finish with zero treatment exposure.",
+  "implementation_baseline": {
+    "stratum_sha": "cf4926be6ee58d9a3aa077ffc4719f38c6931a32",
+    "note": "unchanged since V5 \u2014 V7-R is configuration-only; no code changes"
+  },
+  "runtime_treatment": {
+    "identical_to_v7": true,
+    "settings_file_sha256": "68c161a590a2600798ddb6b8c48346e8ddce5ad8b3c05d57307cf6465d9f511b",
+    "settings_archive": "evidence/v7-frozen-config/settings.json (same frozen file \u2014 byte-identical)",
+    "effective_budgets": {
+      "full-build/design": 32768,
+      "full-build/plan": 32768,
+      "full-build/test": 32768,
+      "full-build/build": 16384,
+      "global_runner_max_tokens": 16384
+    },
+    "unchanged": [
+      "routing",
+      "empty-stop handling",
+      "PLAN budget",
+      "continuation semantics",
+      "BUILD budget",
+      "prompts",
+      "temperature",
+      "tools",
+      "E21/E23",
+      "V3 repair",
+      "V4 continuation"
+    ]
+  },
+  "sampling_rule": {
+    "rule": "Run until 3 evaluable TEST treatment opportunities have occurred, OR until 9 total evaluable end-to-end runs have completed, whichever comes first.",
+    "rationale": "Across V6+V7, TEST was reached in 2 of 6 evaluable runs; a bounded 9-run ceiling gives the stage-level intervention a reasonable chance of observation without an open-ended 'run until success' rule.",
+    "if_ceiling_hit_with_lt_3_opportunities": "STOP and report that the upstream reachability problem itself prevents practical evaluation of TEST \u2014 this is a reportable outcome, not a failure of the rule."
+  },
+  "two_cohort_denominators": {
+    "workflow_cohort": "N evaluable runs; TEST reached X/N \u2014 every upstream ordinary failure counts in N; failures are never replaced or hidden",
+    "treatment_cohort": "TEST reached X; TEST cleared Y/X \u2014 only reached-TEST executions inform the treatment question",
+    "also_carried": "PLAN reached/cleared; structural-repair invocations with direct vs repair-mediated success reported separately"
+  },
+  "accounting_rules": [
+    "transport-censored run \u2192 archive, does NOT consume the evaluable cap or the 9-run ceiling",
+    "implementation/evidence/procedure defect \u2192 STOP whole block immediately",
+    "ordinary model/workflow failure or success \u2192 consumes one evaluable run",
+    "no tuning or config changes between runs, ever",
+    "PLAN/TEST outcome fields per run: direct / repair-invoked / repair max_tokens / repair terminal / repair adopted-rejected; requested max_tokens from the actual provider call for every reached synthesis turn",
+    "after the rule terminates \u2192 STOP for block review"
+  ],
+  "hypotheses": {
+    "H_test_progress": "Raising TEST's request ceiling from 16,384 to 32,768 changes reached TEST executions from the repeated A-class zero-visible-output exhaustion observed in V6 to successful TEST completion. (Unchanged from V7 \u2014 still unobserved.)",
+    "H_test_persist": "Reached TEST executions continue to fail despite the 32,768 ceiling, including possible A-class persistence or another TEST-local failure class.",
+    "H_move": "TEST clears and the first workflow failure moves downstream to BUILD or later.",
+    "H_build_A": "If BUILD is reached at its unchanged 16,384 ceiling, record whether the previously observed A-class zero-visible-output exhaustion recurs. OBSERVATIONAL ONLY \u2014 not a success/failure criterion.",
+    "empty_stop_observation": "Preserve route identity for any empty-by-choice terminal completion. Track the OpenInference association (3/3 occurrences to date) WITHOUT route-causality claims; keep the all-completions denominator problem explicit. Do not change routing or treatment rules. NOT a primary hypothesis."
+  },
+  "interpretation_bound": "Small-sample qualifiers and explicit denominators required; descriptive A-class statement frozen in journal 16d1deb; no necessity/sufficiency overclaims; no PLAN budget raise; no routing change.",
+  "per_run_evidence": "same fields as V5\u2013V7; never persist reasoning payload text; wire observation per synthesis turn; provider counters non-authoritative when internally inconsistent."
+}

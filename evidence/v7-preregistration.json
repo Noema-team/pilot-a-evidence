@@ -1,0 +1,70 @@
+{
+  "preregistration": "V7 \u2014 TEST-only completion-capacity intervention (DESIGN+PLAN 32k retained)",
+  "status": "FROZEN \u2014 pre-execution freeze; STOP before V7-1 for operator approval",
+  "frozen_at": "2026-10-01T08:17:28.059932+00:00",
+  "implementation_baseline": {
+    "stratum_sha": "cf4926be6ee58d9a3aa077ffc4719f38c6931a32",
+    "note": "unchanged since V5 \u2014 V7 is configuration-only"
+  },
+  "frozen_configuration": {
+    "target": "student-platform @ 86ec0871 (pristine reset + clean -fdx before each run)",
+    "settings_file_sha256": "68c161a590a2600798ddb6b8c48346e8ddce5ad8b3c05d57307cf6465d9f511b",
+    "settings_archive": "evidence/v7-frozen-config/settings.json (complete file)",
+    "effective_budgets": {
+      "full-build/design": 32768,
+      "full-build/plan": 32768,
+      "full-build/test": 32768,
+      "full-build/build": 16384,
+      "global_runner_max_tokens": 16384
+    },
+    "sole_V7_intervention": "full-build/test 16384 \u2192 32768; BUILD deliberately UNCHANGED as downstream sentinel",
+    "model": "z-ai/glm-5.3-flash via OpenRouter; routing unchanged; no metadata headers",
+    "temperature_prompts_tools": "unchanged",
+    "authority": "wi-define-108-a8 / 71f1c39c97ec\u2026",
+    "E21": "turns 1-18; first forced synthesis 19 (early natural completion legal)",
+    "E23": "49,152 B newest-first",
+    "v3_structural_repair": "unchanged",
+    "v4_continuation": "unchanged",
+    "v4d1_wire_observation": "present",
+    "excluded": [
+      "no reasoning/reasoning_effort",
+      "no routing change",
+      "no empty-output retry",
+      "no BUILD change",
+      "no other budget changes"
+    ]
+  },
+  "mechanical_budget_proof": {
+    "method": "real AgentRunner path with capturing provider against the byte-exact archived V7 settings, after instantiate + config write + execute-wi",
+    "result": {
+      "full-build/design": 32768,
+      "full-build/plan": 32768,
+      "full-build/test": 32768,
+      "full-build/build": 16384
+    }
+  },
+  "causal_question": "With DESIGN and PLAN retained at 32,768, does raising TEST's request ceiling from 16,384 to 32,768 change reached TEST executions from the repeated A-class zero-visible-output exhaustion to successful TEST completion?",
+  "hypotheses": {
+    "H_test_progress": "Raising TEST's request ceiling from 16,384 to 32,768 changes reached TEST executions from the repeated A-class zero-visible-output exhaustion observed in V6 to successful TEST completion.",
+    "H_test_persist": "Reached TEST executions continue to fail despite the 32,768 ceiling, including possible A-class persistence or another TEST-local failure class.",
+    "H_move": "TEST clears and the first workflow failure moves downstream to BUILD or later.",
+    "H_build_A": "If BUILD is reached at its unchanged 16,384 ceiling, record whether the previously observed A-class zero-visible-output exhaustion recurs. OBSERVATIONAL ONLY \u2014 not a V7 success/failure criterion.",
+    "empty_stop_observation": "Preserve route identity for any empty-by-choice terminal completion (2/2 prior occurrences on OpenInference). Do not change routing or treatment rules during V7. NOT a primary hypothesis."
+  },
+  "runs": {
+    "count": 3,
+    "evaluable_only": true
+  },
+  "accounting_rules": [
+    "transport-censored run \u2192 archive, does not consume a slot",
+    "implementation/evidence/procedure defect \u2192 STOP whole block immediately",
+    "ordinary model/workflow failure or success \u2192 consumes an evaluable slot",
+    "no tuning or config changes between evaluable runs",
+    "after exactly 3 evaluable runs \u2192 STOP for block review",
+    "TWO-DENOMINATOR REPORTING: block accounting 3/3 evaluable AND treatment opportunities: TEST reached X/3, TEST cleared Y/X \u2014 upstream failures are never censored or replaced with extra runs",
+    "PLAN outcome fields carried (direct / repair-invoked / repair max_tokens / repair terminal / repair adopted-rejected); same fields for TEST",
+    "requested max_tokens from the actual provider call recorded for every reached synthesis turn"
+  ],
+  "per_run_evidence": "same fields as V5/V6 (identity/config incl. full settings hash; wire observation per synthesis turn; provider counters non-authoritative when internally inconsistent; V4/V3 involvement; furthest stage; disposition; transport health; Gate B; target integrity). Never persist reasoning payload text.",
+  "interpretation_bound": "Small-sample qualifiers and explicit denominators required; no necessity/sufficiency overclaims; stage-generalization language for cross-stage contrasts."
+}

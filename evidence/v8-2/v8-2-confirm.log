@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-10-02T15:02:06.255Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-02T15:02:06.261Z","event":"decision_resolving","decisionId":"6b5fcd58-2d7e-4afd-b31b-d3adf1d91ed5","optionId":"approve","rationale":"V8-2 operator confirm checkpoint: TEST cleared under effort=low; authorizing BUILD (unchanged 16k sentinel) under frozen preregistration 5159cdaa"}
+[journal] {"ts":"2026-10-02T15:09:38.247Z","event":"decision_resumed","decisionId":"6b5fcd58-2d7e-4afd-b31b-d3adf1d91ed5"}
+[journal] {"ts":"2026-10-02T15:09:38.276Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"build","iteration":1}]}

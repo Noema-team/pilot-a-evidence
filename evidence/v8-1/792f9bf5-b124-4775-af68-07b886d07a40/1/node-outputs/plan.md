@@ -1,0 +1,156 @@
+{
+  "kind": "step-failure-observation",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 19,
+  "format_repairs": 0,
+  "result_repairs": 0,
+  "stop_reason": "max_tokens",
+  "text_length": 0,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": ".",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 4
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 4
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/utils",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service/services",
+      "turn": 7
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/utils/status_updater.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 9
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 10
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 11
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 12
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 13
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 14
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service/models",
+      "turn": 15
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service/config",
+      "turn": 15
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/models/resource.py",
+      "turn": 16
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 17
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 18
+    }
+  ],
+  "tool_uses": [],
+  "wire_observation": {
+    "reasoning_chunks": 11304,
+    "reasoning_bytes": 515202,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 0,
+    "tool_call_fragments": 0,
+    "finish_reason": "length",
+    "completion_tokens": 15000,
+    "reasoning_tokens": 15000,
+    "prompt_tokens": 40754,
+    "total_tokens": 55754,
+    "stream_id": "gen-1790950653-aDfepHaRsqZTJT8hZfSu",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Reka"
+  },
+  "error": "Agent exhausted max_tokens without producing a result block"
+}

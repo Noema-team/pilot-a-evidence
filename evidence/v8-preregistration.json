@@ -1,0 +1,85 @@
+{
+  "preregistration": "V8 \u2014 TEST reasoning-effort intervention (default max \u2192 low) at unchanged 32,768 ceiling",
+  "status": "FROZEN \u2014 pre-execution freeze; execution authorized in the same operator directive (GO)",
+  "frozen_at": "2026-10-02T13:54:55.682511+00:00",
+  "implementation_baseline": {
+    "stratum_sha": "b6dbcd36c18a42ee4d9e9ea4bfa987b5018d0783",
+    "note": "PR #53 merge \u2014 the reasoning-effort seam (workflow_reasoning_effort) is the ONLY implementation change since cf4926be; no behavior change without an override (proven by PR #53 PF.1b/2/4b)"
+  },
+  "frozen_configuration": {
+    "target": "student-platform @ 86ec0871 (pristine reset + clean -fdx before each run)",
+    "settings_file_sha256": "b938bfe03793b207 (full hash in archived file)",
+    "settings_archive": "evidence/v8-frozen-config/settings.json (complete file)",
+    "effective_budgets": {
+      "full-build/design": 32768,
+      "full-build/plan": 32768,
+      "full-build/test": 32768,
+      "full-build/build": 16384,
+      "global_runner_max_tokens": 16384
+    },
+    "sole_V8_intervention": "full-build/test reasoning effort default/max \u2192 explicit 'low' (named effort, NOT a token cap; not described as one anywhere)",
+    "model": "z-ai/glm-5.3-flash via OpenRouter; routing unchanged; no metadata headers; no route exclusions",
+    "temperature_prompts_tools": "unchanged",
+    "authority": "wi-define-108-a8 / 71f1c39c97ec\u2026",
+    "E21": "turns 1-18; first forced synthesis 19",
+    "E23": "49,152 B newest-first",
+    "v3_structural_repair": "unchanged (carries the step effort)",
+    "v4_continuation": "unchanged (carries the step effort)",
+    "excluded": [
+      "no empty-output retry",
+      "no route exclusion",
+      "no BUILD change (sentinel)",
+      "no reasoning change on any other stage",
+      "no 64k anywhere"
+    ]
+  },
+  "mechanical_freeze_proof": {
+    "method": "byte-exact archived V8 settings \u2192 real AgentRunner path with capturing provider, after instantiate + config write + execute-wi",
+    "result": {
+      "design": {
+        "max_tokens": 32768,
+        "reasoning": null
+      },
+      "plan": {
+        "max_tokens": 32768,
+        "reasoning": null
+      },
+      "test": {
+        "max_tokens": 32768,
+        "reasoning_effort": "low"
+      },
+      "build": {
+        "max_tokens": 16384,
+        "reasoning": null
+      }
+    },
+    "outbound_shape": "TEST requests carry exactly {\"max_tokens\": 32768, \"reasoning\": {\"effort\": \"low\"}} (PR #53 PF.1a proves the wire body); DESIGN/PLAN/BUILD carry NO reasoning key (PF.1b)"
+  },
+  "causal_question": "At an unchanged 32,768 ceiling, does lowering TEST reasoning effort from GLM-5.3-Flash's default max to explicit low change reached TEST executions away from the repeated zero-visible A-class reasoning exhaustion?",
+  "hypotheses": {
+    "H_reasoning_control": "PRIMARY \u2014 reached TEST under effort=low no longer shows the A-class pattern (reasoning expanding until the whole completion ceiling with zero visible output) and produces usable synthesis either directly or through the frozen continuation/repair mechanisms.",
+    "H_reasoning_insufficient": "A-class persists under low \u2014 reasoning-effort reduction alone does not solve TEST; the next investigation is the TEST prompt/protocol/convergence, NOT more tokens.",
+    "H_test_other": "A-class disappears but TEST fails through another class (format, near-empty terminal, contract, etc.) \u2014 the reasoning treatment worked mechanistically and exposed the next bottleneck.",
+    "H_move": "TEST clears and the workflow reaches BUILD, whose unchanged 16k budget remains the downstream sentinel.",
+    "no_censoring_rule": "With effort:'low' the treatment is defined at the gateway request level (PR #53 PF.1a): a run whose TEST still reasons heavily under low is a treatment OUTCOME, not a delivery failure. NO provider-ignore censoring."
+  },
+  "sampling_rule": {
+    "rule": "Run until 3 evaluable TEST treatment opportunities have occurred, OR until 9 total evaluable end-to-end runs have completed, whichever comes first (the proven V7-R rule).",
+    "if_ceiling_hit_with_lt_3_opportunities": "STOP and report upstream reachability as itself the finding."
+  },
+  "two_cohort_denominators": {
+    "workflow_cohort": "N evaluable workflows; TEST reached X/N \u2014 upstream failures preserved, never replaced",
+    "treatment_cohort": "TEST reached X; TEST cleared Y/X",
+    "also": "PLAN reached/cleared (direct vs repair-mediated); repair frequency; continuation frequency"
+  },
+  "accounting_rules": [
+    "transport-censored run \u2192 archive, consumes neither counter",
+    "implementation/evidence/procedure defect \u2192 STOP whole block immediately",
+    "ordinary model/workflow failure or success \u2192 consumes one evaluable run",
+    "no tuning or config changes between runs, ever",
+    "requested max_tokens + reasoning effort from the actual provider call recorded for every reached synthesis turn (wire observation substrate)",
+    "after the rule terminates \u2192 STOP for block review"
+  ],
+  "interpretation_bound": "Do NOT preregister V9 \u2014 V8's outcome determines what the right next experiment is. Do not add resilience mechanisms on first success; the post-V8 milestone is repeated end-to-end completion (BUILD + Gate B), then a repeatability block with no tuning.",
+  "per_run_evidence": "same fields as V5\u2013V7R; never persist reasoning payload text; provider counters non-authoritative when internally inconsistent."
+}

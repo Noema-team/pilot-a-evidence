@@ -1,0 +1,12 @@
+[journal] {"ts":"2026-10-02T16:40:28.714Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-02T16:40:28.724Z","event":"decision_resolving","decisionId":"wi-exec-108","optionId":"approve","rationale":"V8-4 operator confirm checkpoint: TEST cleared under effort=low (plan repair-mediated); authorizing BUILD sentinel under frozen preregistration 5159cdaa"}
+FATAL: ResumeServiceError: Decision 'wi-exec-108' not found
+    at ResumeService.resume (/home/theo/Documents/coding/repos/stratum/src/services/resume-service.ts:107:13)
+    at resolve (/home/theo/Documents/coding/repos/stratum/pilot-a-driver.ts:245:29)
+    at main (/home/theo/Documents/coding/repos/stratum/pilot-a-driver.ts:482:33)
+    at <anonymous> (/home/theo/Documents/coding/repos/stratum/pilot-a-driver.ts:491:1)
+    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  code: 'NOT_FOUND'
+}

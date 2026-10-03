@@ -1,0 +1,26 @@
+base sha256: 7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988
+
+===== v9-1 =====
+patch bytes: 3982 | patch sha256: 4737b22e9fb5034a | hunks: 7
+original apply: PatchApplyError: Malformed diff line 19 (expected ' ', '-', or '+'): '@@ -989,6 +993,7 @@'
+fidelity: EXACT MATCH with recorded run error
+  hunk 1: declared -6,+9 → derived -6,+9  (correct)
+  hunk 2: declared -6,+7 → derived -4,+5  NORMALIZED
+  hunk 3: declared -6,+7 → derived -4,+5  NORMALIZED
+  hunk 4: declared -6,+7 → derived -4,+5  NORMALIZED
+  hunk 5: declared -6,+7 → derived -4,+5  NORMALIZED
+  hunk 6: declared -6,+7 → derived -4,+5  NORMALIZED
+  hunk 7: declared -8,+17 → derived -7,+19  NORMALIZED
+normalized apply: Hunk 4 does not apply: original line 996 is '            ' but the patch expects ''
+summary: hunks=7 anyCountNormalized=true normalizedByteDelta=0 replay=STILL FAILS
+
+===== v9-3 =====
+patch bytes: 2518 | patch sha256: 8dcd6b8733c33b79 | hunks: 4
+original apply: PatchApplyError: Malformed hunk header at diff line 21: '             # Step 5: Generate Embeddings'
+fidelity: EXACT MATCH with recorded run error
+  hunk 1: declared -6,+9 → derived -7,+9  NORMALIZED
+  hunk 2: declared -6,+7 → derived -7,+8  NORMALIZED
+  hunk 3: declared -6,+7 → derived -5,+6  NORMALIZED
+  hunk 4: declared -8,+14 → derived -7,+13  NORMALIZED
+normalized apply: Hunk 3 overlaps the previous hunk (starts at original line 1020, already consumed through line 1021)
+summary: hunks=4 anyCountNormalized=true normalizedByteDelta=0 replay=STILL FAILS

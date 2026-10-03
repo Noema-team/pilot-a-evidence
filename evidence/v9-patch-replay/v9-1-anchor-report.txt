@@ -1,0 +1,7 @@
+hunk 1: declared oldStart=974 content-true=974 drift=0 | counts declared -6,+9 derived -6,+9
+hunk 2: declared oldStart=984 content-true=984 drift=0 | counts declared -6,+7 derived -4,+5
+hunk 3: declared oldStart=989 content-true=989 drift=0 | counts declared -6,+7 derived -4,+5
+hunk 4: declared oldStart=994 content-true=994 drift=0 | counts declared -6,+7 derived -4,+5
+hunk 5: declared oldStart=1004 content-true=1014 drift=10 | counts declared -6,+7 derived -4,+5
+hunk 6: declared oldStart=1010 content-true=1021 drift=11 | counts declared -6,+7 derived -4,+5
+hunk 7: declared oldStart=1103 content-true=1094 drift=-9 | counts declared -8,+17 derived -7,+19

@@ -1,0 +1,2 @@
+v9-1 SUPER-NORMALIZED (counts+anchors+2 whitespace restorations, position drift total 30): APPLIED — output 96923 bytes
+v9-3 SUPER-NORMALIZED (counts+anchors+4 whitespace restorations, position drift total 3): APPLIED — output 96325 bytes

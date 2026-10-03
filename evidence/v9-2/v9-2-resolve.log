@@ -1,0 +1,23 @@
+[journal] {"ts":"2026-10-03T13:36:38.160Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-03T13:36:38.165Z","event":"decision_resolving","decisionId":"66636e24-91a7-495d-91c5-9895f9c67161","optionId":"approve","rationale":"V9-2 preregistered operator checkpoint: charter accepted under frozen preregistration 769367b1 (BUILD effort=low)"}
+[journal] {"ts":"2026-10-03T14:01:24.617Z","event":"decision_resumed","decisionId":"66636e24-91a7-495d-91c5-9895f9c67161"}
+[journal] {"ts":"2026-10-03T14:01:24.625Z","event":"tick","round":0,"dispatches":[]}
+[journal] {"ts":"2026-10-03T14:01:24.625Z","event":"decision_pending","decisionId":"6992fa6f-599e-423c-b19f-05768019ba81","type":"checkpoint","title":"Workflow reached another checkpoint","summary":"Workflow 'full-build' paused at step 'confirm'.","options":[{"id":"approve","label":"Approve","description":"Continue to the build phase"},{"id":"revise","label":"Revise","description":"Send back for revision (increments revision counter)"}]}
+{
+  "decisionId": "6992fa6f-599e-423c-b19f-05768019ba81",
+  "type": "checkpoint",
+  "title": "Workflow reached another checkpoint",
+  "summary": "Workflow 'full-build' paused at step 'confirm'.",
+  "options": [
+    {
+      "id": "approve",
+      "label": "Approve",
+      "description": "Continue to the build phase"
+    },
+    {
+      "id": "revise",
+      "label": "Revise",
+      "description": "Send back for revision (increments revision counter)"
+    }
+  ]
+}

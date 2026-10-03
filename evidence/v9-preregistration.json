@@ -1,0 +1,62 @@
+{
+  "experiment": "V9 — configuration-only reasoning-effort experiment at BUILD",
+  "frozen_at_utc": "2026-10-03T13:30:00Z",
+  "baseline_commit": "b6dbcd36c18a42ee4d9e9ea4bfa987b5018d0783",
+  "baseline_note": "Merged V8 reasoning-effort seam (PR #53, head cc958c1). No code changes for V9 — configuration only.",
+  "frozen_config": {
+    "path": "evidence/v9-frozen-config/settings.json",
+    "sha256": "5f326124c6efa4e4c296c25aad745ab1a9a8f181b372680aeaa337a31e1c4fac",
+    "verified_runtime_sha256_prefix": "5f326124c6efa4e4",
+    "content": {
+      "global_max_tokens": 16384,
+      "workflow_max_tokens": { "full-build/design": 32768, "full-build/plan": 32768, "full-build/test": 32768, "full-build/build": 16384 },
+      "workflow_reasoning_effort": { "full-build/build": "low", "full-build/test": "low" }
+    }
+  },
+  "sole_intervention": "full-build/build reasoning effort changes from model default (max, no reasoning key sent) to explicit \"low\". BUILD completion budget unchanged at 16384 (the V8 sentinel is retained by design: 3/3 A-class observations under default reasoning exist at this exact ceiling). DESIGN, PLAN, TEST, routing, prompts, E21/E23, V3 structural repair, V4 continuation, empty-output behavior, budgets, and every other mechanism are frozen unchanged from V8.",
+  "mechanical_proof": {
+    "harness": "AgentRunner resolving the real evidence/v9-frozen-config/settings.json from a live .sle/settings.json",
+    "assertions": [
+      "design: max_tokens=32768, no reasoning effort (undefined) — PASS",
+      "plan:   max_tokens=32768, no reasoning effort (undefined) — PASS",
+      "test:   max_tokens=32768, reasoning_effort=\"low\" — PASS",
+      "build:  max_tokens=16384, reasoning_effort=\"low\" — PASS"
+    ],
+    "outbound_mapping_proof": "tests/v8-reasoning-preflight.test.ts (node:test) 8/8 PASS at this baseline: declared effort is sent as reasoning:{effort}; undeclared steps carry NO reasoning key (byte-identical legacy body); whole-map fail-closed parsing; precedence; single-turn fail-closed guard."
+  },
+  "gate_b_evidence": { "result": "PASS", "definition_sha256_prefix": "71f1c39c97ec", "probe_token_count": "4213/4000", "verbatim": true },
+  "integrity_hashes": { "rag-worker-service": "7d7718bcbeb2", "rag-api-service": "579b0bdfff8f", "student_platform_base_commit": "86ec0871" },
+  "hypotheses": [
+    {
+      "id": "H-build-reasoning-control",
+      "primacy": "primary",
+      "claim": "The BUILD A-class (zero visible output, reasoning exhaustion at the 16,384 ceiling under default/max reasoning — observed 3/3 in V8 at 495 kB-1.23 MB hidden reasoning) is caused by unbounded hidden reasoning consumption. Under reasoning effort=low, BUILD hidden reasoning stays far below the ceiling (predicted order 100 kB, consistent with TEST under low: 73-324 kB vs 1.09-1.23 MB under default), and BUILD clears the stage (validator PASS / workflow advances past build) in at least 2 of 3 treatment opportunities.",
+      "falsified_if": "BUILD reaches finish=length with zero visible output (A-class signature) in any treatment opportunity, or clears fewer than 2 of 3."
+    },
+    {
+      "id": "H-build-persist",
+      "claim": "The A-class persists at BUILD even under effort=low — the stage's reasoning demand is structural (the build step requires more planning than low effort permits), and reasoning still consumes the entire 16,384 allowance with zero visible output.",
+      "falsified_if": "No A-class signature occurs in any BUILD treatment opportunity."
+    },
+    {
+      "id": "H-build-other",
+      "claim": "BUILD fails under effort=low but with a different failure signature: near-empty terminal output, marker corruption, validator FAIL with non-trivial output present, or another non-exhaustion class.",
+      "falsified_if": "All BUILD treatment opportunities either clear or produce the A-class signature exactly."
+    },
+    {
+      "id": "H-end-to-end",
+      "claim": "At least one workflow in this block completes BUILD and passes Gate B end-to-end (workflow terminal state success) — the campaign's first complete run under the frozen authority.",
+      "falsified_if": "Zero workflows reach a successful terminal state in the block."
+    }
+  ],
+  "sampling_rule": "Run until 3 evaluable BUILD treatment opportunities or 9 evaluable workflows, whichever occurs first. A treatment opportunity is an evaluable workflow that reaches the build step (treatment delivered, outcome observed regardless of result). Ordinary upstream failures (scoping/design/plan/test) consume workflow slots only. Transport-censored executions consume neither counter and are re-run. Any implementation, evidence, or procedure defect stops the block immediately.",
+  "reporting_requirements": [
+    "workflow denominator: N evaluable workflows; BUILD reached X/N",
+    "treatment denominator: BUILD cleared Y/X",
+    "end-to-end successes: E (workflows completing build with Gate B PASS)"
+  ],
+  "continuation_rule": "Frozen V4 semantics unchanged: continuation fires only at turn == threshold+1 with max_tokens stop, NON-EMPTY visible text, no tool use, and unspent continuation budget. Zero-text exhaustion is never continuable.",
+  "no_censoring_rule_required": "V9 has no provider-ignore confound to control (V8 removed it); transport-censored executions are simply non-evaluable and re-run without consuming counters.",
+  "constraint": "No tuning between runs. No mechanism changes. No V10 preregistration until this block closes and the operator reviews the evidence.",
+  "block_disposition": "At rule termination: journal all runs, report both denominators plus end-to-end count, freeze the block record, and STOP for operator block review."
+}

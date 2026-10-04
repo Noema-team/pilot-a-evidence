@@ -1,0 +1,121 @@
+{
+  "cycle_id": "f3f1d0d0-190e-4b5a-941b-672c89c7a25f",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-10-04T16:32:33.022Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "scoping.gather",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-10-04T16:32:33.022Z",
+      "completed_at": "2026-10-04T16:32:33.023Z"
+    },
+    {
+      "id": "scoping.produce",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/cycle-charter.md"
+      ],
+      "started_at": "2026-10-04T16:32:33.024Z",
+      "turns_taken": 19,
+      "tool_calls": 26,
+      "completed_at": "2026-10-04T16:35:29.508Z"
+    },
+    {
+      "id": "scoping.checkpoint",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-10-04T16:35:29.512Z",
+      "completed_at": "2026-10-04T16:43:18.288Z"
+    },
+    {
+      "id": "design",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/requirements.md",
+        "docs/architecture.md"
+      ],
+      "started_at": "2026-10-04T16:43:18.293Z",
+      "turns_taken": 19,
+      "tool_calls": 25,
+      "completed_at": "2026-10-04T16:57:22.810Z"
+    },
+    {
+      "id": "critique",
+      "status": "skipped",
+      "artifacts_written": [],
+      "completed_at": "2026-10-04T16:57:22.815Z",
+      "skip_reason": "condition_not_met"
+    },
+    {
+      "id": "plan",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/plan.md",
+        "docs/test-plan.md"
+      ],
+      "started_at": "2026-10-04T16:57:22.816Z",
+      "turns_taken": 19,
+      "tool_calls": 27,
+      "completed_at": "2026-10-04T16:59:15.592Z"
+    },
+    {
+      "id": "test",
+      "status": "failed",
+      "artifacts_written": [],
+      "started_at": "2026-10-04T16:59:15.596Z",
+      "turns_taken": 19,
+      "tool_calls": 22,
+      "completed_at": "2026-10-04T17:02:38.242Z",
+      "duration_ms": 202645
+    },
+    {
+      "id": "sharding_approval",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "confirm",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "build",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "exec",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "validation_gate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "debug",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "evaluate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "summarise",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "snapshot",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

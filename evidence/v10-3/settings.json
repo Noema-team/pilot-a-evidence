@@ -1,0 +1,17 @@
+{
+  "provider": "openrouter",
+  "model": "z-ai/glm-5.3-flash",
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_tokens": 16384,
+  "api_key_env": "OPENROUTER_API_KEY",
+  "workflow_max_tokens": {
+    "full-build/design": 32768,
+    "full-build/plan": 32768,
+    "full-build/test": 32768,
+    "full-build/build": 16384
+  },
+  "workflow_reasoning_effort": {
+    "full-build/build": "medium",
+    "full-build/test": "low"
+  }
+}

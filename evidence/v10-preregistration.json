@@ -1,0 +1,72 @@
+{
+  "experiment": "V10 — configuration-only reasoning-effort escalation at BUILD (low → medium)",
+  "frozen_at_utc": "2026-10-04T17:20:00Z",
+  "baseline_commit": "b6dbcd36c18a42ee4d9e9ea4bfa987b5018d0783",
+  "baseline_note": "Same merged V8 reasoning-effort seam as V9 (PR #53, head cc958c1). No code changes for V10 — configuration only. Patch parser/applier, edit policy, E21/E23, V3 repair, V4 continuation, retry/empty-output behavior all frozen unchanged.",
+  "frozen_config": {
+    "path": "evidence/v10-frozen-config/settings.json",
+    "sha256_prefix": "44afa622f41daf26",
+    "content": {
+      "global_max_tokens": 16384,
+      "workflow_max_tokens": { "full-build/design": 32768, "full-build/plan": 32768, "full-build/test": 32768, "full-build/build": 16384 },
+      "workflow_reasoning_effort": { "full-build/build": "medium", "full-build/test": "low" }
+    }
+  },
+  "sole_intervention": "full-build/build reasoning effort changes from \"low\" (V9) to \"medium\". BUILD completion budget unchanged at 16384. DESIGN, PLAN remain 32768 with no reasoning override; TEST remains 32768 + low. The intervention targets the V9-established bottleneck: edit-generation/serialization quality (2/3 V9 BUILD failures were patch-arithmetic rejects; 1/3 output-bearing exhaustion), not capacity.",
+  "v9_baseline_being_tested_against": {
+    "build_16k_default": "3/3 A-class zero-visible (reasoning 495 kB-1.23 MB)",
+    "build_16k_low": "0/3 clears; 3/3 real visible output (2 patch-arithmetic rejects, 1 output-bearing exhaustion after first live V4 continuation firing)",
+    "replay_reference": "evidence/v9-patch-replay/ — frozen counterfactual, RESULT B: count-only normalization insufficient; defect taxonomy = count inflation (7/11 hunks), oldStart drift (5/11), whitespace truncation (6 lines); semantic content perfect in all 11 hunks"
+  },
+  "mechanical_proof": {
+    "harness": "AgentRunner resolving the real evidence/v10-frozen-config/settings.json from a live .sle/settings.json",
+    "assertions": [
+      "design: max_tokens=32768, no reasoning effort — PASS",
+      "plan:   max_tokens=32768, no reasoning effort — PASS",
+      "test:   max_tokens=32768, reasoning_effort=\"low\" — PASS",
+      "build:  max_tokens=16384, reasoning_effort=\"medium\" — PASS"
+    ],
+    "outbound_mapping_proof": "tests/v8-reasoning-preflight.test.ts (node:test) 8/8 PASS at this baseline: declared effort sent as reasoning:{effort}; undeclared steps carry no reasoning key; whole-map fail-closed parsing; precedence; single-turn fail-closed guard."
+  },
+  "gate_b_evidence": { "result": "PASS", "definition_sha256_prefix": "71f1c39c97ec", "probe_token_count": "4213/4000", "verbatim": true },
+  "integrity_hashes": { "rag-worker-service": "7d7718bcbeb2", "rag-api-service": "579b0bdfff8f", "student_platform_base_commit": "86ec0871" },
+  "authority_recovery_note": "The /tmp working area was wiped between V9 and V10 (key file, a8-authority/, issue seed all lost). Authority was deterministically reconstructed from evidence/pilot-a8-sle-archive.tgz: definition.md sha256 71f1c39c97ecea57… matches the campaign Gate B pin byte-for-byte; issue-108.json reconstructed from the archive db (objectives.description verbatim; derived acceptance criteria == archived acceptance criteria 4/4). Recovery journaled; every downstream hash re-verified.",
+  "outcome_taxonomy": [
+    {
+      "id": "O1-build-clears-medium",
+      "claim": "BUILD clears (validator PASS, workflow advances past build) in at least 2 of 3 treatment opportunities — patch serialization precision scales with reasoning depth and the V9 defect classes fall below the strict applier's threshold.",
+      "discriminates": "O3/O4 (if clears occur, medium was sufficient; if not, either quality or budget bound)"
+    },
+    {
+      "id": "O2-aclass-returns-medium",
+      "claim": "The zero-visible A-class signature returns under medium (finish=length, ~0 visible bytes, reasoning at/near the 16,384 ceiling) — the V7/V8 runaway-reasoning regime re-engages between low and max.",
+      "discriminates": "whether the low-effort suppression of A-class survives a one-step effort increase"
+    },
+    {
+      "id": "O3-patch-quality-persists-medium",
+      "claim": "BUILD continues producing visible output but still fails patch/application correctness under medium (count inflation / oldStart drift / whitespace truncation per the V9 replay taxonomy) — serialization precision is not restored by medium.",
+      "discriminates": "O1 vs O3 on the 2/3 V9 patch-reject share"
+    },
+    {
+      "id": "O4-synthesis-exhaustion-medium",
+      "claim": "BUILD produces valid/near-valid visible synthesis but exhausts the unchanged 16,384 ceiling before publishing a result block (V9-2 class) — budget, not quality, is the residual binding constraint.",
+      "discriminates": "O1 vs O4 on the 1/3 V9 exhaustion share"
+    },
+    {
+      "id": "O5-end-to-end",
+      "claim": "At least one workflow publishes the required code edit and passes downstream Gate B (workflow terminal success) — the campaign's first complete end-to-end run.",
+      "discriminates": "block-level success regardless of which per-run path achieves it"
+    }
+  ],
+  "per_opportunity_evidence_requirements": "For EVERY BUILD treatment opportunity preserve: requested max_tokens + reasoning.effort as sent; route/provider; turn count; finish_reason; visible bytes; reasoning bytes; continuation involvement (fired? eligible? outcome); format-repair involvement; patch parse result (exact PatchApplyError or success); per-hunk count validity (declared vs derived); oldStart/context matching analysis (drift per hunk); base hash verified; apply result; required-edit satisfaction; downstream Gate B if the workflow completes. The V9 replay tooling (parse/derive/anchor) is the observation harness for the patch-stage fields.",
+  "sampling_rule": "Run until 3 evaluable BUILD treatment opportunities or 9 evaluable workflows, whichever occurs first. A treatment opportunity is an evaluable workflow that reaches the build step. Ordinary upstream failures consume workflow slots only. Transport-censored executions consume neither counter and are re-run. Any implementation, evidence, or procedure defect stops the block immediately.",
+  "reporting_requirements": [
+    "workflow denominator: N evaluable workflows; BUILD reached X/N",
+    "treatment denominator: BUILD cleared Y/X",
+    "end-to-end successes: Z",
+    "per-outcome classification under O1-O5"
+  ],
+  "continuation_rule": "Frozen V4 semantics unchanged: continuation fires only at turn == threshold+1 with max_tokens stop, NON-EMPTY visible text, no tool use, unspent budget. Zero-text exhaustion is never continuable.",
+  "constraint": "No tuning between runs. No mechanism changes (no canonicalization, no parser/applier edits — V9 replay RESULT B stands: canonicalization rejected as next intervention). No V11 preregistration until this block closes and the operator reviews the evidence.",
+  "block_disposition": "At rule termination: journal all runs with the per-opportunity evidence, report denominators + end-to-end count + outcome classification, freeze the block record, and STOP for operator block review."
+}

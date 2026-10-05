@@ -1,0 +1,74 @@
+{
+  "experiment": "V11 — final BUILD config-knob experiment: budget escalation at fixed low reasoning (16384 → 32768)",
+  "frozen_at_utc": "2026-10-05T00:00:00Z",
+  "baseline_commit": "b6dbcd36c18a42ee4d9e9ea4bfa987b5018d0783",
+  "baseline_note": "Same merged V8 reasoning-effort seam as V9/V10 (PR #53, head cc958c1). No code changes for V11 — configuration only. Every runtime mechanism, prompt, routing rule, repair policy, patch parser/applier, E21/E23, V3 and V4 unchanged.",
+  "v10_amendment": "Per operator ruling, V10's preregistered medium-treatment outcomes are UNEVALUABLE: OpenRouter's live model metadata for z-ai/glm-5.3-flash declares supported_efforts exactly ['max','high','low'] with default 'max' — 'medium' is not a supported effort, so the three V10 BUILD executions are OBSERVATIONAL EVIDENCE ONLY under an unsupported requested effort. V10 archives and observations are preserved in full (evidence/v10-1..4/); no rerun; 'high' deliberately untested. The campaign-only reasoning-capability preflight introduced at this freeze (evidence/v11-capability-preflight.mjs) mechanically re-demonstrates the defect: V10's build effort 'medium' FAILS the supported_efforts check; V11's 'low' PASSES.",
+  "sole_intervention_relative_to_v9": "full-build/build max_tokens: 16384 → 32768. BUILD reasoning remains 'low'. This tests the last valid BUILD treatment cell (V9) with the single remaining config knob: budget. V9 at 16384+low produced 3/3 real-output failures (2 patch-geometry rejects + 1 output-bearing exhaustion at the 16,384 ceiling).",
+  "frozen_config": {
+    "path": "evidence/v11-frozen-config/settings.json",
+    "sha256_prefix": "5634b2e897eeb564",
+    "content": {
+      "global_max_tokens": 16384,
+      "workflow_max_tokens": { "full-build/design": 32768, "full-build/plan": 32768, "full-build/test": 32768, "full-build/build": 32768 },
+      "workflow_reasoning_effort": { "full-build/build": "low", "full-build/test": "low" }
+    }
+  },
+  "reasoning_capability_preflight": {
+    "new_campaign_gate": "Every configured reasoning effort must appear in the live OpenRouter reasoning.supported_efforts for the exact model slug before freeze and execution.",
+    "metadata_snapshot": { "path": "evidence/v11-model-metadata.json", "sha256_prefix_file": "dac4e6be73c7d50c", "model_id": "z-ai/glm-5.3-flash", "supported_efforts": ["max", "high", "low"], "default_effort": "max", "context_length": 1048576 },
+    "result": "low ∈ supported_efforts — PROVEN for both configured steps (test, build); preflight script evidence/v11-capability-preflight.mjs PASS"
+  },
+  "mechanical_proof": {
+    "harness": "AgentRunner resolving the real evidence/v11-frozen-config/settings.json from a live .sle/settings.json",
+    "assertions": [
+      "design: max_tokens=32768, no reasoning effort — PASS",
+      "plan:   max_tokens=32768, no reasoning effort — PASS",
+      "test:   max_tokens=32768, reasoning_effort=\"low\" — PASS",
+      "build:  max_tokens=32768, reasoning_effort=\"low\" — PASS"
+    ],
+    "outbound_mapping_proof": "tests/v8-reasoning-preflight.test.ts (node:test) 8/8 PASS at this baseline."
+  },
+  "gate_b_evidence": { "result": "PASS", "definition_sha256_prefix": "71f1c39c97ec", "probe_token_count": "4213/4000", "verbatim": true },
+  "integrity_hashes": { "rag-worker-service": "7d7718bcbeb2", "rag-api-service": "579b0bdfff8f", "student_platform_base_commit": "86ec0871", "recovery_pins": { "definition_md": "71f1c39c97ecea57", "title_goal_nine_field": "b0b1cd020d72526d" } },
+  "hypotheses": [
+    {
+      "id": "H-build-budget-low",
+      "primacy": "primary",
+      "claim": "BUILD clears (validator PASS, workflow advances past build) in at least 2 of 3 treatment opportunities at 32768 + low — V9's failure set was budget-bound for the exhaustion share and precision-bound for the geometry share; doubling the budget at fixed low reasoning gives the slower low-effort path room to finish correct hunks.",
+      "falsified_if": "Fewer than 2 of 3 opportunities clear."
+    },
+    {
+      "id": "H-serialization-persists",
+      "claim": "Visible output continues but marker/patch correctness prevents publication (geometry rejects per the V9 taxonomy, or marker truncation per the V10 observational class) — serialization quality is budget-independent at low effort.",
+      "falsified_if": "No BUILD opportunity fails at the marker/patch-correctness level."
+    },
+    {
+      "id": "H-low-aclass",
+      "claim": "Zero-visible A-class occurs despite low effort (it did not in V9's 3 opportunities at 16k; V10 observational evidence showed an A-class under unsupported medium, suggesting route/effort interactions).",
+      "falsified_if": "No A-class signature occurs in any of the 3 opportunities."
+    },
+    {
+      "id": "H-visible-exhaustion",
+      "claim": "BUILD still reaches the 32,768 ceiling with substantive visible synthesis (the V9-2 class scales with budget).",
+      "falsified_if": "No opportunity reaches the 32,768 ceiling with substantive visible output."
+    },
+    {
+      "id": "H-end-to-end",
+      "claim": "The required edit publishes and downstream Gate B passes — the campaign's first complete end-to-end run.",
+      "falsified_if": "Zero workflows complete end-to-end in the block."
+    }
+  ],
+  "per_opportunity_evidence_requirements": "Unchanged from V10 freeze: requested max_tokens + reasoning.effort as sent; route/provider; turn count; finish_reason; visible bytes; reasoning bytes; continuation involvement; format-repair involvement; patch parse result; per-hunk count validity (declared vs derived); oldStart/context matching analysis; base hash; apply result; required-edit satisfaction; downstream Gate B if the workflow completes. The V9 replay tooling remains the observation harness.",
+  "sampling_rule": "Run until 3 evaluable BUILD treatment opportunities or 9 evaluable workflows, whichever occurs first. Ordinary upstream failures consume workflow slots; transport-censored executions consume neither; any implementation, evidence, or procedure defect stops the block immediately.",
+  "terminal_rule": "If V11 produces fewer than 2/3 BUILD clears, do NOT preregister another budget/effort sweep — STOP for redesign of the BUILD edit/output protocol. The config-knob line ends here per operator directive.",
+  "reporting_requirements": [
+    "workflow denominator: N evaluable workflows; BUILD reached X/N",
+    "treatment denominator: BUILD cleared Y/X",
+    "end-to-end successes: Z",
+    "per-hypothesis disposition under H-build-budget-low / H-serialization-persists / H-low-aclass / H-visible-exhaustion / H-end-to-end"
+  ],
+  "continuation_rule": "Frozen V4 semantics unchanged: continuation fires only at turn == threshold+1 with max_tokens stop, NON-EMPTY visible text, no tool use, unspent budget. Zero-text exhaustion is never continuable.",
+  "constraint": "No tuning between runs. No mechanism changes. No V12 preregistration until this block closes and the operator reviews the evidence.",
+  "block_disposition": "At rule termination: journal all runs with per-opportunity evidence, report denominators + end-to-end count + hypothesis dispositions, freeze the block record, and STOP for operator block review."
+}

@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-10-05T10:14:07.283Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-05T10:14:07.288Z","event":"decision_resolving","decisionId":"f16c2216-2524-4e39-81d7-9bab78ba792f","optionId":"approve","rationale":"V11-3 operator confirm checkpoint: TEST cleared; authorizing the FINAL BUILD 32768+low treatment opportunity under frozen preregistration ee2fd57b"}
+[journal] {"ts":"2026-10-05T10:20:04.145Z","event":"decision_resumed","decisionId":"f16c2216-2524-4e39-81d7-9bab78ba792f"}
+[journal] {"ts":"2026-10-05T10:20:04.147Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"build","iteration":1}]}

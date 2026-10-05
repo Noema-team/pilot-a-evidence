@@ -1,0 +1,8 @@
+v9-1: super-normalized (2 whitespace restorations)
+v9-1: ANCHORED REPLAY MATCHES — 96923 bytes, staged sha256 9d665a2248ee… — PASS
+v9-3: super-normalized (4 whitespace restorations)
+v9-3: ANCHORED REPLAY MATCHES — 96325 bytes, staged sha256 0c247dd782be… — PASS
+v11-3-patch: anchor failure after line 376
+v11-3-create: staged bytes equal the SLE-ARTIFACT bytes (2530 B) — PASS
+
+REPLAY QUALIFICATION: 3/4 cases passed

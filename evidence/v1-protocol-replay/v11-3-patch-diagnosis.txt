@@ -1,0 +1,6 @@
+hunk 1: declared -30,6 | extracted oldLines 4 | exact@pos 0 | offset 3 | absent 1 | firstOld sha 28d90cdf
+hunk 2: declared -520,2 | extracted oldLines 1 | exact@pos 0 | offset 1 | absent 0 | firstOld sha da488a04
+hunk 3: declared -560,2 | extracted oldLines 1 | exact@pos 0 | offset 0 | absent 1 | firstOld sha df0fd11a
+hunk 4: declared -600,2 | extracted oldLines 1 | exact@pos 0 | offset 0 | absent 1 | firstOld sha df0fd11a
+hunk 5: declared -640,2 | extracted oldLines 1 | exact@pos 0 | offset 0 | absent 1 | firstOld sha df0fd11a
+hunk 6: declared -680,2 | extracted oldLines 1 | exact@pos 0 | offset 0 | absent 1 | firstOld sha df0fd11a

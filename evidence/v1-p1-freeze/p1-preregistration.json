@@ -1,0 +1,99 @@
+{
+  "experiment": "P1",
+  "title": "BUILD Edit Protocol v1 under the frozen V11 model regime",
+  "preregistered_at_utc": "2026-10-05T00:00:00Z",
+  "directive": "Operator P1 launch directive: proceed to freeze after mechanical proof of twelve items; do NOT run a live model execution; no new token/reasoning experiments; no fuzzy matching or textual patch recovery.",
+  "model_regime_frozen": {
+    "note": "identical to V11 — the model configuration is NOT an experimental variable",
+    "provider": "openrouter",
+    "model": "z-ai/glm-5.3-flash",
+    "base_url": "https://openrouter.ai/api/v1",
+    "max_tokens_global": 16384,
+    "per_step": {
+      "full-build/design": { "max_tokens": 32768, "reasoning_effort": null },
+      "full-build/plan": { "max_tokens": 32768, "reasoning_effort": null },
+      "full-build/test": { "max_tokens": 32768, "reasoning_effort": "low" },
+      "full-build/build": { "max_tokens": 32768, "reasoning_effort": "low" }
+    },
+    "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2"
+  },
+  "treatment": {
+    "name": "BUILD publication protocol v1 (anchored semantic edits)",
+    "old": "textual SLE-PATCH / model-authored unified diff (V8-V11 protocol)",
+    "new": "structured build-changeset ActionContract: run-scoped opaque anchors minted by Stratum on read_source_slice (path + base sha + exact span + content hash); the model submits {edits:[{anchor_id,replacement}], creates:[{path,content}]} through the existing submit_result transport; Stratum re-verifies base hashes against disk, splices exact bytes, and publishes through the unchanged publication boundary; unified diffs exist only as Stratum-generated audit evidence"
+  },
+  "primary_hypothesis": {
+    "id": "H-protocol-publication",
+    "statement": "BUILD successfully stages and publishes its required authorized source edit in at least 2/3 evaluable BUILD opportunities.",
+    "comparator": "V11 (32k+low, old protocol): 0/3 BUILD publications; 6/6 real-output serialization failures across the config line",
+    "decision_rule": "SUPPORTED if >= 2/3 evaluable BUILD opportunities publish; FALSIFIED if < 2/3"
+  },
+  "secondary_outcome_taxonomy": [
+    "submission failure: missing/malformed submit_result, schema or result-repair exhaustion",
+    "anchor failure: unknown/stale/duplicate/overlapping/unavailable anchor",
+    "authority/staging rejection: editPolicy, required-path, create-exists, base-state or ownership rejection",
+    "downstream semantic failure: BUILD publication succeeds but EXEC/tests/validation fail",
+    "end-to-end success: BUILD publishes and the downstream workflow completes successfully"
+  ],
+  "sampling_plan": {
+    "stop_rule": "stop after 3 evaluable BUILD opportunities or 9 evaluable workflows, whichever occurs first",
+    "rules": [
+      "upstream failures consume workflow slots",
+      "transport censoring consumes neither",
+      "implementation/evidence/procedure defects stop immediately"
+    ]
+  },
+  "capability_preflight": {
+    "status": "PASS",
+    "detail": "BUILD effort 'low' and TEST effort 'low' are in the model's live declared supported_efforts ['max','high','low'] (default 'max'); live snapshot matches the V11 metadata snapshot",
+    "preflight_output": "evidence/v1-p1-freeze/capability-preflight-output.txt",
+    "metadata_file": "evidence/v1-p1-freeze/capability-metadata.json",
+    "metadata_sha256": "6bca97c879b3e3ce92c04347ed887685ba4c134fb2542e4f02d73b8913b1737e"
+  },
+  "mechanical_proofs": {
+    "status": "17/17 PASS (all twelve operator items)",
+    "script": "evidence/v1-p1-freeze/p1-freeze-proof.mts",
+    "output": "evidence/v1-p1-freeze/freeze-proof-output.txt",
+    "items": {
+      "1_build_resolves_action_artifact": "PASS — full-build BUILD step declares actionArtifact.type = build-changeset; application registry resolves it",
+      "2_schema_projection_golden": "PASS — submit_result input_schema (both in code and on the wire, request 1) equals the frozen closed {edits, creates} schema; golden archived and hashed",
+      "3_investigation_tools": "PASS — turn 1 tools exactly [read_file, read_source_slice, list_directory, submit_result] (AGENT_TOOLS + the submission channel, nothing else)",
+      "4_anchor_binding": "PASS — read_source_slice result carries anchor {anchor_id, path, base_sha256=file bytes, start_line, end_line, content_sha256=span bytes}; id matches the frozen deterministic formula; a fresh registry cannot resolve it (run-scoped)",
+      "5_synthesis_tools": "PASS — synthesis turns offer exactly [submit_result]",
+      "6_no_patch_teaching": "PASS — zero SLE-PATCH/SLE-ARTIFACT/unified-diff/hunk tokens in everything BUILD sees (system + all messages, both turns)",
+      "7_fail_closed_anchors": "PASS — unknown/cross-run/duplicate/overlapping/stale all rejected (validate or authoritative stage); disjoint anchors validate; identical bindings dedupe to one id and duplicate edits with it fail closed",
+      "8_create_no_overwrite": "PASS — staging a create onto an existing path fails closed",
+      "9_staged_not_proposed": "PASS — 9a: valid proposal without the required path fails the step (requiredEditPaths unsatisfied, base untouched); 9b: schema-valid proposal with a stale base fails authoritatively despite passing validate; no applied-edit provenance in either",
+      "10_staging_no_disk_mutation": "PASS — full tree (sha + mtime) byte-identical across stage(); changeset is in-memory only; the publication boundary remains the sole writer",
+      "11_evidence_only": "PASS — anchored modules import no diff applier and teach no SLE-PATCH syntax (comments excluded, verified); anchor manifest + Stratum-generated audit diff written post-publication under .sle/runs/.../node-outputs/ and never appear in anything the model sees",
+      "12_legacy_byte_identical": "PASS — legacy non-action step: no submission tool offered, no anchor fields on read results, no anchored_edits, unchanged produced-file provenance, expected legacy bytes on disk"
+    }
+  },
+  "freeze": {
+    "implementation_commit_sha256_git": "8138e564527fabae28305062a2951bb26cc42b88",
+    "implementation_repo": "/home/theo/Documents/coding/repos/stratum (tree clean at freeze)",
+    "config_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+    "golden_projection": {
+      "file": "evidence/v1-p1-freeze/golden-submit-result-schema.json",
+      "sha256": "54ce6c07a8454877fb99b32867d525ceb9ba481b35010c2805dd72973559d6c4"
+    },
+    "capability_metadata_sha256": "6bca97c879b3e3ce92c04347ed887685ba4c134fb2542e4f02d73b8913b1737e",
+    "authority_gate_b_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+    "integrity_pins": {
+      "student_platform_head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+      "student_platform_tree": "clean (0 modifications)",
+      "rag_worker_main_py_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+    }
+  },
+  "qualification_context": {
+    "offline_tests": "24 new tests (17 unit + 7 runner-level) incl. campaign regression-impossibility pins; full suite 1838 pass / 0 fail at the freeze commit",
+    "replay_qualification": "v9-1 and v9-3 archived model intents re-expressed as anchored proposals stage BYTE-IDENTICAL outputs (96,923 B sha 9d665a2248ee…; 96,325 B sha 0c247dd782be…); v11-3 SLE-ARTIFACT create staged byte-equal (2,530 B); v11-3's rejected patch diagnosed as fabricated old-side context — a class v1 makes unrepresentable (archive: evidence/v1-protocol-replay/)",
+    "spec": "stratum docs/specs/build-edit-protocol-v1.md"
+  },
+  "prohibited": [
+    "live model execution before final launch review",
+    "any additional token-budget or reasoning-effort experimentation",
+    "fallback fuzzy matching or textual patch recovery"
+  ],
+  "status": "FROZEN — STOPPED before P1-1 pending final launch review"
+}

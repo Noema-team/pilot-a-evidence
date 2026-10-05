@@ -1,0 +1,4 @@
+PASS full-build/build: effort "low" is in supported_efforts ["max","high","low"]
+PASS full-build/test: effort "low" is in supported_efforts ["max","high","low"]
+metadata snapshot: z-ai/glm-5.3-flash sha256 cf35e7ddad015e98 default_effort=max
+CAPABILITY PREFLIGHT: ALL CONFIGURED EFFORTS SUPPORTED

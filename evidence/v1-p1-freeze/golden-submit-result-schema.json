@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "properties": {
+    "edits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "replacement": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "anchor_id",
+          "replacement"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 64
+    },
+    "creates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 64
+    }
+  },
+  "required": [
+    "edits",
+    "creates"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

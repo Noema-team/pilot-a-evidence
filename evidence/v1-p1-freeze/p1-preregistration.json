@@ -4,16 +4,28 @@
   "preregistered_at_utc": "2026-10-05T00:00:00Z",
   "directive": "Operator P1 launch directive: proceed to freeze after mechanical proof of twelve items; do NOT run a live model execution; no new token/reasoning experiments; no fuzzy matching or textual patch recovery.",
   "model_regime_frozen": {
-    "note": "identical to V11 — the model configuration is NOT an experimental variable",
+    "note": "identical to V11 \u2014 the model configuration is NOT an experimental variable",
     "provider": "openrouter",
     "model": "z-ai/glm-5.3-flash",
     "base_url": "https://openrouter.ai/api/v1",
     "max_tokens_global": 16384,
     "per_step": {
-      "full-build/design": { "max_tokens": 32768, "reasoning_effort": null },
-      "full-build/plan": { "max_tokens": 32768, "reasoning_effort": null },
-      "full-build/test": { "max_tokens": 32768, "reasoning_effort": "low" },
-      "full-build/build": { "max_tokens": 32768, "reasoning_effort": "low" }
+      "full-build/design": {
+        "max_tokens": 32768,
+        "reasoning_effort": null
+      },
+      "full-build/plan": {
+        "max_tokens": 32768,
+        "reasoning_effort": null
+      },
+      "full-build/test": {
+        "max_tokens": 32768,
+        "reasoning_effort": "low"
+      },
+      "full-build/build": {
+        "max_tokens": 32768,
+        "reasoning_effort": "low"
+      }
     },
     "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2"
   },
@@ -51,27 +63,29 @@
     "metadata_sha256": "6bca97c879b3e3ce92c04347ed887685ba4c134fb2542e4f02d73b8913b1737e"
   },
   "mechanical_proofs": {
-    "status": "17/17 PASS (all twelve operator items)",
+    "status": "19/19 PASS (all twelve operator items incl. the strengthened collision case)",
     "script": "evidence/v1-p1-freeze/p1-freeze-proof.mts",
-    "output": "evidence/v1-p1-freeze/freeze-proof-output.txt",
+    "output": "evidence/v1-p1-freeze/freeze-proof-output-v2.txt",
     "items": {
-      "1_build_resolves_action_artifact": "PASS — full-build BUILD step declares actionArtifact.type = build-changeset; application registry resolves it",
-      "2_schema_projection_golden": "PASS — submit_result input_schema (both in code and on the wire, request 1) equals the frozen closed {edits, creates} schema; golden archived and hashed",
-      "3_investigation_tools": "PASS — turn 1 tools exactly [read_file, read_source_slice, list_directory, submit_result] (AGENT_TOOLS + the submission channel, nothing else)",
-      "4_anchor_binding": "PASS — read_source_slice result carries anchor {anchor_id, path, base_sha256=file bytes, start_line, end_line, content_sha256=span bytes}; id matches the frozen deterministic formula; a fresh registry cannot resolve it (run-scoped)",
-      "5_synthesis_tools": "PASS — synthesis turns offer exactly [submit_result]",
-      "6_no_patch_teaching": "PASS — zero SLE-PATCH/SLE-ARTIFACT/unified-diff/hunk tokens in everything BUILD sees (system + all messages, both turns)",
-      "7_fail_closed_anchors": "PASS — unknown/cross-run/duplicate/overlapping/stale all rejected (validate or authoritative stage); disjoint anchors validate; identical bindings dedupe to one id and duplicate edits with it fail closed",
-      "8_create_no_overwrite": "PASS — staging a create onto an existing path fails closed",
-      "9_staged_not_proposed": "PASS — 9a: valid proposal without the required path fails the step (requiredEditPaths unsatisfied, base untouched); 9b: schema-valid proposal with a stale base fails authoritatively despite passing validate; no applied-edit provenance in either",
-      "10_staging_no_disk_mutation": "PASS — full tree (sha + mtime) byte-identical across stage(); changeset is in-memory only; the publication boundary remains the sole writer",
-      "11_evidence_only": "PASS — anchored modules import no diff applier and teach no SLE-PATCH syntax (comments excluded, verified); anchor manifest + Stratum-generated audit diff written post-publication under .sle/runs/.../node-outputs/ and never appear in anything the model sees",
-      "12_legacy_byte_identical": "PASS — legacy non-action step: no submission tool offered, no anchor fields on read results, no anchored_edits, unchanged produced-file provenance, expected legacy bytes on disk"
+      "1_build_resolves_action_artifact": "PASS \u2014 full-build BUILD step declares actionArtifact.type = build-changeset; application registry resolves it",
+      "2_schema_projection_golden": "PASS \u2014 submit_result input_schema (both in code and on the wire, request 1) equals the frozen closed {edits, creates} schema; golden archived and hashed",
+      "3_investigation_tools": "PASS \u2014 turn 1 tools exactly [read_file, read_source_slice, list_directory, submit_result] (AGENT_TOOLS + the submission channel, nothing else)",
+      "4_anchor_binding": "PASS \u2014 read_source_slice result carries anchor {anchor_id, path, base_sha256=file bytes, start_line, end_line, content_sha256=span bytes}; id matches the frozen deterministic formula; a fresh registry cannot resolve it (run-scoped)",
+      "5_synthesis_tools": "PASS \u2014 synthesis turns offer exactly [submit_result]",
+      "6_no_patch_teaching": "PASS \u2014 zero SLE-PATCH/SLE-ARTIFACT/unified-diff/hunk tokens in everything BUILD sees (system + all messages, both turns)",
+      "7_fail_closed_anchors": "PASS \u2014 unknown/cross-run/duplicate/overlapping/stale all rejected (validate or authoritative stage); disjoint anchors validate; identical bindings dedupe to one id and duplicate edits with it fail closed",
+      "8_create_no_overwrite": "PASS \u2014 staging a create onto an existing path fails closed",
+      "9_staged_not_proposed": "PASS \u2014 9a: valid proposal without the required path fails the step (requiredEditPaths unsatisfied, base untouched); 9b: schema-valid proposal with a stale base fails authoritatively despite passing validate; no applied-edit provenance in either",
+      "10_staging_no_disk_mutation": "PASS \u2014 full tree (sha + mtime) byte-identical across stage(); changeset is in-memory only; the publication boundary remains the sole writer",
+      "11_evidence_only": "PASS \u2014 anchored modules import no diff applier and teach no SLE-PATCH syntax (comments excluded, verified); anchor manifest + Stratum-generated audit diff written post-publication under .sle/runs/.../node-outputs/ and never appear in anything the model sees",
+      "12_legacy_byte_identical": "PASS \u2014 legacy non-action step: no submission tool offered, no anchor fields on read results, no anchored_edits, unchanged produced-file provenance, expected legacy bytes on disk",
+      "7b_collision_full_binding_authority": "PASS \u2014 same id + identical full binding dedupes to the same anchor; same id + DIFFERENT full binding throws fail-closed and leaves the registered record unchanged (fault-injection drives the same byId.get(id) branch a genuine ~2^-64 sha256-prefix collision would take; mint throw itself pinned by regression test P1.27)",
+      "7c_collision_live_loop": "PASS \u2014 a colliding read through the LIVE loop is delivered WITHOUT an anchor (unanchored pass-through), no anchor is issued, a proposal referencing one is rejected by the acceptor through repair exhaustion, the step fails, and disk bytes are untouched \u2014 no authority transfer"
     }
   },
   "freeze": {
-    "implementation_commit_sha256_git": "8138e564527fabae28305062a2951bb26cc42b88",
-    "implementation_repo": "/home/theo/Documents/coding/repos/stratum (tree clean at freeze)",
+    "implementation_commit_sha256_git": "315d37178a98917b0c5de79ac851fa6083acfad7",
+    "implementation_repo": "/home/theo/Documents/coding/repos/stratum (tree clean at the freeze commit; review branch p1-freeze-review fast-forwarded to it \u2014 no merge commit, it IS the runtime identity)",
     "config_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
     "golden_projection": {
       "file": "evidence/v1-p1-freeze/golden-submit-result-schema.json",
@@ -86,8 +100,8 @@
     }
   },
   "qualification_context": {
-    "offline_tests": "24 new tests (17 unit + 7 runner-level) incl. campaign regression-impossibility pins; full suite 1838 pass / 0 fail at the freeze commit",
-    "replay_qualification": "v9-1 and v9-3 archived model intents re-expressed as anchored proposals stage BYTE-IDENTICAL outputs (96,923 B sha 9d665a2248ee…; 96,325 B sha 0c247dd782be…); v11-3 SLE-ARTIFACT create staged byte-equal (2,530 B); v11-3's rejected patch diagnosed as fabricated old-side context — a class v1 makes unrepresentable (archive: evidence/v1-protocol-replay/)",
+    "offline_tests": "25 new tests (18 unit + 7 runner-level) incl. campaign regression-impossibility pins and the collision guard pin P1.27; full suite 1839 pass / 0 fail at the freeze commit (evidence/v1-p1-freeze/refreeze-suite-output.txt)",
+    "replay_qualification": "v9-1 and v9-3 archived model intents re-expressed as anchored proposals stage BYTE-IDENTICAL outputs (96,923 B sha 9d665a2248ee\u2026; 96,325 B sha 0c247dd782be\u2026); v11-3 SLE-ARTIFACT create staged byte-equal (2,530 B); v11-3's rejected patch diagnosed as fabricated old-side context \u2014 a class v1 makes unrepresentable (archive: evidence/v1-protocol-replay/)",
     "spec": "stratum docs/specs/build-edit-protocol-v1.md"
   },
   "prohibited": [
@@ -95,5 +109,12 @@
     "any additional token-budget or reasoning-effort experimentation",
     "fallback fuzzy matching or textual patch recovery"
   ],
-  "status": "FROZEN — STOPPED before P1-1 pending final launch review"
+  "status": "FROZEN (corrected) \u2014 STOPPED before P1-1 pending operator GO",
+  "supersedes": {
+    "previous_preregistration_sha256": "5c9b4ad5421c8440b5edaba136b621d7dbeda9ea28dd100d73f1a7ed70731056",
+    "previous_implementation_commit": "8138e564527fabae28305062a2951bb26cc42b88",
+    "reason": "launch review found the truncated-ID collision authority defect in the candidate freeze; corrected treatment accepted by operator; disposition (a)",
+    "note": "no live P1 run ever occurred under the rejected candidate \u2014 this is not between-run tuning",
+    "history": "8138e564  P1 candidate freeze\n          \u2193 review found truncated-ID collision authority defect\n315d3717  corrected P1 treatment"
+  }
 }

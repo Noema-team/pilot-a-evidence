@@ -1,0 +1,60 @@
+{
+  "node_id": "test",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 7,
+  "tool_calls": [
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 1
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 4
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/models/resource.py",
+      "turn": 6
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 3722,
+    "reasoning_bytes": 167881,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 22285,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 9515,
+    "reasoning_tokens": 5655,
+    "prompt_tokens": 31111,
+    "total_tokens": 40626,
+    "stream_id": "gen-1791285525-lSFYVPFj1WbOdwjkmpcx",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

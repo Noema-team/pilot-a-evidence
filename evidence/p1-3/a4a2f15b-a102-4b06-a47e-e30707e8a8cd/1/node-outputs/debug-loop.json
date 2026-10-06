@@ -1,0 +1,183 @@
+{
+  "node_id": "debug",
+  "failed": true,
+  "result_transport": "textual-sle-output",
+  "turns_taken": 24,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 1
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": ".sle/work",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 4
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_contract.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 6
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_contract.py",
+      "turn": 7
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 8
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_contract.py",
+      "turn": 9
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "turn": 9
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration/",
+      "turn": 10
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service",
+      "turn": 11
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service",
+      "turn": 11
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 12
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 13
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 14
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 15
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 16
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 17
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/models/resource.py",
+      "turn": 18
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 19
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_shared_algorithms_in_sync.py",
+      "turn": 20
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/fixtures",
+      "turn": 20
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/fixtures/api-contracts",
+      "turn": 21
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_chat_pipeline.py",
+      "turn": 22
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_chat_pipeline.py",
+      "turn": 23
+    }
+  ],
+  "stop_reason": "tool_use",
+  "text_length": 0,
+  "wire_observation": {
+    "reasoning_chunks": 2612,
+    "reasoning_bytes": 118697,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 0,
+    "tool_call_fragments": 4,
+    "finish_reason": "tool_calls",
+    "completion_tokens": 3529,
+    "reasoning_tokens": 4081,
+    "prompt_tokens": 43949,
+    "total_tokens": 47478,
+    "stream_id": "gen-1791289560-NI0jgt82Yca8Y1XkvrgV",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

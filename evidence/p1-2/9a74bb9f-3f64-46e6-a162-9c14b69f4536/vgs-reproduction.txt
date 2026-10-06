@@ -1,0 +1,482 @@
+FFFFFFFF....F.....FFFFFF                                                 [100%]
+=================================== FAILURES ===================================
+_________ TestWorkerFailurePayload.test_payload_carries_required_keys __________
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f5139337250>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_payload_carries_required_keys(self, worker_error_module):
+>       payload = _build_worker_failure_payload(
+            "chunking_complete", ValueError("boom while chunking"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5138c271d0>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+____ TestWorkerFailurePayload.test_payload_carries_actual_exception_message ____
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f5138fab390>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_payload_carries_actual_exception_message(self, worker_error_module):
+>       payload = _build_worker_failure_payload(
+            "starting", ValueError("boom while starting"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:315: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5138947090>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_________ TestWorkerFailurePayload.test_payload_carries_failing_stage __________
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f5138ec3100>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_payload_carries_failing_stage(self, worker_error_module):
+>       payload = _build_worker_failure_payload(
+            "embeddings_complete", ValueError("boom"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5138646510>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_________ TestWorkerFailurePayload.test_payload_never_omits_retryable __________
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f5138ec3360>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_payload_never_omits_retryable(self, worker_error_module):
+        for exc in (
+            ValueError("unknown"),
+            worker_error_module.TransientError("flaky"),
+            worker_error_module.PermanentError("bad input"),
+        ):
+>           payload = _build_worker_failure_payload("starting", exc, worker_error_module.classify_error)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5138345a10>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestWorkerFailurePayload.test_legacy_error_key_retained_for_unknown_consumers _
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f5138e444d0>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_legacy_error_key_retained_for_unknown_consumers(self, worker_error_module):
+>       payload = _build_worker_failure_payload(
+            "starting", ValueError("boom"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5138cd4810>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_____ TestWorkerFailurePayload.test_stage_tracker_uses_progress_vocabulary _____
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f51394ef130>
+
+    def test_stage_tracker_uses_progress_vocabulary(self):
+        tree = _worker_tree()
+        fn = _find_function(tree, "process_document")
+        _, call = _failed_publish_call(fn)
+>       stage_var = _stage_tracker_var(fn, _details_node(call))
+                                           ^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f513811bc10>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+___ TestWorkerFailurePayload.test_stage_tracker_assigned_throughout_pipeline ___
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f51394ef350>
+
+    def test_stage_tracker_assigned_throughout_pipeline(self):
+        tree = _worker_tree()
+        fn = _find_function(tree, "process_document")
+        _, call = _failed_publish_call(fn)
+>       stage_var = _stage_tracker_var(fn, _details_node(call))
+                                           ^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f51388bef50>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+______ TestWorkerFailurePayload.test_stage_tracker_has_safe_unknown_value ______
+
+self = <test_failure_payload_contract.TestWorkerFailurePayload object at 0x7f5139380a50>
+
+    def test_stage_tracker_has_safe_unknown_value(self):
+        tree = _worker_tree()
+        fn = _find_function(tree, "process_document")
+        _, call = _failed_publish_call(fn)
+>       stage_var = _stage_tracker_var(fn, _details_node(call))
+                                           ^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f513804e290>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestRetryableDerivation.test_worker_payload_retryable_matches_classification _
+
+self = <test_failure_payload_contract.TestRetryableDerivation object at 0x7f5138e45910>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_worker_payload_retryable_matches_classification(self, worker_error_module):
+>       transient = _build_worker_failure_payload(
+            "text_retrieved", worker_error_module.TransientError("flaky"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:403: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5137d56350>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+___ TestFailureContractDriftGuards.test_worker_payload_keys_are_the_contract ___
+
+self = <test_failure_payload_contract.TestFailureContractDriftGuards object at 0x7f5138fab9d0>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_worker_payload_keys_are_the_contract(self, worker_error_module):
+        """The worker's payload key set is pinned: adding/removing keys must touch this test."""
+>       payload = _build_worker_failure_payload(
+            "starting", ValueError("boom"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f51386ed850>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestWorkerToApiFailureContract.test_worker_failure_persists_exactly_what_worker_sent[starting-<lambda>-False] _
+
+self = <test_failure_payload_contract.TestWorkerToApiFailureContract object at 0x7f5138e64050>
+run_failed_update = <function run_failed_update.<locals>._run at 0x7f5138e60cc0>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+stage = 'starting'
+exc_factory = <function TestWorkerToApiFailureContract.<lambda> at 0x7f5138e3db20>
+expected_retryable = False
+
+    @pytest.mark.parametrize(
+        "stage,exc_factory,expected_retryable",
+        [
+            ("starting", lambda m: m.PermanentError("document not found at path"), False),
+            ("text_retrieved", lambda m: m.TransientError("gcs download timeout"), True),
+            ("chunking_complete", lambda m: ValueError("unclassified failure"), False),
+            ("embeddings_complete", lambda m: m.TransientError("openrouter 503"), True),
+        ],
+    )
+    def test_worker_failure_persists_exactly_what_worker_sent(
+        self, run_failed_update, worker_error_module, stage, exc_factory, expected_retryable
+    ):
+        exc = exc_factory(worker_error_module)
+>       payload = _build_worker_failure_payload(stage, exc, worker_error_module.classify_error)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:519: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f513874ff10>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestWorkerToApiFailureContract.test_worker_failure_persists_exactly_what_worker_sent[text_retrieved-<lambda>-True] _
+
+self = <test_failure_payload_contract.TestWorkerToApiFailureContract object at 0x7f5138e64190>
+run_failed_update = <function run_failed_update.<locals>._run at 0x7f5138e616c0>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+stage = 'text_retrieved'
+exc_factory = <function TestWorkerToApiFailureContract.<lambda> at 0x7f5138e3dbc0>
+expected_retryable = True
+
+    @pytest.mark.parametrize(
+        "stage,exc_factory,expected_retryable",
+        [
+            ("starting", lambda m: m.PermanentError("document not found at path"), False),
+            ("text_retrieved", lambda m: m.TransientError("gcs download timeout"), True),
+            ("chunking_complete", lambda m: ValueError("unclassified failure"), False),
+            ("embeddings_complete", lambda m: m.TransientError("openrouter 503"), True),
+        ],
+    )
+    def test_worker_failure_persists_exactly_what_worker_sent(
+        self, run_failed_update, worker_error_module, stage, exc_factory, expected_retryable
+    ):
+        exc = exc_factory(worker_error_module)
+>       payload = _build_worker_failure_payload(stage, exc, worker_error_module.classify_error)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:519: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f513854f5d0>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestWorkerToApiFailureContract.test_worker_failure_persists_exactly_what_worker_sent[chunking_complete-<lambda>-False] _
+
+self = <test_failure_payload_contract.TestWorkerToApiFailureContract object at 0x7f5138ec3a80>
+run_failed_update = <function run_failed_update.<locals>._run at 0x7f5138e61c60>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+stage = 'chunking_complete'
+exc_factory = <function TestWorkerToApiFailureContract.<lambda> at 0x7f5138e3dc60>
+expected_retryable = False
+
+    @pytest.mark.parametrize(
+        "stage,exc_factory,expected_retryable",
+        [
+            ("starting", lambda m: m.PermanentError("document not found at path"), False),
+            ("text_retrieved", lambda m: m.TransientError("gcs download timeout"), True),
+            ("chunking_complete", lambda m: ValueError("unclassified failure"), False),
+            ("embeddings_complete", lambda m: m.TransientError("openrouter 503"), True),
+        ],
+    )
+    def test_worker_failure_persists_exactly_what_worker_sent(
+        self, run_failed_update, worker_error_module, stage, exc_factory, expected_retryable
+    ):
+        exc = exc_factory(worker_error_module)
+>       payload = _build_worker_failure_payload(stage, exc, worker_error_module.classify_error)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:519: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f513812ebd0>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestWorkerToApiFailureContract.test_worker_failure_persists_exactly_what_worker_sent[embeddings_complete-<lambda>-True] _
+
+self = <test_failure_payload_contract.TestWorkerToApiFailureContract object at 0x7f5138ec3bb0>
+run_failed_update = <function run_failed_update.<locals>._run at 0x7f5138e61ee0>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+stage = 'embeddings_complete'
+exc_factory = <function TestWorkerToApiFailureContract.<lambda> at 0x7f5138e3dd00>
+expected_retryable = True
+
+    @pytest.mark.parametrize(
+        "stage,exc_factory,expected_retryable",
+        [
+            ("starting", lambda m: m.PermanentError("document not found at path"), False),
+            ("text_retrieved", lambda m: m.TransientError("gcs download timeout"), True),
+            ("chunking_complete", lambda m: ValueError("unclassified failure"), False),
+            ("embeddings_complete", lambda m: m.TransientError("openrouter 503"), True),
+        ],
+    )
+    def test_worker_failure_persists_exactly_what_worker_sent(
+        self, run_failed_update, worker_error_module, stage, exc_factory, expected_retryable
+    ):
+        exc = exc_factory(worker_error_module)
+>       payload = _build_worker_failure_payload(stage, exc, worker_error_module.classify_error)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_failure_payload_contract.py:519: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5137c4a450>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+_ TestWorkerToApiFailureContract.test_legacy_error_key_is_not_what_the_api_persists _
+
+self = <test_failure_payload_contract.TestWorkerToApiFailureContract object at 0x7f5138e471d0>
+run_failed_update = <function run_failed_update.<locals>._run at 0x7f5138e62020>
+worker_error_module = <module 'worker_error_classification' from '/tmp/pytest-of-theo/pytest-1/worker_error_classification0/worker_error_classification.py'>
+
+    def test_legacy_error_key_is_not_what_the_api_persists(self, run_failed_update, worker_error_module):
+        """The API must persist error_message, not the legacy 'error' hedge key."""
+>       payload = _build_worker_failure_payload(
+            "starting", ValueError("real message"), worker_error_module.classify_error
+        )
+
+tests/integration/test_failure_payload_contract.py:539: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_failure_payload_contract.py:158: in _build_worker_failure_payload
+    details = _details_node(call)
+              ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+call = <ast.Call object at 0x7f5137675a10>
+
+    def _details_node(call):
+        for arg in call.args:
+            if isinstance(arg, ast.Dict):
+                return arg
+>       raise AssertionError("failed _publish_status_update call must pass a dict of details")
+E       AssertionError: failed _publish_status_update call must pass a dict of details
+
+tests/integration/test_failure_payload_contract.py:111: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_payload_carries_required_keys
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_payload_carries_actual_exception_message
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_payload_carries_failing_stage
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_payload_never_omits_retryable
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_legacy_error_key_retained_for_unknown_consumers
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_stage_tracker_uses_progress_vocabulary
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_stage_tracker_assigned_throughout_pipeline
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerFailurePayload::test_stage_tracker_has_safe_unknown_value
+FAILED tests/integration/test_failure_payload_contract.py::TestRetryableDerivation::test_worker_payload_retryable_matches_classification
+FAILED tests/integration/test_failure_payload_contract.py::TestFailureContractDriftGuards::test_worker_payload_keys_are_the_contract
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerToApiFailureContract::test_worker_failure_persists_exactly_what_worker_sent[starting-<lambda>-False]
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerToApiFailureContract::test_worker_failure_persists_exactly_what_worker_sent[text_retrieved-<lambda>-True]
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerToApiFailureContract::test_worker_failure_persists_exactly_what_worker_sent[chunking_complete-<lambda>-False]
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerToApiFailureContract::test_worker_failure_persists_exactly_what_worker_sent[embeddings_complete-<lambda>-True]
+FAILED tests/integration/test_failure_payload_contract.py::TestWorkerToApiFailureContract::test_legacy_error_key_is_not_what_the_api_persists
+15 failed, 9 passed in 0.68s

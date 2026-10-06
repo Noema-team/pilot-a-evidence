@@ -1,0 +1,27 @@
+[journal] {"ts":"2026-10-06T10:22:35.725Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-06T10:22:35.730Z","event":"decision_resolving","decisionId":"6bfb0041-8ab4-4852-8e8d-248ddb08ff03","optionId":"approve","rationale":"P1-1: accept the cycle charter (operator-approved launch, preregistration e42a8b46)"}
+[journal] {"ts":"2026-10-06T10:45:36.317Z","event":"decision_resumed","decisionId":"6bfb0041-8ab4-4852-8e8d-248ddb08ff03"}
+[journal] {"ts":"2026-10-06T10:45:36.318Z","event":"tick","round":0,"dispatches":[]}
+[journal] {"ts":"2026-10-06T10:45:36.319Z","event":"decision_pending","decisionId":"75c7fccd-eff3-4060-a0e9-fd9d3214b0ad","type":"checkpoint","title":"Workflow reached another checkpoint","summary":"Workflow 'full-build' paused at step 'confirm'.","options":[{"id":"approve","label":"Approve","description":"Continue to the build phase"},{"id":"revise","label":"Revise","description":"Send back for revision (increments revision counter)"}]}
+{
+  "decisionId": "75c7fccd-eff3-4060-a0e9-fd9d3214b0ad",
+  "type": "checkpoint",
+  "title": "Workflow reached another checkpoint",
+  "summary": "Workflow 'full-build' paused at step 'confirm'.",
+  "options": [
+    {
+      "id": "approve",
+      "label": "Approve",
+      "description": "Continue to the build phase"
+    },
+    {
+      "id": "revise",
+      "label": "Revise",
+      "description": "Send back for revision (increments revision counter)"
+    }
+  ]
+}
+[journal] {"ts":"2026-10-06T10:45:57.315Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-06T10:45:57.320Z","event":"decision_resolving","decisionId":"75c7fccd-eff3-4060-a0e9-fd9d3214b0ad","optionId":"approve","rationale":"P1-1: proceed (operator-approved launch)"}
+[journal] {"ts":"2026-10-06T10:50:17.873Z","event":"decision_resumed","decisionId":"75c7fccd-eff3-4060-a0e9-fd9d3214b0ad"}
+[journal] {"ts":"2026-10-06T10:50:17.880Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"build","iteration":1}]}

@@ -1,0 +1,85 @@
+{
+  "node_id": "build",
+  "result_transport": "submit-result",
+  "turns_taken": 13,
+  "tool_calls": [
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 1
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 1
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 4
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 5
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 7
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_search_pipeline.py",
+      "turn": 9
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 10
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 12
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 12,
+    "reasoning_bytes": 488,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 0,
+    "tool_call_fragments": 2,
+    "finish_reason": "tool_calls",
+    "completion_tokens": 5823,
+    "reasoning_tokens": 12,
+    "prompt_tokens": 61155,
+    "total_tokens": 66978,
+    "stream_id": "gen-1791289375-HUNzOshFAvsIQskJiS10",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

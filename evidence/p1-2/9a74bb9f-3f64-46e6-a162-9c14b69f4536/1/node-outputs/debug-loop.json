@@ -1,0 +1,195 @@
+{
+  "node_id": "debug",
+  "failed": true,
+  "result_transport": "textual-sle-output",
+  "turns_taken": 24,
+  "tool_calls": [
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 1
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "scripts",
+      "turn": 3
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service",
+      "turn": 4
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 4
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 6
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 6
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service/models",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": ".",
+      "turn": 8
+    },
+    {
+      "tool": "list_directory",
+      "path": ".sle",
+      "turn": 8
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 9
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs/task-management",
+      "turn": 10
+    },
+    {
+      "tool": "list_directory",
+      "path": ".devloop",
+      "turn": 10
+    },
+    {
+      "tool": "list_directory",
+      "path": ".devloop/active-task",
+      "turn": 11
+    },
+    {
+      "tool": "read_file",
+      "path": ".ai-review-rubric.md",
+      "turn": 12
+    },
+    {
+      "tool": "list_directory",
+      "path": "dev",
+      "turn": 12
+    },
+    {
+      "tool": "read_file",
+      "path": "dev/verdict.py",
+      "turn": 13
+    },
+    {
+      "tool": "read_file",
+      "path": "dev/loop.py",
+      "turn": 14
+    },
+    {
+      "tool": "read_file",
+      "path": "dev/run",
+      "turn": 15
+    },
+    {
+      "tool": "list_directory",
+      "path": "dev/collectors",
+      "turn": 16
+    },
+    {
+      "tool": "read_file",
+      "path": "dev/collectors/ai-server.sh",
+      "turn": 17
+    },
+    {
+      "tool": "list_directory",
+      "path": "dev/journeys",
+      "turn": 18
+    },
+    {
+      "tool": "read_file",
+      "path": "dev/journeys/README.md",
+      "turn": 19
+    },
+    {
+      "tool": "list_directory",
+      "path": "dev/journeys/specs",
+      "turn": 20
+    },
+    {
+      "tool": "read_file",
+      "path": "dev/journeys/specs/J6-degradation.yaml",
+      "turn": 21
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "turn": 22
+    },
+    {
+      "tool": "list_directory",
+      "path": ".github",
+      "turn": 22
+    },
+    {
+      "tool": "list_directory",
+      "path": ".github/workflows",
+      "turn": 23
+    }
+  ],
+  "stop_reason": "tool_use",
+  "text_length": 0,
+  "wire_observation": {
+    "reasoning_chunks": 0,
+    "reasoning_bytes": 0,
+    "reasoning_fields": [],
+    "content_bytes": 0,
+    "tool_call_fragments": 2,
+    "finish_reason": "tool_calls",
+    "completion_tokens": 17,
+    "reasoning_tokens": 0,
+    "prompt_tokens": 49177,
+    "total_tokens": 49194,
+    "stream_id": "gen-1791286683-UUATMBfWzOm2yJbsS0rJ",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

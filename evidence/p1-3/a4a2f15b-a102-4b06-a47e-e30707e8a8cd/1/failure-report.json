@@ -1,0 +1,25 @@
+{
+  "cycle": 0,
+  "iteration": 1,
+  "run_dir": "/home/theo/Documents/coding/repos/student-platform/.sle/runs/a4a2f15b-a102-4b06-a47e-e30707e8a8cd/1",
+  "run_id": "a4a2f15b-a102-4b06-a47e-e30707e8a8cd",
+  "quick_summary": "Validation failed: static_check passed=true, 3 categories failed",
+  "failed_categories": [
+    {
+      "name": "correctness",
+      "method": "executable",
+      "error_summary": "Category correctness failed validation gate checks"
+    },
+    {
+      "name": "performance",
+      "method": "executable",
+      "error_summary": "Category performance failed validation gate checks"
+    },
+    {
+      "name": "security",
+      "method": "executable",
+      "error_summary": "Category security failed validation gate checks"
+    }
+  ],
+  "passed_categories": []
+}

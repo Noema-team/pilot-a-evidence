@@ -1,0 +1,27 @@
+[journal] {"ts":"2026-10-06T11:46:45.150Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-06T11:46:45.155Z","event":"decision_resolving","decisionId":"69b8ad46-d94a-4c89-b009-a1b4318748fd","optionId":"approve","rationale":"P1-3: accept the cycle charter (preregistration e42a8b46)"}
+[journal] {"ts":"2026-10-06T12:13:56.630Z","event":"decision_resumed","decisionId":"69b8ad46-d94a-4c89-b009-a1b4318748fd"}
+[journal] {"ts":"2026-10-06T12:13:56.632Z","event":"tick","round":0,"dispatches":[]}
+[journal] {"ts":"2026-10-06T12:13:56.632Z","event":"decision_pending","decisionId":"b69a4104-a432-4a8b-bb67-922f2a1d35b5","type":"checkpoint","title":"Workflow reached another checkpoint","summary":"Workflow 'full-build' paused at step 'confirm'.","options":[{"id":"approve","label":"Approve","description":"Continue to the build phase"},{"id":"revise","label":"Revise","description":"Send back for revision (increments revision counter)"}]}
+{
+  "decisionId": "b69a4104-a432-4a8b-bb67-922f2a1d35b5",
+  "type": "checkpoint",
+  "title": "Workflow reached another checkpoint",
+  "summary": "Workflow 'full-build' paused at step 'confirm'.",
+  "options": [
+    {
+      "id": "approve",
+      "label": "Approve",
+      "description": "Continue to the build phase"
+    },
+    {
+      "id": "revise",
+      "label": "Revise",
+      "description": "Send back for revision (increments revision counter)"
+    }
+  ]
+}
+[journal] {"ts":"2026-10-06T12:14:07.276Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-06T12:14:07.281Z","event":"decision_resolving","decisionId":"b69a4104-a432-4a8b-bb67-922f2a1d35b5","optionId":"approve","rationale":"P1-3: proceed"}
+[journal] {"ts":"2026-10-06T12:27:21.976Z","event":"decision_resumed","decisionId":"b69a4104-a432-4a8b-bb67-922f2a1d35b5"}
+[journal] {"ts":"2026-10-06T12:27:21.978Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"debug","iteration":1}]}

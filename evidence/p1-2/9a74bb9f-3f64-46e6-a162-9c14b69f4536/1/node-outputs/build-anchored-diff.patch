@@ -1,0 +1,466 @@
+--- a/apps/ai-server/rag-worker-service/main.py
++++ b/apps/ai-server/rag-worker-service/main.py
+@@ -82,14 +82,42 @@
+         if status_code in (429, 500, 502, 503, 504):
+             return True
+         # 4xx errors (except 429) are typically permanent
+-        return False
+-
+-    # For unknown exceptions, be conservative and treat as permanent
+-    # to avoid infinite retry loops
+-    return False
+-
+-# Document processing
+-from langchain.text_splitter import RecursiveCharacterTextSplitter
++        return False
++
++    # For unknown exceptions, be conservative and treat as permanent
++    # to avoid infinite retry loops
++    return False
++
++
++def build_failure_payload(error: Exception, stage: str = "processing") -> Dict[str, Any]:
++    """
++    Build the failed-status payload the worker publishes for a failed job.
++
++    This is the worker side of the worker→rag-api failure contract; rag-api's
++    run_transactional_update failed branch reads exactly these keys:
++      - error_message: the actual exception message (persisted as `error`)
++      - stage: the pipeline stage executing at failure time (persisted as
++        `error_stage`); "processing" is the safe value when the stage is
++        genuinely unknown
++      - retryable: deliberately derived from classify_error — transient-classified
++        errors are ones Pub/Sub will redeliver (True); permanent-classified and
++        unclassified-unknown errors are not (False), matching run_worker's
++        ACK/NACK behavior. Never silently defaulted.
++
++    The legacy `error` key is retained alongside error_message for continuity
++    with any other consumers of the status topic.
++    """
++    message = str(error)
++    return {
++        "error_message": message,
++        "stage": stage,
++        "retryable": classify_error(error),
++        # Legacy key kept for unknown consumers of the status topic.
++        "error": message,
++    }
++
++# Document processing
++from langchain.text_splitter import RecursiveCharacterTextSplitter
+ from langchain.schema import Document
+ 
+ # AI/ML services
+@@ -972,46 +1000,67 @@
+         return extracted_text, total_pages
+     
+     async def process_document(self, user_id: str, course_id: str, resource_id: str, job_id: Optional[str] = None) -> ProcessingMetrics:
+-        """Enhanced main processing pipeline for subcollection structure"""
+-        metrics = ProcessingMetrics(start_time=time.time())
+-        trace = self.langfuse.trace(name="doc_processing_course_resources",
+-                                input={"user_id": user_id, "course_id": course_id, "resource_id": resource_id, "job_id": job_id}) if self.langfuse else None
+-        
+-        try:
+-            await self._validate_processing_request(user_id, course_id, resource_id)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "starting"}, job_id)
+-            
+-            # Step 1: Get pre-extracted text (replaces file download and extraction)
+-            text_content, doc_metadata = await self._get_extracted_text(user_id, course_id, resource_id)
+-            metrics.text_length = len(text_content)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "text_retrieved", "progress": 20}, job_id)
+-
+-            # Step 2: Content Tagging and Analysis
+-            tags, confidence_scores = await self.content_tagger.generate_tags(text_content, doc_metadata)
+-            metrics.tags, metrics.confidence_scores = tags, confidence_scores
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "tagging_complete", "progress": 40}, job_id)
+-
+-            # Step 3: Generate Summary
+-            summary_data = await self.generate_document_summary(text_content, doc_metadata.get('title', 'Untitled Document'))
+-            
+-            update_data = {}
+-            if summary_data:
+-                update_data["ragDescription"] = summary_data
+-                update_data["ragDescriptionUpdatedAt"] = firestore.SERVER_TIMESTAMP
+-                update_data["ragDescriptionMeta"] = {
+-                    "promptVersion": self.config.summary_prompt_version,
+-                    "maxChars": self.config.summary_max_chars,
+-                    "model": self.config.summary_model
+-                }
+-            else:
+-                update_data["ragDescription"] = None # If summary generation failed, store null
+-
+-            doc_path = self._get_document_path(user_id, course_id, resource_id)
+-            self.db.document(doc_path).update(update_data)
+-
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "summary_generated", "progress": 50}, job_id)
+-
+-            # Step 4: Chunking
++        """Enhanced main processing pipeline for subcollection structure"""
++        metrics = ProcessingMetrics(start_time=time.time())
++        trace = self.langfuse.trace(name="doc_processing_course_resources",
++                                input={"user_id": user_id, "course_id": course_id, "resource_id": resource_id, "job_id": job_id}) if self.langfuse else None
++        
++        # Stage tracker: set immediately before each pipeline step so the
++        # failure handler reports the true failing stage. Names reuse the
++        # progress-update vocabulary; "processing" is the safe value when the
++        # stage is genuinely unknown (e.g. failure before the first step).
++        current_stage = "processing"
++        try:
++            await self._validate_processing_request(user_id, course_id, resource_id)
++            current_stage = "starting"
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "starting"}, job_id)
++            
++            # Step 1: Get pre-extracted text (replaces file download and extraction)
++            current_stage = "text_retrieved"
++            text_content, doc_metadata = await self._get_extracted_text(user_id, course_id, resource_id)
++            metrics.text_length = len(text_content)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "text_retrieved", "progress": 20}, job_id)
++
++            # Step 2: Content Tagging and Analysis
++            current_stage = "tagging_complete"
++            tags, confidence_scores = await self.content_tagger.generate_tags(text_content, doc_metadata)
++            metrics.tags, metrics.confidence_scores = tags, confidence_scores
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "tagging_complete", "progress": 40}, job_id)
++
++            # Step 3: Generate Summary
++            current_stage = "summary_generated"
++            summary_data = await self.generate_document_summary(text_content, doc_metadata.get('title', 'Untitled Document'))
++            
++            update_data = {}
++            if summary_data:
++                update_data["ragDescription"] = summary_data
++                update_data["ragDescriptionUpdatedAt"] = firestore.SERVER_TIMESTAMP
++                update_data["ragDescriptionMeta"] = {
++                    "promptVersion": self.config.summary_prompt_version,
++                    "maxChars": self.config.summary_max_chars,
++                    "model": self.config.summary_model
++                }
++            else:
++                update_data["ragDescription"] = None # If summary generation failed, store null
++
++            doc_path = self._get_document_path(user_id, course_id, resource_id)
++            self.db.document(doc_path).update(update_data)
++
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "summary_generated", "progress": 50}, job_id)
++
++            # Step 4: Chunking
++            current_stage = "chunking_complete"
++            chunks = await self._create_enhanced_chunks(text_content, doc_metadata, tags, user_id, course_id, resource_id)
++            metrics.chunks_created = len(chunks)
++            metrics.tokens_used = sum(c.token_count for c in chunks)
++            metrics.cost_estimate = metrics.tokens_used * self.embedding_cost_per_token
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "chunking_complete", "progress": 60}, job_id)
++
++            # Step 5: Generate Embeddings
++            current_stage = "embeddings_complete"
++            vectors = await self._generate_embeddings_with_openrouter(chunks)
++            metrics.embeddings_generated = len(vectors)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "embeddings_complete", "progress": 80}, job_id)
+             chunks = await self._create_enhanced_chunks(text_content, doc_metadata, tags, user_id, course_id, resource_id)
+             metrics.chunks_created = len(chunks)
+             metrics.tokens_used = sum(c.token_count for c in chunks)
+@@ -1087,18 +1136,30 @@
+             )
+ 
+             metrics.end_time = time.time()
+-            if trace: trace.update(output={"success": True, "metrics": asdict(metrics)})
+-            self.logger.info("document_processing_completed", user_id=user_id, course_id=course_id, resource_id=resource_id, processing_time=metrics.processing_time)
+-            return metrics
+-            
+-        except Exception as e:
+-            metrics.error_message, metrics.end_time = str(e), time.time()
+-            self.logger.error("document_processing_failed", user_id=user_id, course_id=course_id, resource_id=resource_id, error=str(e))
+-            await self._publish_status_update(user_id, course_id, resource_id, "failed", {"error": str(e)}, job_id)
+-            if trace: trace.update(output={"success": False, "error": str(e)})
+-            return metrics
+-    
+-    async def _validate_processing_request(self, user_id: str, course_id: str, resource_id: str):
++            if trace: trace.update(output={"success": True, "metrics": asdict(metrics)})
++            self.logger.info("document_processing_completed", user_id=user_id, course_id=course_id, resource_id=resource_id, processing_time=metrics.processing_time)
++            return metrics
++            
++        except Exception as e:
++            metrics.error_message, metrics.end_time = str(e), time.time()
++            # Contract with rag-api's failed branch: publish the actual error
++            # message, the failing stage, and a deliberately derived retryable
++            # flag — never rely on rag-api's fallback defaults.
++            failure_details = build_failure_payload(e, current_stage)
++            self.logger.error(
++                "document_processing_failed",
++                user_id=user_id,
++                course_id=course_id,
++                resource_id=resource_id,
++                error=str(e),
++                stage=current_stage,
++                retryable=failure_details["retryable"],
++            )
++            await self._publish_status_update(user_id, course_id, resource_id, "failed", failure_details, job_id)
++            if trace: trace.update(output={"success": False, "error": str(e), "stage": current_stage})
++            return metrics
++    
++    async def _validate_processing_request(self, user_id: str, course_id: str, resource_id: str):
+         """Validate processing request using subcollection paths"""
+         
+         doc_path = self._get_document_path(user_id, course_id, resource_id)
+
+--- a/apps/ai-server/tests/integration/test_worker_failure_payload_contract.py
++++ b/apps/ai-server/tests/integration/test_worker_failure_payload_contract.py
+@@ -0,0 +1,258 @@
++"""Contract test: rag-worker failure payload → rag-api failed-branch persistence.
++
++Pins the worker→rag-api failure contract end to end:
++
++- the worker's build_failure_payload emits error_message / stage / retryable
++  (plus the legacy `error` key) and derives retryable from classify_error;
++- rag-api's run_transactional_update failed branch persists those values
++  unchanged as error / error_stage / retryable and mirrors the same message
++  and stage into the processing/summary error subdocument;
++- AST/source drift guards fail the build if either side's payload keys change.
++
++Both sides are imported (not restated in a fixture), so a key change on either
++side fails here instead of silently re-creating the fallback-values bug.
++"""
++import ast
++import importlib.util
++import os
++import sys
++from unittest.mock import MagicMock
++
++import pytest
++
++import main as rag_api_main  # conftest put rag-api-service on sys.path
++
++RAG_WORKER_DIR = os.path.abspath(
++    os.path.join(os.path.dirname(__file__), "..", "..", "rag-worker-service")
++)
++WORKER_MAIN = os.path.join(RAG_WORKER_DIR, "main.py")
++RAG_API_MAIN = os.path.abspath(
++    os.path.join(os.path.dirname(__file__), "..", "..", "rag-api-service", "main.py")
++)
++
++# Extra third-party mocks the worker needs at import time (conftest already
++# covers the firebase/google ones rag-api needs).
++for _mod in [
++    "langchain",
++    "langchain.text_splitter",
++    "langchain.schema",
++    "openai",
++    "langfuse",
++    "spacy",
++    "sklearn",
++    "sklearn.feature_extraction",
++    "sklearn.feature_extraction.text",
++    "tiktoken",
++    "tenacity",
++    "google.cloud.firestore_v1.base_query",
++    "google.auth",
++    "google.auth.credentials",
++]:
++    sys.modules.setdefault(_mod, MagicMock())
++
++
++def _load_worker_main():
++    spec = importlib.util.spec_from_file_location("rag_worker_main", WORKER_MAIN)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++@pytest.fixture(scope="module")
++def rag_worker_main():
++    return _load_worker_main()
++
++
++# ---------------------------------------------------------------------------
++# Worker side: failure-payload construction
++# ---------------------------------------------------------------------------
++
++
++class TestWorkerFailurePayload:
++    def test_payload_carries_contract_keys(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(ValueError("boom"), "chunking_complete")
++        assert {"error_message", "stage", "retryable"} <= set(payload)
++        assert payload["error_message"] == "boom"
++        assert payload["stage"] == "chunking_complete"
++
++    def test_retryable_true_for_transient(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(
++            rag_worker_main.TransientError("connection reset"), "text_retrieved"
++        )
++        assert payload["retryable"] is True
++
++    def test_retryable_false_for_permanent(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(
++            rag_worker_main.PermanentError("bad input"), "starting"
++        )
++        assert payload["retryable"] is False
++
++    def test_retryable_false_for_unclassified_unknown(self, rag_worker_main):
++        # classify_error's conservative default: unknown exceptions are
++        # permanent, so retryable must be False — not a silent True.
++        payload = rag_worker_main.build_failure_payload(ValueError("weird"))
++        assert payload["retryable"] is False
++        assert payload["stage"] == "processing"
++
++    def test_legacy_error_key_retained(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(ValueError("boom"), "starting")
++        assert payload["error"] == "boom"
++
++
++# ---------------------------------------------------------------------------
++# rag-api side: failed-branch persistence (fake Firestore transaction)
++# ---------------------------------------------------------------------------
++
++
++class _Snapshot:
++    exists = True
++
++    def to_dict(self):
++        return {"status": "processing"}
++
++
++class _DocRef:
++    id = "res-1"
++
++    def get(self, transaction=None):
++        return _Snapshot()
++
++    def collection(self, name):
++        return self
++
++    def document(self, name):
++        return self
++
++
++class _Transaction:
++    def __init__(self, writes):
++        self._writes = writes
++
++    def update(self, ref, data):
++        self._writes["main"] = dict(data)
++
++    def set(self, ref, data, merge=False):
++        self._writes["summary"] = dict(data)
++
++
++class _DB:
++    def __init__(self, writes):
++        self._writes = writes
++
++    def transaction(self):
++        return _Transaction(self._writes)
++
++
++@pytest.fixture(autouse=True)
++def _patch_firestore_helpers(monkeypatch):
++    # Make @firestore.transactional a passthrough so update_logic runs against
++    # the fake transaction above.
++    monkeypatch.setattr(
++        rag_api_main.firestore, "transactional", lambda f: f, raising=False
++    )
++    monkeypatch.setattr(
++        rag_api_main.firestore,
++        "SERVER_TIMESTAMP",
++        "SERVER_TIMESTAMP",
++        raising=False,
++    )
++
++
++def _run_failed_branch(payload):
++    writes = {}
++    rag_api_main.run_transactional_update(
++        _DB(writes), _DocRef(), "failed", payload, rag_api_main.logger, "user-1"
++    )
++    return writes
++
++
++class TestFailurePersistenceContract:
++    def test_worker_payload_persists_verbatim(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(
++            ValueError("embedding call failed"), "embeddings_complete"
++        )
++        writes = _run_failed_branch(payload)
++        assert writes["main"]["error"] == "embedding call failed"
++        assert writes["main"]["error_stage"] == "embeddings_complete"
++        assert writes["main"]["retryable"] is False
++        assert writes["summary"]["error"]["message"] == "embedding call failed"
++        assert writes["summary"]["error"]["stage"] == "embeddings_complete"
++        assert writes["summary"]["stage"] == "embeddings_complete"
++
++    def test_transient_failure_persists_retryable_true(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(
++            rag_worker_main.TransientError("connection reset"), "text_retrieved"
++        )
++        writes = _run_failed_branch(payload)
++        assert writes["main"]["error"] == "connection reset"
++        assert writes["main"]["error_stage"] == "text_retrieved"
++        assert writes["main"]["retryable"] is True
++
++    def test_unknown_stage_defaults_to_processing_not_none(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(ValueError("early boom"))
++        writes = _run_failed_branch(payload)
++        assert writes["main"]["error_stage"] == "processing"
++        assert writes["main"]["error"] == "early boom"
++
++
++# ---------------------------------------------------------------------------
++# Drift guards: either side changing its payload keys fails the build
++# ---------------------------------------------------------------------------
++
++
++def _parse(path):
++    with open(path) as f:
++        return ast.parse(f.read())
++
++
++class TestPayloadDriftGuards:
++    def test_worker_failure_handler_uses_payload_builder_with_stage(self):
++        tree = _parse(WORKER_MAIN)
++        calls = [
++            n
++            for n in ast.walk(tree)
++            if isinstance(n, ast.Call)
++            and isinstance(n.func, ast.Name)
++            and n.func.id == "build_failure_payload"
++        ]
++        assert calls, "worker failure handler must build its payload via build_failure_payload"
++        assert all(len(c.args) >= 2 for c in calls), (
++            "build_failure_payload must be called with (error, stage) — "
++            "the failing stage must be reported"
++        )
++
++    def test_worker_tracks_stage_through_pipeline(self):
++        tree = _parse(WORKER_MAIN)
++        stages = set()
++        for node in ast.walk(tree):
++            if (
++                isinstance(node, ast.Assign)
++                and len(node.targets) == 1
++                and isinstance(node.targets[0], ast.Name)
++                and node.targets[0].id == "current_stage"
++                and isinstance(node.value, ast.Constant)
++            ):
++                stages.add(node.value.value)
++        expected = {
++            "processing",
++            "starting",
++            "text_retrieved",
++            "tagging_complete",
++            "summary_generated",
++            "chunking_complete",
++            "embeddings_complete",
++        }
++        missing = expected - stages
++        assert not missing, f"stage tracker missing stages: {missing}"
++
++    def test_worker_payload_builder_emits_all_contract_keys(self, rag_worker_main):
++        payload = rag_worker_main.build_failure_payload(ValueError("x"), "starting")
++        assert {"error_message", "stage", "retryable", "error"} <= set(payload)
++
++    def test_rag_api_failed_branch_reads_worker_keys(self):
++        with open(RAG_API_MAIN) as f:
++            src = f.read()
++        for key in ("error_message", "stage", "retryable"):
++            assert f'details.get("{key}"' in src, (
++                f"rag-api failed branch must read details key '{key}'"
++            )

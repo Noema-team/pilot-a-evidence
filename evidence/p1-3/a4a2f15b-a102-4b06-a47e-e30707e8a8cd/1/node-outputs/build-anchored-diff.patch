@@ -1,0 +1,810 @@
+--- a/apps/ai-server/rag-worker-service/main.py
++++ b/apps/ai-server/rag-worker-service/main.py
+@@ -25,71 +25,81 @@
+ 
+ # ========================================
+ # Custom Exception Classes for Error Classification
+-# ========================================
+-
+-class ProcessingError(Exception):
+-    """Base class for processing errors."""
+-    pass
+-
+-
+-class TransientError(ProcessingError):
+-    """
+-    Transient errors that should be retried.
+-    Examples: network timeouts, temporary service unavailability, rate limits.
+-    """
+-    pass
+-
+-
+-class PermanentError(ProcessingError):
+-    """
+-    Permanent errors that should NOT be retried.
+-    Examples: invalid input data, missing required fields, authorization errors.
+-    """
+-    pass
+-
+-
+-def classify_error(e: Exception) -> bool:
+-    """
+-    Classify an exception as transient or permanent.
+-
+-    Returns:
+-        True if the error is transient (should retry), False if permanent (should ack and skip).
+-    """
+-    # Check explicit exception types first
+-    if isinstance(e, TransientError):
+-        return True
+-    if isinstance(e, PermanentError):
+-        return False
+-
+-    # Check for known transient exception types
+-    transient_types = (
+-        httpx.ConnectError,
+-        httpx.ConnectTimeout,
+-        httpx.ReadTimeout,
+-        httpx.WriteTimeout,
+-        httpx.PoolTimeout,
+-        ConnectionError,
+-        TimeoutError,
+-        asyncio.TimeoutError,
+-    )
+-    if isinstance(e, transient_types):
+-        return True
+-
+-    # Check for HTTP status codes that indicate transient errors
+-    if isinstance(e, httpx.HTTPStatusError):
+-        status_code = e.response.status_code
+-        # 429 (rate limit), 500, 502, 503, 504 are typically transient
+-        if status_code in (429, 500, 502, 503, 504):
+-            return True
+-        # 4xx errors (except 429) are typically permanent
+-        return False
+-
+-    # For unknown exceptions, be conservative and treat as permanent
+-    # to avoid infinite retry loops
+-    return False
+-
+-# Document processing
+-from langchain.text_splitter import RecursiveCharacterTextSplitter
++def classify_error(e: Exception) -> bool:
++    """
++    Classify an exception as transient or permanent.
++
++    Returns:
++        True if the error is transient (should retry), False if permanent (should ack and skip).
++    """
++    # Check explicit exception types first
++    if isinstance(e, TransientError):
++        return True
++    if isinstance(e, PermanentError):
++        return False
++
++    # Check for known transient exception types
++    transient_types = (
++        httpx.ConnectError,
++        httpx.ConnectTimeout,
++        httpx.ReadTimeout,
++        httpx.WriteTimeout,
++        httpx.PoolTimeout,
++        ConnectionError,
++        TimeoutError,
++        asyncio.TimeoutError,
++    )
++    if isinstance(e, transient_types):
++        return True
++
++    # Check for HTTP status codes that indicate transient errors
++    if isinstance(e, httpx.HTTPStatusError):
++        status_code = e.response.status_code
++        # 429 (rate limit), 500, 502, 503, 504 are typically transient
++        if status_code in (429, 500, 502, 503, 504):
++            return True
++        # 4xx errors (except 429) are typically permanent
++        return False
++
++    # For unknown exceptions, be conservative and treat as permanent
++    # to avoid infinite retry loops
++    return False
++
++
++def build_failure_payload(e: Exception, stage: Optional[str]) -> Dict[str, Any]:
++    """
++    Build the `details` payload published with a "failed" status update.
++
++    This is the worker→rag-api failure contract, in one place:
++
++    - error_message: the actual exception message — rag-api's failed branch
++      persists this as the main document's `error` and into the
++      processing/summary error subdocument. Never rely on rag-api's
++      "Processing failed" fallback.
++    - stage: the pipeline stage executing at failure time (tracked by
++      process_document's current_stage local). "processing" is the safe
++      value when the stage is genuinely unknown — the same value the
++      stale-lease sweep uses for error_stage, so the field never regresses
++      to null.
++    - retryable: deliberately derived from classify_error (transient →
++      True, permanent/unknown → False), mirroring the ACK/NACK decision in
++      run_worker. Never silently defaulted by the consumer.
++    - error: legacy key retained alongside error_message for continuity
++      with any existing consumers of the status topic.
++
++    The worker→rag-api failure-path contract test pins this key set; if you
++    add or remove a key here, update that test — that is the point of it.
++    """
++    message = str(e)
++    return {
++        "error_message": message,
++        "error": message,
++        "stage": stage or "processing",
++        "retryable": classify_error(e),
++    }
++
++# Document processing
++from langchain.text_splitter import RecursiveCharacterTextSplitter
+ from langchain.schema import Document
+ 
+ # AI/ML services
+@@ -963,144 +973,169 @@
+             return '\n\n'.join(text_pages), total_pages
+ 
+         extracted_text, total_pages = await asyncio.to_thread(extract_text_sync)
+-
+-        self.logger.info("pypdf_extraction_complete",
+-                       resource_id=resource_id,
+-                       total_pages=total_pages,
+-                       text_length=len(extracted_text))
+-
+-        return extracted_text, total_pages
+-    
+-    async def process_document(self, user_id: str, course_id: str, resource_id: str, job_id: Optional[str] = None) -> ProcessingMetrics:
+-        """Enhanced main processing pipeline for subcollection structure"""
+-        metrics = ProcessingMetrics(start_time=time.time())
+-        trace = self.langfuse.trace(name="doc_processing_course_resources",
+-                                input={"user_id": user_id, "course_id": course_id, "resource_id": resource_id, "job_id": job_id}) if self.langfuse else None
+-        
+-        try:
+-            await self._validate_processing_request(user_id, course_id, resource_id)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "starting"}, job_id)
+-            
+-            # Step 1: Get pre-extracted text (replaces file download and extraction)
+-            text_content, doc_metadata = await self._get_extracted_text(user_id, course_id, resource_id)
+-            metrics.text_length = len(text_content)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "text_retrieved", "progress": 20}, job_id)
+-
+-            # Step 2: Content Tagging and Analysis
+-            tags, confidence_scores = await self.content_tagger.generate_tags(text_content, doc_metadata)
+-            metrics.tags, metrics.confidence_scores = tags, confidence_scores
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "tagging_complete", "progress": 40}, job_id)
+-
+-            # Step 3: Generate Summary
+-            summary_data = await self.generate_document_summary(text_content, doc_metadata.get('title', 'Untitled Document'))
+-            
+-            update_data = {}
+-            if summary_data:
+-                update_data["ragDescription"] = summary_data
+-                update_data["ragDescriptionUpdatedAt"] = firestore.SERVER_TIMESTAMP
+-                update_data["ragDescriptionMeta"] = {
+-                    "promptVersion": self.config.summary_prompt_version,
+-                    "maxChars": self.config.summary_max_chars,
+-                    "model": self.config.summary_model
+-                }
+-            else:
+-                update_data["ragDescription"] = None # If summary generation failed, store null
+-
+-            doc_path = self._get_document_path(user_id, course_id, resource_id)
+-            self.db.document(doc_path).update(update_data)
+-
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "summary_generated", "progress": 50}, job_id)
+-
+-            # Step 4: Chunking
+-            chunks = await self._create_enhanced_chunks(text_content, doc_metadata, tags, user_id, course_id, resource_id)
+-            metrics.chunks_created = len(chunks)
+-            metrics.tokens_used = sum(c.token_count for c in chunks)
+-            metrics.cost_estimate = metrics.tokens_used * self.embedding_cost_per_token
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "chunking_complete", "progress": 60}, job_id)
+-
+-            # Step 5: Generate Embeddings
+-            vectors = await self._generate_embeddings_with_openrouter(chunks)
+-            metrics.embeddings_generated = len(vectors)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "embeddings_complete", "progress": 80}, job_id)
+-
+-            # Step 6a: Delete old vectors AFTER successful processing but BEFORE storing new ones
+-            # This ensures we don't lose data if processing fails
+-            await self.delete_old_vectors_via_service(user_id, course_id, resource_id)
+-
+-            # Step 6b: Store in Weaviate via Weaviate Service
+-            storage_result = await self.store_chunks_via_service(chunks, vectors)
+-            # What the index actually accepted — store_chunks_via_service
+-            # raises on partial writes, so this equals len(chunks) here, but
+-            # reporting it from the storage result (not from
+-            # embeddings_generated) keeps the claim honest if that ever
+-            # changes.
+-            metrics.chunks_stored = storage_result.get("successful_inserts", 0)
+-
+-            # Save processing metadata to subcollection (new architecture)
+-            await self._save_processing_metadata_to_subcollection(
+-                user_id=user_id,
+-                course_id=course_id,
+-                resource_id=resource_id,
+-                metrics=metrics,
+-                tags=tags
+-            )
+-
+-            final_details = {
+-                "stage": "completed",
+-                "progress": 100,
+-                "jobId": job_id,
+-                "weaviate_storage": storage_result,
+-                "ragProcessingMetrics": {
+-                    "chunks_created": metrics.chunks_created,
+-                    "chunks_stored": metrics.chunks_stored,
+-                    "tokens_used": metrics.tokens_used,
+-                    "cost_estimate": metrics.cost_estimate,
+-                    "processing_time": metrics.processing_time,
+-                    "embeddings_generated": metrics.embeddings_generated
+-                },
+-                "ragContentTags": tags,
+-                "ragContentAnalysis": {
+-                    "confidence_scores": metrics.confidence_scores,
+-                    "document_type": metrics.document_type.value if isinstance(metrics.document_type, DocumentType) else str(metrics.document_type),
+-                    "text_length": metrics.text_length
+-                },
+-                "ragSearchable": True,
+-                "ragVectorStorage": {
+-                    "provider": "weaviate-service",
+-                    "chunks_stored": metrics.chunks_stored
+-                }
+-            }
+-            await self._publish_status_update(user_id, course_id, resource_id, "completed", final_details, job_id)
+-
+-            # Update user usage counter
+-            await self._update_user_usage(user_id)
+-
+-            # Generate resource map for flashcard system (directly, not via Pub/Sub)
+-            await self._generate_resource_map(
+-                user_id=user_id,
+-                course_id=course_id,
+-                resource_id=resource_id,
+-                markdown_text=text_content,
+-                total_pages=doc_metadata.get('total_pages', 0),
+-                filename=doc_metadata.get('filename', 'Unknown'),
+-                chunks_metadata=[asdict(c) for c in chunks],
+-            )
+-
+-            metrics.end_time = time.time()
+-            if trace: trace.update(output={"success": True, "metrics": asdict(metrics)})
+-            self.logger.info("document_processing_completed", user_id=user_id, course_id=course_id, resource_id=resource_id, processing_time=metrics.processing_time)
+-            return metrics
+-            
+-        except Exception as e:
+-            metrics.error_message, metrics.end_time = str(e), time.time()
+-            self.logger.error("document_processing_failed", user_id=user_id, course_id=course_id, resource_id=resource_id, error=str(e))
+-            await self._publish_status_update(user_id, course_id, resource_id, "failed", {"error": str(e)}, job_id)
+-            if trace: trace.update(output={"success": False, "error": str(e)})
+-            return metrics
+-    
+-    async def _validate_processing_request(self, user_id: str, course_id: str, resource_id: str):
+-        """Validate processing request using subcollection paths"""
+-        
++
++        self.logger.info("pypdf_extraction_complete",
++                       resource_id=resource_id,
++                       total_pages=total_pages,
++                       text_length=len(extracted_text))
++
++        return extracted_text, total_pages
++    
++    async def process_document(self, user_id: str, course_id: str, resource_id: str, job_id: Optional[str] = None) -> ProcessingMetrics:
++        """Enhanced main processing pipeline for subcollection structure"""
++        metrics = ProcessingMetrics(start_time=time.time())
++        trace = self.langfuse.trace(name="doc_processing_course_resources",
++                                input={"user_id": user_id, "course_id": course_id, "resource_id": resource_id, "job_id": job_id}) if self.langfuse else None
++        # Stage tracker for the failure handler: set current_stage
++        # immediately before the await of each pipeline step (the update-
++        # before-await convention) so a failure reports the stage that was
++        # actually executing. Names reuse the progress-update vocabulary.
++        current_stage = "processing"
++        
++        try:
++            current_stage = "starting"
++            await self._validate_processing_request(user_id, course_id, resource_id)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "starting"}, job_id)
++            
++            # Step 1: Get pre-extracted text (replaces file download and extraction)
++            current_stage = "text_retrieved"
++            text_content, doc_metadata = await self._get_extracted_text(user_id, course_id, resource_id)
++            metrics.text_length = len(text_content)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "text_retrieved", "progress": 20}, job_id)
++
++            # Step 2: Content Tagging and Analysis
++            current_stage = "tagging_complete"
++            tags, confidence_scores = await self.content_tagger.generate_tags(text_content, doc_metadata)
++            metrics.tags, metrics.confidence_scores = tags, confidence_scores
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "tagging_complete", "progress": 40}, job_id)
++
++            # Step 3: Generate Summary
++            current_stage = "summary_generated"
++            summary_data = await self.generate_document_summary(text_content, doc_metadata.get('title', 'Untitled Document'))
++            
++            update_data = {}
++            if summary_data:
++                update_data["ragDescription"] = summary_data
++                update_data["ragDescriptionUpdatedAt"] = firestore.SERVER_TIMESTAMP
++                update_data["ragDescriptionMeta"] = {
++                    "promptVersion": self.config.summary_prompt_version,
++                    "maxChars": self.config.summary_max_chars,
++                    "model": self.config.summary_model
++                }
++            else:
++                update_data["ragDescription"] = None # If summary generation failed, store null
++
++            doc_path = self._get_document_path(user_id, course_id, resource_id)
++            self.db.document(doc_path).update(update_data)
++
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "summary_generated", "progress": 50}, job_id)
++
++            # Step 4: Chunking
++            current_stage = "chunking_complete"
++            chunks = await self._create_enhanced_chunks(text_content, doc_metadata, tags, user_id, course_id, resource_id)
++            metrics.chunks_created = len(chunks)
++            metrics.tokens_used = sum(c.token_count for c in chunks)
++            metrics.cost_estimate = metrics.tokens_used * self.embedding_cost_per_token
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "chunking_complete", "progress": 60}, job_id)
++
++            # Step 5: Generate Embeddings
++            current_stage = "embeddings_complete"
++            vectors = await self._generate_embeddings_with_openrouter(chunks)
++            metrics.embeddings_generated = len(vectors)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "embeddings_complete", "progress": 80}, job_id)
++
++            # Step 6a: Delete old vectors AFTER successful processing but BEFORE storing new ones
++            # This ensures we don't lose data if processing fails
++            current_stage = "completed"
++            await self.delete_old_vectors_via_service(user_id, course_id, resource_id)
++
++            # Step 6b: Store in Weaviate via Weaviate Service
++            storage_result = await self.store_chunks_via_service(chunks, vectors)
++            # What the index actually accepted — store_chunks_via_service
++            # raises on partial writes, so this equals len(chunks) here, but
++            # reporting it from the storage result (not from
++            # embeddings_generated) keeps the claim honest if that ever
++            # changes.
++            metrics.chunks_stored = storage_result.get("successful_inserts", 0)
++
++            # Save processing metadata to subcollection (new architecture)
++            await self._save_processing_metadata_to_subcollection(
++                user_id=user_id,
++                course_id=course_id,
++                resource_id=resource_id,
++                metrics=metrics,
++                tags=tags
++            )
++
++            final_details = {
++                "stage": "completed",
++                "progress": 100,
++                "jobId": job_id,
++                "weaviate_storage": storage_result,
++                "ragProcessingMetrics": {
++                    "chunks_created": metrics.chunks_created,
++                    "chunks_stored": metrics.chunks_stored,
++                    "tokens_used": metrics.tokens_used,
++                    "cost_estimate": metrics.cost_estimate,
++                    "processing_time": metrics.processing_time,
++                    "embeddings_generated": metrics.embeddings_generated
++                },
++                "ragContentTags": tags,
++                "ragContentAnalysis": {
++                    "confidence_scores": metrics.confidence_scores,
++                    "document_type": metrics.document_type.value if isinstance(metrics.document_type, DocumentType) else str(metrics.document_type),
++                    "text_length": metrics.text_length
++                },
++                "ragSearchable": True,
++                "ragVectorStorage": {
++                    "provider": "weaviate-service",
++                    "chunks_stored": metrics.chunks_stored
++                }
++            }
++            await self._publish_status_update(user_id, course_id, resource_id, "completed", final_details, job_id)
++
++            # Update user usage counter
++            await self._update_user_usage(user_id)
++
++            # Generate resource map for flashcard system (directly, not via Pub/Sub)
++            await self._generate_resource_map(
++                user_id=user_id,
++                course_id=course_id,
++                resource_id=resource_id,
++                markdown_text=text_content,
++                total_pages=doc_metadata.get('total_pages', 0),
++                filename=doc_metadata.get('filename', 'Unknown'),
++                chunks_metadata=[asdict(c) for c in chunks],
++            )
++
++            metrics.end_time = time.time()
++            if trace: trace.update(output={"success": True, "metrics": asdict(metrics)})
++            self.logger.info("document_processing_completed", user_id=user_id, course_id=course_id, resource_id=resource_id, processing_time=metrics.processing_time)
++            return metrics
++            
++        except Exception as e:
++            metrics.error_message, metrics.end_time = str(e), time.time()
++            # Full failure contract: actual message, failing stage, and a
++            # deliberately derived retryable flag (see build_failure_payload).
++            # rag-api's fallback defaults must never be the operative values
++            # for worker-originated failures.
++            failure_details = build_failure_payload(e, current_stage)
++            self.logger.error(
++                "document_processing_failed",
++                user_id=user_id,
++                course_id=course_id,
++                resource_id=resource_id,
++                error=str(e),
++                stage=failure_details["stage"],
++                retryable=failure_details["retryable"],
++            )
++            await self._publish_status_update(user_id, course_id, resource_id, "failed", failure_details, job_id)
++            if trace: trace.update(output={"success": False, "error": str(e), "stage": failure_details["stage"], "retryable": failure_details["retryable"]})
++            return metrics
++    
++    async def _validate_processing_request(self, user_id: str, course_id: str, resource_id: str):
++        """Validate processing request using subcollection paths"""
++        
+         doc_path = self._get_document_path(user_id, course_id, resource_id)
+         doc_ref = self.db.document(doc_path)
+         doc_data = doc_ref.get().to_dict()
+
+--- a/apps/ai-server/tests/integration/test_worker_failure_contract.py
++++ b/apps/ai-server/tests/integration/test_worker_failure_contract.py
+@@ -0,0 +1,349 @@
++"""Worker → rag-api failure-path contract test.
++
++Pins the failure payload contract across the Pub/Sub status-topic seam:
++
++- the worker's failure-payload construction (build_failure_payload in
++  rag-worker-service/main.py) must publish error_message / stage /
++  retryable (plus the legacy `error` key),
++- rag-api's failed branch (run_transactional_update in
++  rag-api-service/main.py) must persist those values unchanged as
++  error / error_stage / retryable on the main document and carry the same
++  message and stage into the processing/summary error subdocument.
++
++If either side's keys drift, these tests fail the build instead of
++silently re-creating the "every failure persists as 'Processing failed'
++with a null stage and a fabricated retryable=true" bug.
++"""
++
++import ast
++import importlib.util
++import json
++import os
++import sys
++import types
++from unittest.mock import MagicMock
++
++import httpx
++import pytest
++
++RAG_API_DIR = os.path.normpath(
++    os.path.join(os.path.dirname(__file__), "..", "..", "rag-api-service")
++)
++RAG_WORKER_DIR = os.path.normpath(
++    os.path.join(os.path.dirname(__file__), "..", "..", "rag-worker-service")
++)
++RAG_API_MAIN = os.path.join(RAG_API_DIR, "main.py")
++RAG_WORKER_MAIN = os.path.join(RAG_WORKER_DIR, "main.py")
++
++for _p in (RAG_API_DIR, RAG_WORKER_DIR):
++    if _p not in sys.path:
++        sys.path.insert(0, _p)
++
++os.environ.setdefault("GCP_PROJECT", "test-project")
++os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/fake-creds.json")
++os.environ.setdefault("SHARED_INTERNAL_TOKEN", "test-token")
++
++
++# ---------------------------------------------------------------------
++# Minimal fake Firestore supporting the @firestore.transactional path
++# used by run_transactional_update.
++# ---------------------------------------------------------------------
++
++
++SERVER_TIMESTAMP = "SERVER_TIMESTAMP"
++
++
++class FakeTransaction:
++    def __init__(self, db):
++        self.db = db
++        self._ops = []
++
++    def update(self, ref, data):
++        self._ops.append(("update", ref, data))
++
++    def set(self, ref, data, merge=False):
++        self._ops.append(("set", ref, data, merge))
++
++
++class FakeSnapshot:
++    def __init__(self, data):
++        self._data = data
++
++    @property
++    def exists(self):
++        return self._data is not None
++
++    def to_dict(self):
++        return dict(self._data) if self._data is not None else None
++
++
++class FakeCollectionRef:
++    def __init__(self, db, path):
++        self.db = db
++        self.path = path
++
++    def document(self, name):
++        return FakeDocRef(self.db, f"{self.path}/{name}")
++
++
++class FakeDocRef:
++    def __init__(self, db, path):
++        self.db = db
++        self.path = path
++
++    @property
++    def id(self):
++        return self.path.rsplit("/", 1)[-1]
++
++    def get(self, transaction=None):
++        return FakeSnapshot(self.db._docs.get(self.path))
++
++    def collection(self, name):
++        return FakeCollectionRef(self.db, f"{self.path}/{name}")
++
++
++class FakeFirestoreDB:
++    def __init__(self):
++        self._docs = {}
++
++    def document(self, path):
++        return FakeDocRef(self, path)
++
++    def transaction(self):
++        return FakeTransaction(self)
++
++
++def _transactional(fn):
++    def wrapper(transaction, *args, **kwargs):
++        result = fn(transaction, *args, **kwargs)
++        for op in transaction._ops:
++            if op[0] == "update":
++                _, ref, data = op
++                transaction.db._docs.setdefault(ref.path, {}).update(data)
++            else:
++                _, ref, data, merge = op
++                if merge:
++                    transaction.db._docs.setdefault(ref.path, {}).update(data)
++                else:
++                    transaction.db._docs[ref.path] = dict(data)
++        transaction._ops.clear()
++        return result
++
++    return wrapper
++
++
++# ---------------------------------------------------------------------
++# Module fakes so both services import hermetically.
++# ---------------------------------------------------------------------
++
++
++def _install_module_fakes():
++    fake_firestore = types.ModuleType("firebase_admin.firestore")
++    fake_firestore.transactional = _transactional
++    fake_firestore.SERVER_TIMESTAMP = SERVER_TIMESTAMP
++
++    fake_fb = types.ModuleType("firebase_admin")
++    fake_fb._apps = {}
++    fake_fb.firestore = fake_firestore
++    fake_fb.credentials = MagicMock()
++    fake_fb.auth = MagicMock()
++
++    sys.modules["firebase_admin"] = fake_fb
++    sys.modules["firebase_admin.firestore"] = fake_firestore
++
++    # Heavy third-party deps of the worker that are irrelevant to the
++    # failure-payload code under test.
++    for mod in [
++        "langchain", "langchain.text_splitter", "langchain.schema",
++        "openai", "langfuse", "spacy",
++        "sklearn", "sklearn.feature_extraction",
++        "sklearn.feature_extraction.text",
++        "tiktoken", "tenacity", "pydantic_settings",
++        "google", "google.cloud", "google.cloud.firestore",
++        "google.cloud.firestore_v1", "google.cloud.firestore_v1.base_query",
++        "google.cloud.pubsub_v1", "google.cloud.storage",
++        "google.oauth2", "google.oauth2.service_account",
++        "structlog",
++    ]:
++        sys.modules.setdefault(mod, MagicMock())
++
++
++_install_module_fakes()
++
++
++def _load_module(name, path):
++    spec = importlib.util.spec_from_file_location(name, path)
++    mod = importlib.util.module_from_spec(spec)
++    sys.modules[name] = mod
++    spec.loader.exec_module(mod)
++    return mod
++
++
++rag_api_main = _load_module("rag_api_failure_contract_main", RAG_API_MAIN)
++worker_main = _load_module("rag_worker_failure_contract_main", RAG_WORKER_MAIN)
++
++
++# ---------------------------------------------------------------------
++# Behavioral tests: worker payload construction → rag-api persistence
++# ---------------------------------------------------------------------
++
++
++def _seed_processing_resource(db, user_id="user1", resource_id="res-1"):
++    path = f"users/{user_id}/resources/{resource_id}"
++    db._docs[path] = {
++        "status": "processing",
++        "userId": user_id,
++        "filename": "test.pdf",
++    }
++    return db.document(path), path
++
++
++class TestWorkerFailurePayloadPersisted:
++    def test_transient_failure_persists_worker_values(self):
++        db = FakeFirestoreDB()
++        doc_ref, path = _seed_processing_resource(db)
++
++        err = httpx.ConnectError("connection to openrouter failed")
++        details = worker_main.build_failure_payload(err, "embeddings_complete")
++
++        rag_api_main.run_transactional_update(db, doc_ref, "failed", details, MagicMock(), "user1")
++
++        data = db._docs[path]
++        assert data["status"] == "failed"
++        # The worker's actual message — never rag-api's "Processing failed" fallback.
++        assert data["error"] == "connection to openrouter failed"
++        # The failing stage — never None.
++        assert data["error_stage"] == "embeddings_complete"
++        # Deliberately derived (transient → True), not the silent default.
++        assert data["retryable"] is True
++
++    def test_permanent_failure_persists_retryable_false(self):
++        db = FakeFirestoreDB()
++        doc_ref, path = _seed_processing_resource(db)
++
++        err = ValueError("Document res-1 has neither extracted text nor a valid source URL")
++        details = worker_main.build_failure_payload(err, "starting")
++
++        rag_api_main.run_transactional_update(db, doc_ref, "failed", details, MagicMock(), "user1")
++
++        data = db._docs[path]
++        assert data["error"] == str(err)
++        assert data["error_stage"] == "starting"
++        # Permanent/unknown errors classify as permanent → retryable False.
++        assert data["retryable"] is False
++
++    def test_unknown_stage_falls_back_to_processing_not_null(self):
++        db = FakeFirestoreDB()
++        doc_ref, path = _seed_processing_resource(db)
++
++        details = worker_main.build_failure_payload(RuntimeError("boom"), None)
++        assert details["stage"] == "processing"
++
++        rag_api_main.run_transactional_update(db, doc_ref, "failed", details, MagicMock(), "user1")
++
++        data = db._docs[path]
++        assert data["error"] == "boom"
++        assert data["error_stage"] == "processing"
++
++    def test_processing_summary_error_subdocument_carries_message_and_stage(self):
++        db = FakeFirestoreDB()
++        doc_ref, path = _seed_processing_resource(db)
++
++        details = worker_main.build_failure_payload(
++            httpx.ReadTimeout("summary generation timed out"), "summary_generated"
++        )
++        rag_api_main.run_transactional_update(db, doc_ref, "failed", details, MagicMock(), "user1")
++
++        summary = db._docs[f"{path}/processing/summary"]
++        assert summary["error"]["message"] == "summary generation timed out"
++        assert summary["error"]["stage"] == "summary_generated"
++        assert summary["error"]["code"] == "UNKNOWN"
++        assert summary["stage"] == "summary_generated"
++        # Same message and stage as the main document.
++        main = db._docs[path]
++        assert main["error"] == summary["error"]["message"]
++        assert main["error_stage"] == summary["error"]["stage"]
++
++
++class TestFailurePayloadContract:
++    """Static drift guards on both sides of the seam."""
++
++    @staticmethod
++    def _worker_payload_keys():
++        with open(RAG_WORKER_MAIN) as f:
++            tree = ast.parse(f.read())
++        for node in ast.walk(tree):
++            if isinstance(node, ast.FunctionDef) and node.name == "build_failure_payload":
++                for sub in ast.walk(node):
++                    if isinstance(sub, ast.Return) and isinstance(sub.value, ast.Dict):
++                        return {
++                            k.value for k in sub.value.keys if isinstance(k, ast.Constant)
++                        }
++        raise AssertionError("build_failure_payload must return a dict literal")
++
++    @staticmethod
++    def _api_details_keys():
++        with open(RAG_API_MAIN) as f:
++            tree = ast.parse(f.read())
++        for node in ast.walk(tree):
++            if isinstance(node, ast.FunctionDef) and node.name == "run_transactional_update":
++                keys = set()
++                for sub in ast.walk(node):
++                    if (
++                        isinstance(sub, ast.Call)
++                        and isinstance(sub.func, ast.Attribute)
++                        and sub.func.attr == "get"
++                        and isinstance(sub.func.value, ast.Name)
++                        and sub.func.value.id == "details"
++                        and sub.args
++                        and isinstance(sub.args[0], ast.Constant)
++                    ):
++                        keys.add(sub.args[0].value)
++                return keys
++        raise AssertionError("run_transactional_update not found")
++
++    def test_worker_publishes_required_failure_keys(self):
++        keys = self._worker_payload_keys()
++        missing = {"error_message", "stage", "retryable"} - keys
++        assert not missing, f"Worker failure payload missing contract keys: {missing}"
++
++    def test_worker_retains_legacy_error_key(self):
++        assert "error" in self._worker_payload_keys(), (
++            "Worker failure payload must retain the legacy `error` key for "
++            "existing status-topic consumers"
++        )
++
++    def test_api_failed_branch_reads_worker_keys(self):
++        keys = self._api_details_keys()
++        missing = {"error_message", "stage", "retryable"} - keys
++        assert not missing, f"rag-api failed branch no longer reads keys: {missing}"
++
++    def test_worker_keys_are_superset_of_api_reads(self):
++        assert {"error_message", "stage", "retryable"}.issubset(self._worker_payload_keys())
++
++    def test_process_document_tracks_stage_and_reports_it(self):
++        with open(RAG_WORKER_MAIN) as f:
++            tree = ast.parse(f.read())
++        fn = next(
++            n for n in ast.walk(tree)
++            if isinstance(n, ast.FunctionDef) and n.name == "process_document"
++        )
++        stage_assignments = [
++            n for n in ast.walk(fn)
++            if isinstance(n, ast.Assign)
++            and any(isinstance(t, ast.Name) and t.id == "current_stage" for t in n.targets)
++        ]
++        # One per pipeline stage plus the init — the tracker must not be
++        # removed or bypassed.
++        assert len(stage_assignments) >= 7, (
++            "process_document must set current_stage before each pipeline step"
++        )
++        handler = next(n for n in fn.body if isinstance(n, ast.ExceptHandler))
++        handler_src = ast.dump(handler)
++        assert "build_failure_payload" in handler_src, (
++            "process_document's failure handler must publish via "
++            "build_failure_payload, not a hand-rolled payload"
++        )
++        assert "current_stage" in handler_src, (
++            "process_document's failure handler must report the tracked stage"
++        )

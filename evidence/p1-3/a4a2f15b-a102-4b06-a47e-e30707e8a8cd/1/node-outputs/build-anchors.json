@@ -1,0 +1,52 @@
+{
+  "node_id": "build",
+  "workflow_run_id": "a4a2f15b-a102-4b06-a47e-e30707e8a8cd",
+  "iteration": 1,
+  "anchors": [
+    {
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "base_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+      "start_line": 744,
+      "end_line": 813,
+      "content_sha256": "f729c1e3d9320c562198ef965f280e378d7c2ea93c5513478dc119f595a7229c",
+      "anchor_id": "src_48a144b1e485be38",
+      "turn": 3
+    },
+    {
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "base_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+      "start_line": 955,
+      "end_line": 1064,
+      "content_sha256": "858e810caa0a6f39097683e2e022340a8617dedbc35c05e0c45a54d92afcf364",
+      "anchor_id": "src_f88c255c7da7937a",
+      "turn": 4
+    },
+    {
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "base_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+      "start_line": 1064,
+      "end_line": 1103,
+      "content_sha256": "3a59a9c05562e0793002d9d35665adf131e55380b11ce444c646b6ff3343436e",
+      "anchor_id": "src_99d43721882c31ac",
+      "turn": 5
+    },
+    {
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "base_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+      "start_line": 28,
+      "end_line": 92,
+      "content_sha256": "9806fcbc222fd8577a093d79f2dc4a3e2979d6f79f2a216d74c918f28a24f9af",
+      "anchor_id": "src_dd88804dc76263ec",
+      "turn": 10
+    },
+    {
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "base_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+      "start_line": 966,
+      "end_line": 1103,
+      "content_sha256": "b910a41ec207cb44e3b488f0c5ac4befbdaaedf544b57acb8f32cf3e07e70b48",
+      "anchor_id": "src_fd9efdc64b64bf4a",
+      "turn": 12
+    }
+  ]
+}

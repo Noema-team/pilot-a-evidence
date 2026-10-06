@@ -1,0 +1,1 @@
+I have everything I need. Now I'll make the changes: add a `build_failure_payload` helper + stage tracking in the worker, and a new contract test.

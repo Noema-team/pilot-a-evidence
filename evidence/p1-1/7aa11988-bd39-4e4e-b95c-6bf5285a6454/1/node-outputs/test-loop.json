@@ -1,0 +1,130 @@
+{
+  "node_id": "test",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 16,
+  "tool_calls": [
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service",
+      "turn": 2
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 4
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service/tests",
+      "turn": 7
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests",
+      "turn": 7
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/tests/conftest.py",
+      "turn": 8
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-api-service/tests/integration",
+      "turn": 9
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests/integration",
+      "turn": 9
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/tests/integration/test_endpoints.py",
+      "turn": 10
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 11
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 12
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/tests/conftest.py",
+      "turn": 13
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/rag-worker-service/tests/unit",
+      "turn": 13
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/tests/unit/test_processing_lease.py",
+      "turn": 14
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/pytest.ini",
+      "turn": 15
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 15
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 3950,
+    "reasoning_bytes": 176836,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 21712,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 9876,
+    "reasoning_tokens": 5823,
+    "prompt_tokens": 46039,
+    "total_tokens": 55915,
+    "stream_id": "gen-1791283277-wGe0PFdI2RxxLW57i55S",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

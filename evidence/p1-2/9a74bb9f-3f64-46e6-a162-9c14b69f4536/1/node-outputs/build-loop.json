@@ -1,0 +1,120 @@
+{
+  "node_id": "build",
+  "result_transport": "submit-result",
+  "turns_taken": 15,
+  "tool_calls": [
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 1
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 1
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 3
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 4
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 5
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 6
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 7
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 7
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 8
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 9
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 10
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 11
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 11
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 12
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 12
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 14
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 4032,
+    "reasoning_bytes": 190442,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 0,
+    "tool_call_fragments": 2,
+    "finish_reason": "tool_calls",
+    "completion_tokens": 9946,
+    "reasoning_tokens": 7188,
+    "prompt_tokens": 39922,
+    "total_tokens": 49868,
+    "stream_id": "gen-1791286157-fxoIkNVHTrBI1aFnpwKn",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

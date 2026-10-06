@@ -1,0 +1,14 @@
+1. identical binding minted twice -> SAME anchor object (harmless dedupe)
+/home/theo/Documents/coding/repos/stratum/src/workflow/anchored-edits.ts:111
+        throw new Error(`anchor id collision across different bindings ('${id}') — fail closed`);
+              ^
+
+
+Error: anchor id collision across different bindings ('src_c116db0694a341ec') — fail closed
+    at AnchorRegistry.mint (/home/theo/Documents/coding/repos/stratum/src/workflow/anchored-edits.ts:111:15)
+    at <anonymous> (/tmp/opencode/p1-collision-proof.mts:23:22)
+    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.17.0

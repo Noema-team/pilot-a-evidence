@@ -1,0 +1,8 @@
+# Subtest: P1.27: id equality never stands in for binding equality — identical bindings dedupe, a colliding different binding fails closed
+ok 18 - P1.27: id equality never stands in for binding equality — identical bindings dedupe, a colliding different binding fails closed
+# pass 18
+# fail 0
+guard branch p1-collision-guard = 315d37178a98917b0c5de79ac851fa6083acfad7 (child of frozen 8138e564; 8138e564 unchanged, not rebased/amended)
+delta: src/workflow/anchored-edits.ts mint() full-binding comparison + fail-closed throw; tests/anchored-edits.test.ts P1.27
+full suite on guard branch: 1839 pass / 0 fail (two consecutive clean runs); typecheck clean
+collision proof against guard branch: mint THROWS 'anchor id collision across different bindings' — registry unchanged, no takeover

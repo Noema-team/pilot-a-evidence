@@ -1,0 +1,75 @@
+{
+  "node_id": "test",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 9,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 2
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 2
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 3
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/rag-api-service/main.py",
+      "turn": 4
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/conftest.py",
+      "turn": 5
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/fixtures",
+      "turn": 6
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/fixtures/api-contracts",
+      "turn": 7
+    },
+    {
+      "tool": "read_file",
+      "path": "apps/ai-server/tests/integration/test_chat_pipeline.py",
+      "turn": 8
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 6870,
+    "reasoning_bytes": 306143,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 27738,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 14243,
+    "reasoning_tokens": 9968,
+    "prompt_tokens": 48763,
+    "total_tokens": 63006,
+    "stream_id": "gen-1791385496-w0VXBiot0v7jZeQsiXYH",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "Relace"
+  }
+}

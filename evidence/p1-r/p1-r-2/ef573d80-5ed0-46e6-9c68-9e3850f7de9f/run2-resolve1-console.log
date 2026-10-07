@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-10-07T13:55:18.345Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-07T13:55:18.355Z","event":"decision_resolving","decisionId":"522a0b14-9717-4003-9c91-3070835e4256","optionId":"approve","rationale":"Charter accepted; proceed under the frozen P1-R contract"}
+[journal] {"ts":"2026-10-07T14:29:11.210Z","event":"decision_resumed","decisionId":"522a0b14-9717-4003-9c91-3070835e4256"}
+[journal] {"ts":"2026-10-07T14:29:11.216Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"plan","iteration":1}]}

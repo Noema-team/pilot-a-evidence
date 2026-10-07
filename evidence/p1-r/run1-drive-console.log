@@ -1,5 +1,17 @@
-cat: /tmp/opencode/.openrouter_key: No such file or directory
-[journal] {"ts":"2026-10-07T08:26:17.521Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
-[journal] {"ts":"2026-10-07T08:26:17.554Z","event":"tick","round":0,"dispatches":[{"workItemId":"wi-exec-108","outcome":"dispatched","stepExecutionId":"3bcece84-2564-4891-ba2c-f4aa3ba97aa6","workflowRunId":"d4b363dd-ef52-453e-a327-89cdef9a1994"}]}
-[journal] {"ts":"2026-10-07T08:26:17.554Z","event":"run_status","runId":"d4b363dd-ef52-453e-a327-89cdef9a1994","status":"halted","step":"scoping.produce","iteration":1}
-[journal] {"ts":"2026-10-07T08:26:17.555Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"scoping.produce","iteration":1}]}
+[journal] {"ts":"2026-10-07T11:33:20.030Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-07T11:34:33.050Z","event":"tick","round":0,"dispatches":[{"workItemId":"wi-exec-108","outcome":"dispatched","stepExecutionId":"218d28e8-ba4d-45a9-a0fd-740805157ced","workflowRunId":"5f79a128-188f-44d7-9ef6-a097c7de7bc1"}]}
+[journal] {"ts":"2026-10-07T11:34:33.050Z","event":"run_status","runId":"5f79a128-188f-44d7-9ef6-a097c7de7bc1","status":"halted","step":"scoping.checkpoint","iteration":1}
+[journal] {"ts":"2026-10-07T11:34:33.050Z","event":"decision_pending","decisionId":"784e661b-1f9b-4eef-b436-302cb66cb406","type":"checkpoint","title":"Workflow reached a checkpoint","summary":"Workflow 'full-build' paused at step 'scoping.checkpoint' and requires operator approval to continue.","options":[{"id":"approve","label":"Approve","description":"Accept the cycle charter and begin the cycle"}]}
+{
+  "decisionId": "784e661b-1f9b-4eef-b436-302cb66cb406",
+  "type": "checkpoint",
+  "title": "Workflow reached a checkpoint",
+  "summary": "Workflow 'full-build' paused at step 'scoping.checkpoint' and requires operator approval to continue.",
+  "options": [
+    {
+      "id": "approve",
+      "label": "Approve",
+      "description": "Accept the cycle charter and begin the cycle"
+    }
+  ]
+}

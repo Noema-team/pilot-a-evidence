@@ -1,0 +1,2 @@
+[journal] {"ts":"2026-10-07T11:34:49.040Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-07T11:34:49.046Z","event":"decision_resolving","decisionId":"784e661b-1f9b-4eef-b436-302cb66cb406","optionId":"approve","rationale":"Charter accepted; proceed to the build cycle under the frozen P1-R contract"}

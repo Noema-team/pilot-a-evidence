@@ -1,0 +1,330 @@
+--- a/apps/ai-server/rag-worker-service/main.py
++++ b/apps/ai-server/rag-worker-service/main.py
+@@ -952,101 +952,113 @@
+ 
+         pdf_file = io.BytesIO(pdf_bytes)
+         text_pages = []
+-
+-        def extract_text_sync():
+-            reader = PdfReader(pdf_file)
+-            total_pages = len(reader.pages)
+-            for page_num, page in enumerate(reader.pages, 1):
+-                page_text = page.extract_text() or ''
+-                if page_text.strip():
+-                    text_pages.append(f"\n## Page {page_num}\n\n{page_text}")
+-            return '\n\n'.join(text_pages), total_pages
+-
+-        extracted_text, total_pages = await asyncio.to_thread(extract_text_sync)
+-
+-        self.logger.info("pypdf_extraction_complete",
+-                       resource_id=resource_id,
+-                       total_pages=total_pages,
+-                       text_length=len(extracted_text))
+-
+-        return extracted_text, total_pages
+-    
+-    async def process_document(self, user_id: str, course_id: str, resource_id: str, job_id: Optional[str] = None) -> ProcessingMetrics:
+-        """Enhanced main processing pipeline for subcollection structure"""
+-        metrics = ProcessingMetrics(start_time=time.time())
+-        trace = self.langfuse.trace(name="doc_processing_course_resources",
+-                                input={"user_id": user_id, "course_id": course_id, "resource_id": resource_id, "job_id": job_id}) if self.langfuse else None
+-        
+-        try:
+-            await self._validate_processing_request(user_id, course_id, resource_id)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "starting"}, job_id)
+-            
+-            # Step 1: Get pre-extracted text (replaces file download and extraction)
+-            text_content, doc_metadata = await self._get_extracted_text(user_id, course_id, resource_id)
+-            metrics.text_length = len(text_content)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "text_retrieved", "progress": 20}, job_id)
+-
+-            # Step 2: Content Tagging and Analysis
+-            tags, confidence_scores = await self.content_tagger.generate_tags(text_content, doc_metadata)
+-            metrics.tags, metrics.confidence_scores = tags, confidence_scores
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "tagging_complete", "progress": 40}, job_id)
+-
+-            # Step 3: Generate Summary
+-            summary_data = await self.generate_document_summary(text_content, doc_metadata.get('title', 'Untitled Document'))
+-            
+-            update_data = {}
+-            if summary_data:
+-                update_data["ragDescription"] = summary_data
+-                update_data["ragDescriptionUpdatedAt"] = firestore.SERVER_TIMESTAMP
+-                update_data["ragDescriptionMeta"] = {
+-                    "promptVersion": self.config.summary_prompt_version,
+-                    "maxChars": self.config.summary_max_chars,
+-                    "model": self.config.summary_model
+-                }
+-            else:
+-                update_data["ragDescription"] = None # If summary generation failed, store null
+-
+-            doc_path = self._get_document_path(user_id, course_id, resource_id)
+-            self.db.document(doc_path).update(update_data)
+-
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "summary_generated", "progress": 50}, job_id)
+-
+-            # Step 4: Chunking
+-            chunks = await self._create_enhanced_chunks(text_content, doc_metadata, tags, user_id, course_id, resource_id)
+-            metrics.chunks_created = len(chunks)
+-            metrics.tokens_used = sum(c.token_count for c in chunks)
+-            metrics.cost_estimate = metrics.tokens_used * self.embedding_cost_per_token
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "chunking_complete", "progress": 60}, job_id)
+-
+-            # Step 5: Generate Embeddings
+-            vectors = await self._generate_embeddings_with_openrouter(chunks)
+-            metrics.embeddings_generated = len(vectors)
+-            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "embeddings_complete", "progress": 80}, job_id)
+-
+-            # Step 6a: Delete old vectors AFTER successful processing but BEFORE storing new ones
+-            # This ensures we don't lose data if processing fails
+-            await self.delete_old_vectors_via_service(user_id, course_id, resource_id)
+-
+-            # Step 6b: Store in Weaviate via Weaviate Service
+-            storage_result = await self.store_chunks_via_service(chunks, vectors)
+-            # What the index actually accepted — store_chunks_via_service
+-            # raises on partial writes, so this equals len(chunks) here, but
+-            # reporting it from the storage result (not from
+-            # embeddings_generated) keeps the claim honest if that ever
+-            # changes.
+-            metrics.chunks_stored = storage_result.get("successful_inserts", 0)
+-
+-            # Save processing metadata to subcollection (new architecture)
+-            await self._save_processing_metadata_to_subcollection(
+-                user_id=user_id,
+-                course_id=course_id,
+-                resource_id=resource_id,
+-                metrics=metrics,
+-                tags=tags
+-            )
+-
+-            final_details = {
+-                "stage": "completed",
++    @staticmethod
++    def build_failure_payload(error_message: str, stage: str, retryable: bool) -> Dict[str, Any]:
++        """
++        Build the failed-status payload published to the status topic.
++
++        Contract (must stay in sync with rag-api's run_transactional_update
++        failed branch, which reads error_message/stage/retryable):
++        - error_message: the actual exception message (rag-api persists it as `error`)
++        - stage: the pipeline stage executing at failure time (persisted as `error_stage`)
++        - retryable: deliberately derived by the caller from classify_error —
++          True for transient errors Pub/Sub will redeliver, False for permanent
++          ones (never silently defaulted on the API side)
++        - error: legacy key retained for continuity with any other consumers
++          of the status topic and existing log tooling
++        """
++        return {
++            "error_message": error_message,
++            "stage": stage,
++            "retryable": retryable,
++            "error": error_message,
++        }
++
++    async def process_document(self, user_id: str, course_id: str, resource_id: str, job_id: Optional[str] = None) -> ProcessingMetrics:
++        """Enhanced main processing pipeline for subcollection structure"""
++        metrics = ProcessingMetrics(start_time=time.time())
++        trace = self.langfuse.trace(name="doc_processing_course_resources",
++                                input={"user_id": user_id, "course_id": course_id, "resource_id": resource_id, "job_id": job_id}) if self.langfuse else None
++        # Stage tracker: set immediately before each pipeline step (the
++        # "update before await" convention) so the failure handler reports
++        # the true failing stage. Names reuse the progress-update vocabulary.
++        current_stage = "starting"
++        
++        try:
++            await self._validate_processing_request(user_id, course_id, resource_id)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "starting"}, job_id)
++            
++            # Step 1: Get pre-extracted text (replaces file download and extraction)
++            current_stage = "text_retrieved"
++            text_content, doc_metadata = await self._get_extracted_text(user_id, course_id, resource_id)
++            metrics.text_length = len(text_content)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "text_retrieved", "progress": 20}, job_id)
++
++            # Step 2: Content Tagging and Analysis
++            current_stage = "tagging_complete"
++            tags, confidence_scores = await self.content_tagger.generate_tags(text_content, doc_metadata)
++            metrics.tags, metrics.confidence_scores = tags, confidence_scores
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "tagging_complete", "progress": 40}, job_id)
++
++            # Step 3: Generate Summary
++            current_stage = "summary_generated"
++            summary_data = await self.generate_document_summary(text_content, doc_metadata.get('title', 'Untitled Document'))
++            
++            update_data = {}
++            if summary_data:
++                update_data["ragDescription"] = summary_data
++                update_data["ragDescriptionUpdatedAt"] = firestore.SERVER_TIMESTAMP
++                update_data["ragDescriptionMeta"] = {
++                    "promptVersion": self.config.summary_prompt_version,
++                    "maxChars": self.config.summary_max_chars,
++                    "model": self.config.summary_model
++                }
++            else:
++                update_data["ragDescription"] = None # If summary generation failed, store null
++
++            doc_path = self._get_document_path(user_id, course_id, resource_id)
++            self.db.document(doc_path).update(update_data)
++
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "summary_generated", "progress": 50}, job_id)
++
++            # Step 4: Chunking
++            current_stage = "chunking_complete"
++            chunks = await self._create_enhanced_chunks(text_content, doc_metadata, tags, user_id, course_id, resource_id)
++            metrics.chunks_created = len(chunks)
++            metrics.tokens_used = sum(c.token_count for c in chunks)
++            metrics.cost_estimate = metrics.tokens_used * self.embedding_cost_per_token
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "chunking_complete", "progress": 60}, job_id)
++
++            # Step 5: Generate Embeddings
++            current_stage = "embeddings_complete"
++            vectors = await self._generate_embeddings_with_openrouter(chunks)
++            metrics.embeddings_generated = len(vectors)
++            await self._publish_status_update(user_id, course_id, resource_id, "processing", {"stage": "embeddings_complete", "progress": 80}, job_id)
++
++            # Step 6a: Delete old vectors AFTER successful processing but BEFORE storing new ones
++            # This ensures we don't lose data if processing fails
++            await self.delete_old_vectors_via_service(user_id, course_id, resource_id)
++
++            # Step 6b: Store in Weaviate via Weaviate Service
++            storage_result = await self.store_chunks_via_service(chunks, vectors)
++            # What the index actually accepted — store_chunks_via_service
++            # raises on partial writes, so this equals len(chunks) here, but
++            # reporting it from the storage result (not from
++            # embeddings_generated) keeps the claim honest if that ever
++            # changes.
++            metrics.chunks_stored = storage_result.get("successful_inserts", 0)
++
++            # Save processing metadata to subcollection (new architecture)
++            await self._save_processing_metadata_to_subcollection(
++                user_id=user_id,
++                course_id=course_id,
++                resource_id=resource_id,
++                metrics=metrics,
++                tags=tags
++            )
++
++            final_details = {
++                "stage": "completed",
+                 "progress": 100,
+                 "jobId": job_id,
+                 "weaviate_storage": storage_result,
+@@ -1092,56 +1104,68 @@
+             return metrics
+             
+         except Exception as e:
+-            metrics.error_message, metrics.end_time = str(e), time.time()
+-            self.logger.error("document_processing_failed", user_id=user_id, course_id=course_id, resource_id=resource_id, error=str(e))
+-            await self._publish_status_update(user_id, course_id, resource_id, "failed", {"error": str(e)}, job_id)
+-            if trace: trace.update(output={"success": False, "error": str(e)})
+-            return metrics
+-    
+-    async def _validate_processing_request(self, user_id: str, course_id: str, resource_id: str):
+-        """Validate processing request using subcollection paths"""
+-        
+-        doc_path = self._get_document_path(user_id, course_id, resource_id)
+-        doc_ref = self.db.document(doc_path)
+-        doc_data = doc_ref.get().to_dict()
+-        
+-        if not doc_data:
+-            raise ValueError(f"Document {resource_id} not found at path {doc_path}")
+-        
+-        # Verify user ownership (implicit in path structure, but double-check)
+-        if doc_data.get('userId') != user_id:
+-            raise PermissionError(f"User {user_id} does not own document {resource_id}")
+-        
+-        # Check if already processed is handled by _claim_resource_if_queued
+-        # if doc_data.get('ragProcessingStatus') == 'processing':
+-        #     raise ValueError(f"Document {resource_id} is already being processed")
+-        
+-        # Ensure we have either extracted text OR a source file to extract from
+-        has_text = bool(doc_data.get('extractedText'))
+-        has_source = bool(doc_data.get('storage_url') or doc_data.get('pdfUrl'))
+-        
+-        if not has_text and not has_source:
+-            raise ValueError(f"Document {resource_id} has neither extracted text nor a valid source URL")
+-    
+-    async def _save_content_to_subcollection(self, user_id: str, course_id: str, resource_id: str,
+-                                             text_content: str, total_pages: int):
+-        """Save extracted text to content subcollection (new architecture)"""
+-        try:
+-            doc_path = self._get_document_path(user_id, course_id, resource_id)
+-            # content/data + extracted_text is the contract the readers use
+-            # (flashcard-service generate, rag-worker regenerate-map). An
+-            # earlier revision wrote content/extracted with a `text` field,
+-            # which no reader ever looked at — flashcard generation found
+-            # "no markdown content" for every freshly ingested resource.
+-            content_ref = self.db.document(f"{doc_path}/content/data")
+-
+-            await asyncio.to_thread(
+-                content_ref.set,
+-                {
+-                    "extracted_text": text_content,
+-                    "text_length": len(text_content),
+-                    "extraction_method": "marker-pdf",
+-                    "extracted_at": firestore.SERVER_TIMESTAMP,
++        except Exception as e:
++            metrics.error_message, metrics.end_time = str(e), time.time()
++            # Report the true failing stage and a deliberately derived
++            # retryable flag — never rely on rag-api's fallback defaults.
++            # "processing" is the safe value when the stage is unknown,
++            # matching the stale-lease sweep's error_stage.
++            failure_stage = current_stage if current_stage else "processing"
++            retryable = classify_error(e)
++            self.logger.error("document_processing_failed", user_id=user_id, course_id=course_id, resource_id=resource_id, error=str(e), stage=failure_stage, retryable=retryable)
++            await self._publish_status_update(
++                user_id, course_id, resource_id, "failed",
++                self.build_failure_payload(str(e), failure_stage, retryable),
++                job_id,
++            )
++            if trace: trace.update(output={"success": False, "error": str(e), "stage": failure_stage, "retryable": retryable})
++            return metrics
++    
++    async def _validate_processing_request(self, user_id: str, course_id: str, resource_id: str):
++        """Validate processing request using subcollection paths"""
++        
++        doc_path = self._get_document_path(user_id, course_id, resource_id)
++        doc_ref = self.db.document(doc_path)
++        doc_data = doc_ref.get().to_dict()
++        
++        if not doc_data:
++            raise ValueError(f"Document {resource_id} not found at path {doc_path}")
++        
++        # Verify user ownership (implicit in path structure, but double-check)
++        if doc_data.get('userId') != user_id:
++            raise PermissionError(f"User {user_id} does not own document {resource_id}")
++        
++        # Check if already processed is handled by _claim_resource_if_queued
++        # if doc_data.get('ragProcessingStatus') == 'processing':
++        #     raise ValueError(f"Document {resource_id} is already being processed")
++        
++        # Ensure we have either extracted text OR a source file to extract from
++        has_text = bool(doc_data.get('extractedText'))
++        has_source = bool(doc_data.get('storage_url') or doc_data.get('pdfUrl'))
++        
++        if not has_text and not has_source:
++            raise ValueError(f"Document {resource_id} has neither extracted text nor a valid source URL")
++    
++    async def _save_content_to_subcollection(self, user_id: str, course_id: str, resource_id: str,
++                                             text_content: str, total_pages: int):
++        """Save extracted text to content subcollection (new architecture)"""
++        try:
++            doc_path = self._get_document_path(user_id, course_id, resource_id)
++            # content/data + extracted_text is the contract the readers use
++            # (flashcard-service generate, rag-worker regenerate-map). An
++            # earlier revision wrote content/extracted with a `text` field,
++            # which no reader ever looked at — flashcard generation found
++            # "no markdown content" for every freshly ingested resource.
++            content_ref = self.db.document(f"{doc_path}/content/data")
++
++            await asyncio.to_thread(
++                content_ref.set,
++                {
++                    "extracted_text": text_content,
++                    "text_length": len(text_content),
++                    "extraction_method": "marker-pdf",
++                    "extracted_at": firestore.SERVER_TIMESTAMP,
++                    "total_pages": total_pages,
+                     "total_pages": total_pages
+                 }
+             )

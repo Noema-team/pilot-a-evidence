@@ -1,0 +1,23 @@
+[journal] {"ts":"2026-10-07T12:16:49.738Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384}
+[journal] {"ts":"2026-10-07T12:16:49.749Z","event":"decision_resolving","decisionId":"4eba71ff-3dfe-4868-86bd-dbf28af37296","optionId":"approve","rationale":"Charter accepted; proceed under the frozen P1-R contract (frozen main.py-only editPolicy enforced)"}
+[journal] {"ts":"2026-10-07T13:13:59.330Z","event":"decision_resumed","decisionId":"4eba71ff-3dfe-4868-86bd-dbf28af37296"}
+[journal] {"ts":"2026-10-07T13:13:59.332Z","event":"tick","round":0,"dispatches":[]}
+[journal] {"ts":"2026-10-07T13:13:59.332Z","event":"decision_pending","decisionId":"bd16a4de-b73c-4ca9-83ff-c33b1e167c0a","type":"checkpoint","title":"Workflow reached another checkpoint","summary":"Workflow 'full-build' paused at step 'confirm'.","options":[{"id":"approve","label":"Approve","description":"Continue to the build phase"},{"id":"revise","label":"Revise","description":"Send back for revision (increments revision counter)"}]}
+{
+  "decisionId": "bd16a4de-b73c-4ca9-83ff-c33b1e167c0a",
+  "type": "checkpoint",
+  "title": "Workflow reached another checkpoint",
+  "summary": "Workflow 'full-build' paused at step 'confirm'.",
+  "options": [
+    {
+      "id": "approve",
+      "label": "Approve",
+      "description": "Continue to the build phase"
+    },
+    {
+      "id": "revise",
+      "label": "Revise",
+      "description": "Send back for revision (increments revision counter)"
+    }
+  ]
+}

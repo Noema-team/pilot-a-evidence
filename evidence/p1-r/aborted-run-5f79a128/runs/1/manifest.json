@@ -1,0 +1,117 @@
+{
+  "cycle_id": "5f79a128-188f-44d7-9ef6-a097c7de7bc1",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-10-07T11:33:20.049Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "scoping.gather",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-10-07T11:33:20.049Z",
+      "completed_at": "2026-10-07T11:33:20.050Z"
+    },
+    {
+      "id": "scoping.produce",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/cycle-charter.md"
+      ],
+      "started_at": "2026-10-07T11:33:20.050Z",
+      "turns_taken": 2,
+      "tool_calls": 2,
+      "completed_at": "2026-10-07T11:34:33.042Z"
+    },
+    {
+      "id": "scoping.checkpoint",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-10-07T11:34:33.045Z",
+      "completed_at": "2026-10-07T11:34:49.063Z"
+    },
+    {
+      "id": "design",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/requirements.md",
+        "docs/architecture.md"
+      ],
+      "started_at": "2026-10-07T11:34:49.068Z",
+      "turns_taken": 19,
+      "tool_calls": 26,
+      "completed_at": "2026-10-07T11:44:05.773Z"
+    },
+    {
+      "id": "critique",
+      "status": "skipped",
+      "artifacts_written": [],
+      "completed_at": "2026-10-07T11:44:05.779Z",
+      "skip_reason": "condition_not_met"
+    },
+    {
+      "id": "plan",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/plan.md",
+        "docs/test-plan.md"
+      ],
+      "started_at": "2026-10-07T11:44:05.779Z",
+      "turns_taken": 21,
+      "tool_calls": 33,
+      "completed_at": "2026-10-07T12:02:15.018Z"
+    },
+    {
+      "id": "test",
+      "status": "running",
+      "artifacts_written": [],
+      "started_at": "2026-10-07T12:02:15.022Z"
+    },
+    {
+      "id": "sharding_approval",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "confirm",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "build",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "exec",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "validation_gate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "debug",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "evaluate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "summarise",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "snapshot",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

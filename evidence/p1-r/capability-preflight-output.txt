@@ -1,0 +1,3 @@
+PASS full-build/build: effort 'low' is in supported_efforts ['max', 'high', 'low']
+PASS full-build/test: effort 'low' is in supported_efforts ['max', 'high', 'low']
+PREFLIGHT PASS — snapshot 2026-10-07T04:45:46Z, default_effort 'max'

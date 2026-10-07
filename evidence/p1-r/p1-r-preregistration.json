@@ -1,0 +1,108 @@
+{
+ "experiment": "P1-R",
+ "title": "BUILD Edit Protocol v1 under the intended frozen contract (editPolicy-seam corrected; P1 model/task regime unchanged)",
+ "preregistered_at_utc": "2026-10-07T05:00:00Z",
+ "directive": "Operator P1-R directive: correct ONLY the editPolicy invocation seam; prepare P1-R with the exact P1 model/config/protocol/task regime and the same preregistered primary endpoint; record P1 as observational/UNEVALUABLE (not the comparator qualification); freeze and STOP. Do not run P1-R. Do not implement the TEST→BUILD handoff yet.",
+ "campaign_record_amendment": {
+  "p1_status": "OBSERVATIONAL / UNEVALUABLE for H-protocol-publication",
+  "reason": "The full-build invocation normalizer (validateFullBuildParams) dropped workflowParameters.editPolicy before WorkflowEngine execution in every campaign run (V8–P1). P1 therefore measured the protocol under an UNPOLICIED runtime: the declared frozen policy never reached StepRunContext, so unauthorized-create-path and requiredEditPaths enforcement were inert end-to-end. The primary endpoint (publication under the intended frozen contract) was not measured.",
+  "p1_observations_preserved": {
+   "protocol_mechanics": "submit_result accepted 3/3; zero serialization failures; anchored edits applied deterministically",
+   "staging_publication_unpolicied": "2/3 staging+publication under the actual unpolicied runtime",
+   "archives": "evidence/p1-1..p1-3/; forensics evidence/p1-forensics/test-build-boundary-forensics.md (journal b33721f); amendment journal b095e98"
+  },
+  "not_a_comparator": "P1 must not be cited as the comparator qualification. The primary decision rule is absolute (>= 2/3), so P1-R requires no comparator."
+ },
+ "model_regime_frozen": {
+  "note": "identical to V11/P1 — the model configuration is NOT an experimental variable",
+  "provider": "openrouter",
+  "model": "z-ai/glm-5.3-flash",
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_tokens_global": 16384,
+  "per_step": {
+   "full-build/design": { "max_tokens": 32768, "reasoning_effort": null },
+   "full-build/plan": { "max_tokens": 32768, "reasoning_effort": null },
+   "full-build/test": { "max_tokens": 32768, "reasoning_effort": "low" },
+   "full-build/build": { "max_tokens": 32768, "reasoning_effort": "low" }
+  },
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2"
+ },
+ "capability_preflight": {
+  "status": "PASS",
+  "detail": "Live snapshot 2026-10-07T04:45:46Z: supported_efforts ['max','high','low'], default 'max' — BUILD/TEST effort 'low' supported. API now nests the reasoning object under `reasoning` (was `reasoning_metadata` at the P1 snapshot); same source endpoint, values unchanged.",
+  "metadata_file": "evidence/p1-r/capability-metadata.json",
+  "metadata_sha256": "89e8e9940aab1b63c38273fc411c93937b673ee9e9d8bf839379d47d1a653901",
+  "preflight_output": "evidence/p1-r/capability-preflight-output.txt"
+ },
+ "sole_intervention_relative_to_p1": {
+  "name": "editPolicy invocation-seam correction (P1-R)",
+  "kind": "mechanical defect correction — NOT a new treatment cell",
+  "old": "validateFullBuildParams whitelisted {planning_depth, max_iterations, on_cap_hit, definitionSource} and silently dropped workflowParameters.editPolicy: the declared policy never reached WorkflowRun.resolvedParameters or StepRunContext.editPolicy; BUILD ran unpolicied",
+  "new": "the seam validates the declared editPolicy with the ONE strict fail-closed shape validator (workflow/edit-policy.ts, shared with the engine) and preserves it into normalizedParams -> WorkflowRun.resolvedParameters (resume reuses exactly the frozen policy); unknown keys still never pass through; the engine's definition-level target gate (validateEditPolicyTargets) and per-step applicability are unchanged",
+  "explicitly_unchanged": "BUILD Edit Protocol v1, ActionContract schema, anchors, model configuration, routing, budgets, reasoning effort, TEST, BUILD teaching, sampling behavior",
+  "frozen_policy_that_now_binds": {
+   "appliesToSteps": ["build"],
+   "allowedEditPaths": ["apps/ai-server/rag-worker-service/main.py"],
+   "requiredEditPaths": ["apps/ai-server/rag-worker-service/main.py"]
+  }
+ },
+ "treatment": {
+  "name": "BUILD publication protocol v1 (anchored semantic edits) — unchanged from P1",
+  "detail": "structured build-changeset ActionContract: run-scoped opaque anchors minted by Stratum on read_source_slice; the model submits {edits:[{anchor_id,replacement}], creates:[{path,content}]} through submit_result; Stratum re-verifies base hashes, splices exact bytes, publishes through the unchanged publication boundary; unified diffs exist only as Stratum-generated audit evidence"
+ },
+ "primary_hypothesis": {
+  "id": "H-protocol-publication",
+  "statement": "BUILD successfully stages and publishes its required authorized source edit in at least 2/3 evaluable BUILD opportunities, under the INTENDED frozen contract (task editPolicy enforced end-to-end).",
+  "decision_rule": "SUPPORTED if >= 2/3 evaluable BUILD opportunities publish; FALSIFIED if < 2/3"
+ },
+ "secondary_outcome_taxonomy": [
+  "submission failure: missing/malformed submit_result, schema or result-repair exhaustion",
+  "anchor failure: unknown/stale/duplicate/overlapping/unavailable anchor",
+  "authority/staging rejection: editPolicy, required-path, create-exists, base-state or ownership rejection",
+  "downstream semantic failure: BUILD publication succeeds but EXEC/tests/validation fail",
+  "end-to-end success: BUILD publishes and the downstream workflow completes successfully"
+ ],
+ "sampling_plan": {
+  "stop_rule": "stop after 3 evaluable BUILD opportunities or 9 evaluable workflows, whichever occurs first",
+  "rules": [
+   "upstream failures consume workflow slots",
+   "transport censoring consumes neither",
+   "implementation/evidence/procedure defects stop immediately"
+  ]
+ },
+ "freeze_chain": {
+  "implementation_commit": "c0060f09cfa727a98744a278c10582c5d9f04b3d",
+  "implementation_branch": "p1-collision-guard (single forward commit on the frozen lineage; prior frozen identity 315d37178a98917b0c5de79ac851fa6083acfad7 preserved in history; no live run ever executed on an unfrozen tree)",
+  "config_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2 (evidence/v11-frozen-config/settings.json — unchanged)",
+  "golden_submit_result_schema_sha256": "54ce6c07a8454877fb99b32867d525ceb9ba481b35010c2805dd72973559d6c4 (unchanged)",
+  "capability_metadata_sha256": "89e8e9940aab1b63c38273fc411c93937b673ee9e9d8bf839379d47d1a653901",
+  "gate_b": {
+   "status": "PASS",
+   "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+   "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+   "probe_token_count": 4213,
+   "output": "evidence/p1-r/gate-b-output.txt"
+  },
+  "target_pins": {
+   "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e (tracked tree clean at freeze)",
+   "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+  }
+ },
+ "qualification_at_freeze": {
+  "suite": "1849 tests, 0 failures, 4 pre-existing skips (evidence/p1-r/refreeze-suite-output.txt); typecheck clean",
+  "p1_freeze_proof": "19/19 PASS re-run at c0060f0 (twelve operator items incl. strengthened collision case; script evidence/v1-p1-freeze/p1-freeze-proof-v2.mts)",
+  "seam_proof": {
+   "status": "ALL PINS PASS — production-shaped, zero model traffic",
+   "script": "evidence/p1-r/seam-proof.mts",
+   "chain": "ExecutionRequest/WorkItem editPolicy -> StratumAgentAdapter -> resolveWorkflowInvocation -> persisted WorkflowRun.resolvedParameters -> BUILD StepRunContext.editPolicy -> ActionContract validation/publication",
+   "pins": {
+    "1": "BUILD receives exactly the frozen policy allowing/requiring only apps/ai-server/rag-worker-service/main.py",
+    "2": "anchored main.py edit + create outside the policy: rejected in-loop (unauthorized-create-path), repairable, writes nothing for the rejected create",
+    "3": "main.py-only valid proposal stages and satisfies requiredEditPaths (applied-edit provenance recorded)",
+    "4": "every non-build step receives no editPolicy at all (design/plan/test/evaluate/summarise/... probed)",
+    "5": "resume restores exactly the frozen policy from the persisted run; a tampered request policy (deep/99/force_pass + evil path) cannot leak into any step context; persisted row unchanged",
+    "6": "malformed shape (missing requiredEditPaths) and misspelled appliesToSteps target ('buidl') both fail closed BEFORE any step executes (zero steps ran)"
+   }
+  }
+ }
+}

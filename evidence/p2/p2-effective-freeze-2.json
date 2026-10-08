@@ -1,0 +1,89 @@
+{
+ "artifact": "P2 EFFECTIVE FREEZE BINDING v2 \u2014 supersedes v1 (p2-effective-freeze.json) for the chain extension ONLY; every v1 element is unchanged and re-pinned here by the same hash",
+ "generated_at_utc": "2026-10-08T14:15:00Z",
+ "supersedes": {
+  "v1_path": "evidence/p2/p2-effective-freeze.json",
+  "v1_sha256": "ae23eb3c63041b1a3bb3ae58885769425e4057c11db8b93f81e4d5510a2c4fb5",
+  "scope": "chain extension only (addendum 3 + S3 evidence). No v1 element changed: orders 1-6 of v1 carry the same hashes here.",
+  "note": "v1 file and its checksum file (p2-effective-freeze.sha256, 24 entries) remain untouched as historical records; verification now runs against p2-effective-freeze-2.sha256 (30 entries)."
+ },
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "ci_run": "37751982897 (success)",
+  "verified_untouched_after_addendum_3": true
+ },
+ "target": {
+  "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "chain": [
+  {
+   "order": 1,
+   "role": "preregistration (original)",
+   "path": "evidence/p2/p2-preregistration.json",
+   "sha256": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa"
+  },
+  {
+   "order": 2,
+   "role": "freeze manifest (original)",
+   "path": "evidence/p2/p2-freeze-manifest.json",
+   "sha256": "21814ac04b286d67ae60cd74b173f6db654d3d5fd1e5748b14d49456a46d5a1a"
+  },
+  {
+   "order": 3,
+   "role": "original checksum file (21 pins)",
+   "path": "evidence/p2/p2-freeze-manifest.sha256",
+   "sha256": "e92e43555e06b0332ac17a45ac6c2f9c5bc1ba98c144c06bc4147bbdbb97bbe9"
+  },
+  {
+   "order": 4,
+   "role": "addendum 1 (A1 disposition + A2 replay rules)",
+   "path": "evidence/p2/p2-preregistration-addendum-1.json",
+   "sha256": "d9e9bb83da38a7e3af695fc6ce32b7f99dc17f723117a240e59b57202386278f"
+  },
+  {
+   "order": 5,
+   "role": "addendum 2 (A2 correction: truncated BUILD repairs evaluable)",
+   "path": "evidence/p2/p2-preregistration-addendum-2.json",
+   "sha256": "aeb6288d72efbb326ffa1a92adc663b2c8b11d1c6a7729793712d7a40e4048d9"
+  },
+  {
+   "order": 6,
+   "role": "binding v1 (superseded by this file, preserved)",
+   "path": "evidence/p2/p2-effective-freeze.json",
+   "sha256": "ae23eb3c63041b1a3bb3ae58885769425e4057c11db8b93f81e4d5510a2c4fb5"
+  },
+  {
+   "order": 7,
+   "role": "addendum 3 (S3 request observability + S1 BUILD-scoped authority + S4 pristine-gate drift semantics)",
+   "path": "evidence/p2/p2-preregistration-addendum-3.json",
+   "sha256": "df69a3fa01fce1bc43e85a98b3684a76ab421a87e941380495369bf14ac2959a"
+  },
+  {
+   "order": 8,
+   "role": "S3 wire-capture wrapper source (campaign tooling, outside the frozen implementation)",
+   "path": "evidence/p2/wire-capture-wrapper.mts",
+   "sha256": "d787a668e4b671dfd022e512e2aa4480a2c88be193c006bb24ebac4e0f0059a2"
+  },
+  {
+   "order": 9,
+   "role": "S3 proof output at the frozen implementation",
+   "path": "evidence/p2/qualification/s3-request-observability.txt",
+   "sha256": "44e64b059fe0e44defc99ec90bdcea7b6c6580d1734e0484c51a700316eed0d5"
+  }
+ ],
+ "supersession_ledger": [
+  "addendum-1 boundary case 'token-truncated repairs are budget-censored' RETRACTED by addendum 2",
+  "binding v1 superseded by this binding v2 (extension only; orders 1-6 hashes identical)",
+  "prereg S1 and S4 texts superseded by addendum-3 effective texts; S2/S5/S6/S7 unchanged",
+  "wire_surface_offered reporting field mechanism superseded by addendum-3 S3 (archived wire-capture.jsonl, not configuration inference)"
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p2/p2-effective-freeze-2.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public) and run sha256sum -c evidence/p2/p2-effective-freeze-2.sha256 (27 entries); the original 21-pin and 24-entry chains also still verify independently",
+  "implementation_check": "git -C <stratum> rev-parse p1-collision-guard == 9f298f219db927d5065876cf99cdec11e462aa04; git -C <stratum> status --short must be empty for tracked files"
+ },
+ "execution_status": "HOLD \u2014 no live P2 until the operator's final launch ruling at this effective-freeze identity"
+}

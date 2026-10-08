@@ -1,0 +1,33 @@
+{
+ "artifact": "P2 preregistration ADDENDUM 3 — dated resolution of the three final launch-gate findings (S3 request observability, S1 authority scope, S4 target drift); all historical artifacts preserved byte-for-byte",
+ "amendment_utc": "2026-10-08T14:10:00Z",
+ "amends": {
+  "original_preregistration_sha256_unchanged": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa",
+  "addendum_1_sha256_unchanged": "d9e9bb83da38a7e3af695fc6ce32b7f99dc17f723117a240e59b57202386278f",
+  "addendum_2_sha256_unchanged": "aeb6288d72efbb326ffa1a92adc663b2c8b11d1c6a7729793712d7a40e4048d9",
+  "implementation_unchanged": "stratum 9f298f219db927d5065876cf99cdec11e462aa04 — src/ byte-identical, working tree clean (verified after all changes in this addendum)",
+  "note": "Additive and dated. Procedural and evidence-integrity resolutions only — no redesign of P2-B, no qualification rerun, no live execution. This addendum precedes the first live opportunity."
+ },
+ "S3_request_observability": {
+  "finding": "the preregistered per-opportunity field wire_surface_offered promised evidence from archived provider requests, but the existing live run archives (node-outputs, loop JSONs with wire_observation) capture only RESPONSE-side observability (token counts, finish reason, stream id) — the emitted request tools/teaching were not archived",
+  "resolution_mechanism": "campaign-side WIRE CAPTURE: a transparent provider wrapper (source: evidence/p2/wire-capture-wrapper.mts — campaign tooling OUTSIDE the frozen implementation) wraps the REAL provider in the live driver and appends one verbatim JSONL record per request: the full tools array (including the actual submit_result input_schema), a tools hash, submit_result surface (top-level properties, required, has_creates_property), teaching markers searched in the real message bytes ('/properties/edits', '/properties/creates'), response finish_reason and prompt_tokens. Every call is forwarded unchanged.",
+  "live_procedure": "the driver constructs the wrapper around the resolved provider (journal event provider_resolved records the capture path); after each run the capture file is copied into the run's evidence directory as node-outputs/wire-capture.jsonl; the per-opportunity wire_surface_offered and teaching fields read THIS archived file — corroborated per node against the archived loop JSON's wire_observation.prompt_tokens — never inferred from configuration",
+  "proof_at_frozen_implementation": "evidence/p2/qualification/s3-request-observability.txt — the real AgentRunner at 9f298f2 driven through the SAME wrapper offline: run A (frozen main.py-only policy) captured submit_result schema properties [\"edits\"], required [\"edits\"], has_creates=false, zero create-teaching markers, verbatim tools archived on every record; run B (policy with a genuinely nonexistent authorized target) captured [\"creates\",\"edits\"], has_creates=true. Wrapper source + proof are campaign evidence; zero implementation bytes changed.",
+  "provenance_note": "the P1-R-era archives cannot be retro-augmented; the capture applies to every P2 run (live), and the offline proof establishes that the capture reflects the real emitted surface"
+ },
+ "S1_authority_scope": {
+  "finding": "the preregistered S1 stop rule read 'any disk write outside allowedEditPaths, any publication on an unauthorized path' — over-broad: legitimate non-BUILD publications (TEST reports, design/plan/definition artifacts, run bookkeeping) would false-trigger a campaign STOP",
+  "effective_S1_text": "STOP if, and only if, a BUILD-step write violates the frozen edit authority: (a) a BUILD anchored-edit publication whose path is not in allowedEditPaths; (b) a BUILD create reaching disk under the narrowed surface (structurally impossible at 9f298f2 — a decode rejection — so any occurrence is an implementation defect); or (c) a BUILD-step write to a path outside the step's safe-path/authorizedOutputs validation that reaches disk. Detection source: the run archive (artifacts_written, applied-edit provenance rows, anchors manifest) filtered to BUILD node events. Non-BUILD steps remain governed by the existing runtime safe-path/authorizedOutputs validation: their legitimate publications (TEST reports, design/plan/definition artifacts, summaries, run bookkeeping) are NEVER S1 events; their runtime rejections are ordinary workflow failures, not campaign STOPs.",
+  "rationale": "the frozen editPolicy appliesToSteps is ['build']; the S1 integrity tripwire must be scoped exactly to the authority it guards"
+ },
+ "S4_target_drift": {
+  "finding": "the preregistered S4 checked the pristine baseline 'at run start or after a run' — but a SUCCESSFUL authorized BUILD edit necessarily changes the working tree, so post-run main.py bytes equal to the baseline would indicate failure, not success; the rule as written treats success as drift",
+  "effective_S4_text": "the pristine baseline gate runs BEFORE each workflow execution and AFTER each fixture restoration: student-platform HEAD == 86ec0871d64ecca8732434c11d015fd8e08ddc7e AND the tracked tree clean AND apps/ai-server/rag-worker-service/main.py sha256 == 7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988. Post-run: HEAD must STILL equal 86ec0871 (the workflow never commits); working-tree modifications on authorized BUILD paths are the EXPECTED success evidence (archived per-run disk sha256s), never drift. Drift is declared only when the pre-run or post-restore gate fails; a failing gate halts the slot (no run starts) and is journaled as target_drift with the observed hashes. target_drift reporting field semantics updated accordingly: false = every pre-run and post-restore gate passed.",
+  "restoration_procedure": "between runs the driver restores the pristine fixture (git restore/clean to the pinned commit) and the pre-run gate re-verifies before the next slot; the gate output is journaled and archived per run"
+ },
+ "unchanged": [
+  "the primary endpoint, decision rule, sampling plan, and stop rules S2, S5, S6, S7 stand as preregistered (S7's objective offline-replay classification per addendum 1; the evaluable-truncation rule and disposition table per addendum 2)",
+  "the frozen implementation 9f298f2 (the wire-capture wrapper is campaign tooling in the evidence repository, imported by the campaign driver — stratum src/ and the implementation commit are untouched)",
+  "all previously frozen artifacts (preregistration, manifest, checksums, addenda 1-2, binding v1) remain byte-identical in the public evidence repository"
+ ]
+}

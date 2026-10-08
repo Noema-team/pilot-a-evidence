@@ -1,0 +1,47 @@
+{
+ "artifact": "P2 EFFECTIVE FREEZE BINDING v3 — supersedes v2 for the chain extension ONLY (wrapper v2 + addendum 4 + qualification v2); every v1/v2 element re-pinned unchanged",
+ "generated_at_utc": "2026-10-08T15:05:00Z",
+ "supersedes": {
+  "v2_path": "evidence/p2/p2-effective-freeze-2.json",
+  "v2_sha256": "5ffa9c6918f926e211caeba604c26279a7d7ce78154a2ca17e8bb2dbc9081dda",
+  "v1_path": "evidence/p2/p2-effective-freeze.json",
+  "v1_sha256": "ae23eb3c63041b1a3bb3f3d6113f51caaf4e545fc6c6c8b9b9add5b31048fba0",
+  "scope": "chain extension only. Wrapper bytes corrected per the operator's three findings (addendum 4); all preregistration/addenda texts unchanged; implementation unchanged (9f298f2)."
+ },
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "ci_run": "37751982897 (success)",
+  "verified_untouched_after_addendum_4": true
+ },
+ "target": {
+  "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "chain": [
+  {"order": 1, "role": "preregistration (original)", "path": "evidence/p2/p2-preregistration.json", "sha256": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa"},
+  {"order": 2, "role": "freeze manifest (original)", "path": "evidence/p2/p2-freeze-manifest.json", "sha256": "21814ac04b286d67ae60cd74b173f6db654d3d5fd1e5748b14d49456a46d5a1a"},
+  {"order": 3, "role": "original checksum file (21 pins)", "path": "evidence/p2/p2-freeze-manifest.sha256", "sha256": "e92e43555e06b0332ac17a45ac6c2f9c5bc1ba98c144c06bc4147bbdbb97bbe9"},
+  {"order": 4, "role": "addendum 1 (A1 disposition + A2 replay rules)", "path": "evidence/p2/p2-preregistration-addendum-1.json", "sha256": "d9e9bb83da38a7e3af695fc6ce32b7f99dc17f723117a240e59b57202386278f"},
+  {"order": 5, "role": "addendum 2 (A2 correction: truncated BUILD repairs evaluable)", "path": "evidence/p2/p2-preregistration-addendum-2.json", "sha256": "aeb6288d72efbb326ffa1a92adc663b2c8b11d1c6a7729793712d7a40e4048d9"},
+  {"order": 6, "role": "binding v1 (superseded by v2, preserved)", "path": "evidence/p2/p2-effective-freeze.json", "sha256": "ae23eb3c63041b1a3bb3f3d6113f51caaf4e545fc6c6c8b9b9add5b31048fba0"},
+  {"order": 7, "role": "addendum 3 (S3 mechanism + S1 scope + S4 drift semantics)", "path": "evidence/p2/p2-preregistration-addendum-3.json", "sha256": "df69a3fa01fce1bc43e85a98b3684a76ab421a87e941380495369bf14ac2959a"},
+  {"order": 8, "role": "S3 wire-capture wrapper v2 (Proxy-based, fail-closed, wire_observation metadata, failure archiving)", "path": "evidence/p2/wire-capture-wrapper.mts", "sha256": "b9855ddeb7ae169057c9c85651e6b1ee1c590627227f2b2d6b9cd11b0cfa0179"},
+  {"order": 9, "role": "S3 qualification v2 output (A-F all pass) at the frozen implementation", "path": "evidence/p2/qualification/s3-request-observability.txt", "sha256": "3ec0fa6b766827c8462cc600db8b340bc23e5094062ffcc522d3ba928fe03c51"},
+  {"order": 10, "role": "binding v2 (superseded by this binding, preserved)", "path": "evidence/p2/p2-effective-freeze-2.json", "sha256": "5ffa9c6918f926e211caeba604c26279a7d7ce78154a2ca17e8bb2dbc9081dda"},
+  {"order": 11, "role": "addendum 4 (wrapper defect corrections + fail-closed policy + qualification v2)", "path": "evidence/p2/p2-preregistration-addendum-4.json", "sha256": "a04d8d34f5ed0e10553916f5974ac522c2cbbf0d404199e50f75f5c82578fc91"}
+ ],
+ "supersession_ledger": [
+  "addendum-1 boundary case 'token-truncated repairs are budget-censored' RETRACTED by addendum 2",
+  "binding v1 superseded by v2 (extension); binding v2 superseded by THIS binding v3 (wrapper v2 bytes per the operator's three findings); orders 1-7 hashes identical across all bindings",
+  "wrapper v1 bytes (spread-based) superseded by wrapper v2 (Proxy delegation, paired request/response/error records, wire_observation metadata, fail-closed 'wire-capture:' errors)",
+  "S3 qualification output superseded by the v2 output (six qualifications A-F)"
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p2/p2-effective-freeze-3.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public) and run sha256sum -c evidence/p2/p2-effective-freeze-3.sha256; the v2 (27), v1 (24), and original (21) chains also still verify independently",
+  "implementation_check": "git -C <stratum> rev-parse p1-collision-guard == 9f298f219db927d5065876cf99cdec11e462aa04; tracked tree clean"
+ },
+ "execution_status": "HOLD — no live P2 until the operator's final launch ruling at this effective-freeze identity"
+}

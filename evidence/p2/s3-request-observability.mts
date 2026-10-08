@@ -1,21 +1,27 @@
-// P2 S3 — REQUEST OBSERVABILITY PROOF (operator finding S3).
+// P2 S3 — REQUEST OBSERVABILITY QUALIFICATION v2 (operator launch-gate review
+// of binding v2 @ e272e2a: wrapper defects 1-3 + live-driver integration and
+// fail-closed qualification).
 //
-// Proves, offline at the frozen implementation (stratum 9f298f2, zero model
-// traffic), that the campaign wire-capture wrapper — the SAME wrapper the
-// live driver wraps around the real provider — archives the ACTUAL emitted
-// provider request surface (submit_result input_schema + teaching markers),
-// not a configuration inference:
-//   run A (frozen main.py-only policy) -> captured submit_result schema has
-//   properties {edits} ONLY, required [edits], has_creates=false; teaching
-//   marker has_creates=false.
-//   run B (policy with a genuinely nonexistent authorized target) -> captured
-//   schema HAS creates; teaching marker has_creates=true.
-// The capture records are verbatim JSONL — exactly what live runs will
-// archive into the run evidence directory.
+// Offline at the frozen implementation (stratum 9f298f2, zero model traffic):
+//   A. narrowed policy  -> captured submit_result schema has properties
+//      ["edits"] ONLY, has_creates=false, zero create teaching
+//   B. create-allowed policy -> captured ["creates","edits"], has_creates=true
+//   C. response metadata read from result.wire_observation (the REAL
+//      provider's field; src/sse-accumulator.ts WireObservation)
+//   D. fail-closed capture: an unwritable capture file throws 'wire-capture:'
+//      BEFORE the model call — the inner provider is never invoked
+//   E. failed provider requests ARE archived (error record + propagation)
+//   F. capability preservation with the REAL OpenAI-compatible provider class
+//      (built via the same resolveLLMProvider call the live driver uses):
+//      every prototype method reachable through the Proxy wrapper with its
+//      ORIGINAL function reference; only complete/completeMultiTurn
+//      overridden; completeStructured survives (operator defect 3)
+// The capture records are verbatim JSONL — exactly what live runs archive
+// into the run evidence directory (node-outputs/wire-capture.jsonl).
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -28,12 +34,13 @@ import { ContextManager, DEFAULT_CONFIG } from '/home/theo/Documents/coding/repo
 import type { MultiTurnResult } from '/home/theo/Documents/coding/repos/stratum/src/agent-loop.js';
 import { SUBMIT_RESULT_TOOL_NAME } from '/home/theo/Documents/coding/repos/stratum/src/transport/step-result.js';
 import { createBuildChangesetActionContract, BUILD_CHANGESET_ARTIFACT_TYPE } from '/home/theo/Documents/coding/repos/stratum/src/workflow/methodology/build-changeset-contract.js';
-import { createWireCaptureProvider } from './wire-capture-wrapper.mts';
+import { resolveLLMProvider } from '/home/theo/Documents/coding/repos/stratum/src/application.js';
+import type { IMultiTurnProvider } from '/home/theo/Documents/coding/repos/stratum/src/agent-loop.js';
+import { createWireCaptureProvider, type WireCaptureRecord } from './wire-capture-wrapper.mts';
 
 const sha256 = (s: string): string => createHash('sha256').update(s, 'utf8').digest('hex');
 const WORKER_PATH = 'apps/ai-server/rag-worker-service/main.py';
 const WORKER_ORIGINAL = 'DEFAULT_FAILURE_STAGE = "consume"\n\n\ndef process_document(doc):\n    return doc\n';
-const WORKER_PATCHED_SINGLE = 'DEFAULT_FAILURE_STAGE = "consume"\nFAILURE_STAGE_FALLBACK = "processing"\n\ndef process_document(doc):\n    return doc\n';
 const NEW_FILE_PATH = 'apps/ai-server/rag-worker-service/failure_payload.py';
 const NEW_FILE_CONTENT = 'FAILURE_STAGE = "processing"\n';
 
@@ -52,13 +59,19 @@ class Repo implements Partial<ArtifactRepository> {
   save(rec: ArtifactRecord): void { this.saved.push(rec); }
 }
 
-class ScriptedProvider {
+interface ToolUseShape { type: 'tool_use'; id: string; name: string; input: unknown }
+
+class ScriptedProvider implements IMultiTurnProvider {
   private turn = 0;
-  constructor(private readonly script: MultiTurnResult[]) {}
-  async complete(): Promise<never> { throw new Error('not expected'); }
+  /** A prototype method (NOT an own property) — the spread-based wrapper v1 lost these. */
+  completeStructured(): never {
+    throw new Error('completeStructured is a prototype capability and must survive wrapping');
+  }
+  async complete(_params: unknown): Promise<never> { throw new Error('not expected'); }
   async completeMultiTurn(_params: unknown): Promise<MultiTurnResult> {
     return this.script[this.turn++] ?? { stop_reason: 'end_turn', text: '', tool_uses: [], tokens_used: 1 };
   }
+  constructor(private readonly script: MultiTurnResult[]) {}
 }
 
 const sliceTurn = (id: string): MultiTurnResult => ({
@@ -77,14 +90,14 @@ function expectedAnchorId(): string {
   return 'src_' + createHash('sha256').update([WORKER_PATH, sha256(WORKER_ORIGINAL), '1', '2', sha256(content)].join('\0'), 'utf8').digest('hex').slice(0, 16);
 }
 
-async function runScenario(name: string, capturePath: string, editPolicy: Record<string, unknown> | undefined, proposal: (a: string) => unknown): Promise<void> {
+async function runScenario(name: string, capturePath: string, editPolicy: Record<string, unknown> | undefined, proposal: (a: string) => unknown, scripted?: ScriptedProvider): Promise<void> {
   const root = makeRoot();
   try {
-    const scripted = new ScriptedProvider([
+    const inner = scripted ?? new ScriptedProvider([
       sliceTurn('t1'),
       submitTurn('t2', proposal(expectedAnchorId())),
     ]);
-    const provider = createWireCaptureProvider(scripted, capturePath, 'offline-proof');
+    const provider = createWireCaptureProvider(inner, capturePath, 'offline-proof');
     const runner = new AgentRunner(
       new ContextManager(root, DEFAULT_CONFIG),
       provider as never,
@@ -106,49 +119,182 @@ async function runScenario(name: string, capturePath: string, editPolicy: Record
   }
 }
 
-const captured = (capturePath: string): Array<Record<string, unknown>> =>
-  readFileSync(capturePath, 'utf-8').trim().split('\n').map((l) => JSON.parse(l));
+const captured = (capturePath: string): WireCaptureRecord[] =>
+  readFileSync(capturePath, 'utf-8').trim().split('\n').map((l) => JSON.parse(l) as WireCaptureRecord);
 
-// ─── run A: frozen main.py-only policy → narrowed surface captured ───────────
-const captureA = join(tmpdir(), `p2-s3-capture-narrowed-${Date.now()}.jsonl`);
+// ─── A + B: narrowed / full surface capture (as before) ───────────────────────
+
+const captureA = join(tmpdir(), `p2-s3v2-narrowed-${Date.now()}.jsonl`);
 await runScenario('narrowed', captureA, { appliesToSteps: ['build'], allowedEditPaths: [WORKER_PATH], requiredEditPaths: [WORKER_PATH] }, (a) => ({
   edits: [{ anchor_id: a, replacement: 'DEFAULT_FAILURE_STAGE = "consume"\nFAILURE_STAGE_FALLBACK = "processing"' }],
 }));
 const recsA = captured(captureA);
-const submitA = recsA.map((r) => r.submit_result_surface as Record<string, unknown>).filter((s) => s.offered);
+const submitA = recsA.filter((r) => r.submit_result_surface?.offered);
 assert.ok(submitA.length >= 1, 'run A: submit_result requests captured');
-for (const s of submitA) {
-  assert.deepEqual(s.top_level_properties, ['edits'], 'narrowed: captured schema properties == [edits]');
-  assert.deepEqual(s.required, ['edits']);
-  assert.equal(s.has_creates_property, false);
+for (const r of submitA) {
+  assert.deepEqual(r.submit_result_surface!.top_level_properties, ['edits']);
+  assert.deepEqual(r.submit_result_surface!.required, ['edits']);
+  assert.equal(r.submit_result_surface!.has_creates_property, false);
+  assert.equal(r.teaching_markers!.has_creates_field_line, false);
+  assert.ok(Array.isArray(r.tools) && (r.tools as unknown[]).length > 0, 'verbatim tools archived');
 }
-for (const r of recsA) {
-  const t = r.teaching_markers as Record<string, boolean>;
-  assert.equal(t.has_edits_field_line, true);
-  if (submitA.length > 0) assert.equal(t.has_creates_field_line, false, 'narrowed: zero create teaching in captured requests');
+// every request record got its paired response record (proxy transparency through the live loop)
+for (const req of recsA.filter((r) => r.phase === 'request')) {
+  assert.ok(recsA.some((r) => r.phase === 'response' && r.request_id === req.request_id), 'paired response record present');
 }
-// every captured record carries the VERBATIM tools array (actual request, not inference)
-for (const r of recsA) assert.ok(Array.isArray(r.tools) && r.tools.length > 0, 'verbatim tools archived');
-console.log(`PASS run A (narrowed policy): ${recsA.length} request(s) captured; submit_result schema properties ${JSON.stringify(submitA[0].top_level_properties)}, has_creates=${submitA[0].has_creates_property}, teaching creates-line=false`);
+console.log(`PASS A (narrowed): ${recsA.length} records; schema ${JSON.stringify(submitA[0].submit_result_surface!.top_level_properties)}, has_creates=${submitA[0].submit_result_surface!.has_creates_property}; request/response pairs intact`);
 
-// ─── run B: nonexistent authorized target → full surface captured ────────────
-const captureB = join(tmpdir(), `p2-s3-capture-full-${Date.now()}.jsonl`);
+const captureB = join(tmpdir(), `p2-s3v2-full-${Date.now()}.jsonl`);
 await runScenario('full', captureB, { appliesToSteps: ['build'], allowedEditPaths: [WORKER_PATH, NEW_FILE_PATH], requiredEditPaths: [] }, (a) => ({
   edits: [{ anchor_id: a, replacement: 'DEFAULT_FAILURE_STAGE = "consume"\nFAILURE_STAGE_FALLBACK = "processing"' }],
   creates: [{ path: NEW_FILE_PATH, content: NEW_FILE_CONTENT }],
 }));
 const recsB = captured(captureB);
-const submitB = recsB.map((r) => r.submit_result_surface as Record<string, unknown>).filter((s) => s.offered);
-assert.ok(submitB.length >= 1, 'run B: submit_result requests captured');
-for (const s of submitB) {
-  assert.deepEqual(s.top_level_properties, ['creates', 'edits'], 'full: captured schema properties == [creates, edits]');
-  assert.equal(s.has_creates_property, true);
+const submitB = recsB.filter((r) => r.submit_result_surface?.offered);
+for (const r of submitB) {
+  assert.deepEqual(r.submit_result_surface!.top_level_properties, ['creates', 'edits']);
+  assert.equal(r.submit_result_surface!.has_creates_property, true);
 }
-console.log(`PASS run B (create-allowed policy): captured schema properties ${JSON.stringify(submitB[0].top_level_properties)}, has_creates=${submitB[0].has_creates_property}`);
+console.log(`PASS B (full): captured ${JSON.stringify(submitB[0].submit_result_surface!.top_level_properties)}, has_creates=${submitB[0].submit_result_surface!.has_creates_property}`);
 
-// ─── capture file bytes are the evidence artifact ─────────────────────────────
-assert.ok(existsSync(captureA) && existsSync(captureB));
-console.log('\nS3 REQUEST OBSERVABILITY: PASS — the live-path wrapper archives the actual emitted');
-console.log('provider request surface (verbatim tools + input_schema + teaching markers); in live');
-console.log('runs the driver wraps the REAL provider with this same wrapper and copies the capture');
-console.log('into the run evidence directory (node-outputs/wire-capture.jsonl).');
+// ─── C: response metadata read from result.wire_observation (defect 1) ───────
+
+const captureC = join(tmpdir(), `p2-s3v2-obs-${Date.now()}.jsonl`);
+{
+  const inner = new ScriptedProvider([
+    {
+      stop_reason: 'tool_use', text: '',
+      tool_uses: [{ type: 'tool_use', id: 't1', name: SUBMIT_RESULT_TOOL_NAME, input: { edits: [{ anchor_id: 'src_x', replacement: 'y' }] } }],
+      tokens_used: 9,
+      // the REAL provider carries wire metadata here (WireObservation):
+      wire_observation: { finish_reason: 'tool_use', prompt_tokens: 4321, completion_tokens: 55, reasoning_chunks: 0, reasoning_bytes: 0, reasoning_fields: [], content_bytes: 10, tool_call_fragments: 1, reasoning_tokens: null, total_tokens: 4376, stream_id: 's', model: 'm', provider: 'p' },
+    } as unknown as MultiTurnResult,
+    { stop_reason: 'end_turn', text: '', tool_uses: [], tokens_used: 1 },
+  ]);
+  const provider = createWireCaptureProvider(inner, captureC, 'offline-proof');
+  // drive the wrapper directly (no runner needed for metadata plumbing):
+  await (provider as unknown as IMultiTurnProvider).completeMultiTurn({ messages: [{ role: 'user', content: 'go' }], tools: [{ name: SUBMIT_RESULT_TOOL_NAME, input_schema: { type: 'object', properties: { edits: { type: 'array' } }, required: ['edits'] } }] });
+}
+const recsC = captured(captureC);
+const respC = recsC.find((r) => r.phase === 'response')!;
+assert.equal(respC.response_finish_reason, 'tool_use', 'finish_reason read from wire_observation');
+assert.equal(respC.response_prompt_tokens, 4321, 'prompt_tokens read from wire_observation');
+console.log(`PASS C (response metadata): finish_reason=${respC.response_finish_reason}, prompt_tokens=${respC.response_prompt_tokens} — read from result.wire_observation`);
+
+// ─── D: fail-closed capture — unwritable capture blocks the model call ───────
+
+{
+  // D1: construction fails loudly when the capture location cannot exist
+  const blocker = join(tmpdir(), `p2-s3v2-blocker-${Date.now()}`);
+  writeFileSync(blocker, 'this is a FILE, not a directory');
+  const capturePath = join(blocker, 'out.jsonl'); // dirname() mkdir must fail
+  let innerCalled = 0;
+  const inner = {
+    async completeMultiTurn(): Promise<MultiTurnResult> { innerCalled++; return { stop_reason: 'end_turn', text: '', tool_uses: [], tokens_used: 1 }; },
+  };
+  assert.throws(() => createWireCaptureProvider(inner, capturePath, 'offline-proof'), /wire-capture:/, 'construction fails closed with the wire-capture marker');
+  rmSync(blocker, { force: true });
+
+  // D2: append-phase failure (read-only capture dir) throws 'wire-capture:'
+  // BEFORE the model call — the inner provider is never invoked
+  const roDir = join(tmpdir(), `p2-s3v2-ro-${Date.now()}`);
+  mkdirSync(roDir, { recursive: true });
+  const roCapture = join(roDir, 'out.jsonl');
+  const provider = createWireCaptureProvider(inner, roCapture, 'offline-proof');
+  // directory exists (construction mkdir succeeded silently); make it
+  // non-writable so the first appendFileSync fails EACCES
+  execSync(`chmod 500 '${roDir}'`);
+  try {
+    await assert.rejects(
+      () => (provider as unknown as IMultiTurnProvider).completeMultiTurn({ messages: [{ role: 'user', content: 'go' }], tools: [] }),
+      /wire-capture:/,
+      'capture-write failure must throw a wire-capture error',
+    );
+    assert.equal(innerCalled, 0, 'fail-closed: the inner provider was NEVER called');
+    console.log('PASS D (fail-closed): construction + append-phase capture failures throw the wire-capture marker BEFORE any model call; inner invocations = 0');
+  } finally {
+    execSync(`chmod 700 '${roDir}'`);
+    rmSync(roDir, { recursive: true, force: true });
+  }
+}
+
+// ─── E: failed provider requests are archived (defect 2) ─────────────────────
+
+const captureE = join(tmpdir(), `p2-s3v2-err-${Date.now()}.jsonl`);
+{
+  const inner = {
+    async completeMultiTurn(): Promise<never> { throw new Error('provider 503 upstream error'); },
+  };
+  const provider = createWireCaptureProvider(inner, captureE, 'offline-proof');
+  await assert.rejects(() => (provider as unknown as IMultiTurnProvider).completeMultiTurn({ messages: [{ role: 'user', content: 'go' }], tools: [] }), /503/);
+}
+const recsE = captured(captureE);
+const reqE = recsE.find((r) => r.phase === 'request')!;
+const errE = recsE.find((r) => r.phase === 'error')!;
+assert.ok(reqE && errE && errE.request_id === reqE.request_id, 'request+error records share the request_id');
+assert.match(errE.error!, /503/);
+console.log(`PASS E (failure archiving): request record + error record (same request_id, error='${errE.error}') archived and rethrown`);
+
+// ─── F: capability preservation with the REAL provider class (defect 3) ──────
+
+{
+  const root = mkdtempSync(join(tmpdir(), 'p2-s3-realprov-'));
+  try {
+    mkdirSync(join(root, '.sle'), { recursive: true });
+    writeFileSync(join(root, '.sle', 'settings.json'), JSON.stringify({
+      provider: 'openai_compatible',
+      base_url: 'https://openrouter.ai/api/v1',
+      model: 'z-ai/glm-5.3-flash',
+      api_key_env: 'OPENROUTER_API_KEY',
+    }));
+    const resolved = resolveLLMProvider(root);
+    const real = resolved.provider as unknown as Record<string, unknown>;
+    const wrapped = createWireCaptureProvider(real, join(tmpdir(), `p2-s3v2-real-${Date.now()}.jsonl`), resolved.model) as unknown as Record<string, unknown>;
+    // every prototype-chain method of the REAL provider is reachable through
+    // the wrapper with its ORIGINAL function reference:
+    const protoNames = new Set<string>();
+    let proto = Object.getPrototypeOf(real);
+    while (proto && proto !== Object.prototype) {
+      for (const n of Object.getOwnPropertyNames(proto)) {
+        if (n !== 'constructor') protoNames.add(n);
+      }
+      proto = Object.getPrototypeOf(proto);
+    }
+    const lost: string[] = [];
+    for (const n of protoNames) {
+      const w = (wrapped as unknown as Record<string, unknown>)[n];
+      const r = (real as unknown as Record<string, unknown>)[n];
+      if (typeof r === 'function') {
+        if (typeof w !== 'function') lost.push(n);
+        else if (n !== 'complete' && n !== 'completeMultiTurn' && w !== r) lost.push(`${n} (rebound)`);
+      }
+    }
+    assert.deepEqual(lost, [], `every real provider capability preserved: lost=${JSON.stringify(lost)}`);
+    assert.notEqual(wrapped.completeMultiTurn, real.completeMultiTurn, 'completeMultiTurn is the wrapper override');
+    assert.notEqual(wrapped.complete, real.complete, 'complete is the wrapper override');
+    // completeStructured: the openai_compatible multi-turn provider does NOT
+    // declare it at 9f298f2 (it lives on the opt-in structured subclass); the
+    // guarantee is conditional-preservation — prototype methods survive with
+    // identical references WHEN present. Prove the mechanism on the same
+    // inheritance shape via the scripted harness class (completeStructured
+    // IS a prototype method there) — runs A/B already executed through it.
+    const scriptedWithStructured = new ScriptedProvider([]);
+    const wrappedScripted = createWireCaptureProvider(scriptedWithStructured, join(tmpdir(), 'p2-s3v2-synth.jsonl'), 'offline-proof') as unknown as Record<string, unknown>;
+    assert.equal(typeof wrappedScripted.completeStructured, 'function', 'completeStructured survives wrapping when the provider declares it');
+    assert.equal(wrappedScripted.completeStructured, (scriptedWithStructured as unknown as Record<string, unknown>).completeStructured, 'completeStructured identical reference');
+    // behavioral probe: preserved mutators/observers actually execute through
+    // the proxy (the real class uses TS-private regular properties, not
+    // #private fields, so proxy receivers are safe):
+    wrapped.setProvider(real.getProvider());
+    wrapped.syncMultiTurnCapability();
+    assert.ok(typeof wrapped.getProvider() === 'object' || wrapped.getProvider() === undefined, 'getProvider executes through the proxy');
+    console.log(`PASS F (capability preservation): real ${real.constructor?.name} — members [${[...protoNames].sort().join(', ')}] all preserved by reference, 0 lost; behavioral probe (setProvider/syncMultiTurnCapability/getProvider) OK; complete/completeMultiTurn overridden; completeStructured identity proven on the prototype-method harness class`);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+console.log('\nS3 REQUEST OBSERVABILITY v2: ALL PASS — actual emitted request surface archived (verbatim tools +');
+console.log('input_schema + teaching), wire_observation metadata, failure archiving, fail-closed capture, and');
+console.log('full capability preservation of the real provider class. In live runs the driver wraps the REAL');
+console.log('provider with this same wrapper and copies the capture into node-outputs/wire-capture.jsonl.');

@@ -1,7 +1,11 @@
-PASS run A (narrowed policy): 2 request(s) captured; submit_result schema properties ["edits"], has_creates=false, teaching creates-line=false
-PASS run B (create-allowed policy): captured schema properties ["creates","edits"], has_creates=true
+PASS A (narrowed): 4 records; schema ["edits"], has_creates=false; request/response pairs intact
+PASS B (full): captured ["creates","edits"], has_creates=true
+PASS C (response metadata): finish_reason=tool_use, prompt_tokens=4321 — read from result.wire_observation
+PASS D (fail-closed): construction + append-phase capture failures throw the wire-capture marker BEFORE any model call; inner invocations = 0
+PASS E (failure archiving): request record + error record (same request_id, error='provider 503 upstream error') archived and rethrown
+PASS F (capability preservation): real DynamicLLMProvider — members [complete, getProvider, setProvider, syncMultiTurnCapability] all preserved by reference, 0 lost; behavioral probe (setProvider/syncMultiTurnCapability/getProvider) OK; complete/completeMultiTurn overridden; completeStructured identity proven on the prototype-method harness class
 
-S3 REQUEST OBSERVABILITY: PASS — the live-path wrapper archives the actual emitted
-provider request surface (verbatim tools + input_schema + teaching markers); in live
-runs the driver wraps the REAL provider with this same wrapper and copies the capture
-into the run evidence directory (node-outputs/wire-capture.jsonl).
+S3 REQUEST OBSERVABILITY v2: ALL PASS — actual emitted request surface archived (verbatim tools +
+input_schema + teaching), wire_observation metadata, failure archiving, fail-closed capture, and
+full capability preservation of the real provider class. In live runs the driver wraps the REAL
+provider with this same wrapper and copies the capture into node-outputs/wire-capture.jsonl.

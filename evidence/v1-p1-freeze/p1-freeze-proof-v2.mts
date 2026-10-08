@@ -185,14 +185,22 @@ mkdirSync(EV, { recursive: true });
 }
 
 // ─── [2] golden projection: submit_result schema is exactly {edits, creates} ──
+// [P2-B amendment 2026-10-08 (operator-review corrections): protocol v1.1
+// makes `creates` optional-with-canonical-default-[] (mechanic A) and adds
+// the policy-specialized narrowed projection (mechanic B). Check 2a now pins
+// the v1.1 canonical shape: required={edits}, creates present-but-optional
+// with its default, closed objects unchanged. The P1-era frozen golden
+// (54ce6c07…) remains the archived P1-R record; the P2 freeze re-pins.]
 const golden = toJsonSchema(createBuildChangesetActionContract().modelSchema) as Record<string, any>;
 {
   const s = JSON.parse(JSON.stringify(golden));
   const topOk =
     s.type === 'object' &&
-    Array.isArray(s.required) && s.required.length === 2 && s.required.includes('edits') && s.required.includes('creates') &&
+    Array.isArray(s.required) && s.required.length === 1 && s.required.includes('edits') &&
     s.additionalProperties === false &&
-    JSON.stringify(Object.keys(s.properties).sort()) === JSON.stringify(['creates', 'edits']);
+    JSON.stringify(Object.keys(s.properties).sort()) === JSON.stringify(['creates', 'edits']) &&
+    // creates: optional, canonicalized to [] when absent (v1.1 mechanic A)
+    Array.isArray(s.properties.creates.default);
   const e = s.properties.edits.items;
   const c = s.properties.creates.items;
   const editsOk =
@@ -205,7 +213,7 @@ const golden = toJsonSchema(createBuildChangesetActionContract().modelSchema) as
     JSON.stringify(Object.keys(c.properties).sort()) === JSON.stringify(['content', 'path']) &&
     JSON.stringify([...c.required].sort()) === JSON.stringify(['content', 'path']) &&
     c.properties.path.type === 'string' && c.properties.content.type === 'string';
-  check('2a', 'projection declares exactly required {edits, creates}, closed objects', topOk && editsOk && createsOk);
+  check('2a', 'projection declares exactly required {edits}, optional creates (v1.1 canonical default []), closed objects', topOk && editsOk && createsOk);
 }
 const goldenJson = JSON.stringify(golden, null, 2) + '\n';
 writeFileSync(join(EV, 'golden-submit-result-schema.json'), goldenJson);

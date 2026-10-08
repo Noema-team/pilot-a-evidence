@@ -1,0 +1,9 @@
+── op2 fixture (p1-r-3/99100d24…) ──
+  ✓ narrowed surface rejects the illegal create explicitly (unknown key) — not silently discarded
+  ✓ boundary composition succeeds — ZERO contract defects (the P1-R-3 blocking defect is gone)
+  ✓ staged main.py bytes == forensic mechanical merge (98920 B, sha256 a7810d604cb2…); composed_from recorded
+── op3 fixture (p1-r-5/fb79af13…) ──
+  ✓ missing creates canonicalizes to []
+  ✓ first and only defect = unknown-anchor (fabricated anchor), truthful instruction, nothing masked
+
+P2-B OFFLINE QUALIFICATION: ALL FIXTURE PINS PASS

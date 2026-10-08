@@ -14,6 +14,12 @@
 //   1  BUILD receives exactly the frozen policy allowing/requiring ONLY main.py
 //   2  anchored main.py edit + create outside the policy → rejected in-loop,
 //      repairable, writes NOTHING for the rejected create
+//      [P2-B amendment 2026-10-08 (operator-review corrections): under the
+//      frozen main.py-only policy the model-facing submit_result surface no
+//      longer OFFERS creates at all, so an out-of-policy create is now an
+//      unknown-key DECODE rejection — never decodable, never silently
+//      discarded; the authoritative unauthorized-create-path validate check
+//      remains as the second gate (unit pin P2B.A3).]
 //   3  a main.py-only proposal stages and satisfies requiredEditPaths
 //   4  every non-build step receives no editPolicy at all
 //   5  resume uses exactly the frozen policy — a tampered request policy cannot leak
@@ -413,18 +419,25 @@ async function pin2_and_3(seamPolicy: unknown): Promise<void> {
   const provider = new ScriptedProvider([
     readSliceTurn('t1', WORKER_PATH),
     // Turn 2 — anchored main.py edit PLUS a create outside the policy.
+    // P2-B: the frozen main.py-only policy leaves zero legal create targets,
+    // so the wire surface has NO creates field — this submission cannot even
+    // decode (unknown-key rejection naming the key).
     submitTurn('t2', { edits: [mainEdit], creates: [outsideCreate] }),
-    // Turn 3 — the repaired proposal: main.py-only.
-    submitTurn('t3', { edits: [mainEdit], creates: [] }),
+    // Turn 3 — the repaired proposal in the CANONICAL NARROWED form: edits
+    // only, no creates key at all.
+    submitTurn('t3', { edits: [mainEdit] }),
   ]);
   try {
     const result = await makeBuildRunner(root, provider, repository).run('builder', buildCtx(root, seamPolicy));
     assert.equal(result.success, true, `repaired proposal must publish: ${result.error}`);
 
-    // Pin 2 — the out-of-policy create was rejected IN-LOOP (repairable) and wrote nothing
-    const repairFeedback = provider.toolResultContents.find((c) => c.includes('unauthorized-create-path'));
-    assert.ok(repairFeedback, 'the loop must hand the model a repairable rejection for the out-of-policy create');
-    assert.match(repairFeedback!, new RegExp(OUTSIDE_CREATE_PATH.replace(/\//g, '\\/')));
+    // Pin 2 — the out-of-policy create was rejected IN-LOOP (repairable) and
+    // wrote nothing. Under P2-B the rejection is the decode-layer unknown-key
+    // error naming 'creates' (the operation is structurally inexpressible;
+    // the authoritative unauthorized-create-path validate check remains as
+    // the second gate — pinned by unit P2B.A3).
+    const repairFeedback = provider.toolResultContents.find((c) => c.includes('Unrecognized key') && c.includes('creates'));
+    assert.ok(repairFeedback, 'the loop must hand the model a repairable rejection for the inexpressible create');
     assert.ok(!existsSync(join(root, OUTSIDE_CREATE_PATH)), 'the rejected create must never touch the tree');
     assert.ok(!repository.saved.some((r) => r.path === OUTSIDE_CREATE_PATH), 'no provenance row for the rejected create');
 

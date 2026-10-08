@@ -1,0 +1,10 @@
+── Pin 1+4: adapter → engine → StepRunContext wiring ──
+   ✓ build ctx.editPolicy === frozen policy; all other steps policy-free; resolvedParameters frozen
+── Pin 5: resume uses exactly the frozen policy ──
+   ✓ resume restored the frozen policy; tampered request policy never leaked; persisted row unchanged
+── Pin 6: invalid / misspelled policies fail closed ──
+   ✓ malformed shape and misspelled target both fail closed; zero steps executed
+── Pin 2+3: ActionContract validation/publication under the seam policy ──
+   ✓ out-of-policy create rejected in-loop + repairable + zero writes; main.py-only publish satisfied requiredEditPaths
+
+ALL P1-R SEAM PINS PASS (production-shaped, zero model traffic)

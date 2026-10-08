@@ -2,129 +2,159 @@ TAP version 13
 # Subtest: P2B.A1: a proposal without `creates` parses with the canonical empty default
 ok 1 - P2B.A1: a proposal without `creates` parses with the canonical empty default
   ---
-  duration_ms: 2.001849
+  duration_ms: 2.425195
   type: 'test'
   ...
 # Subtest: P2B.A2: the outer object stays strict — unknown keys are still decode rejections
 ok 2 - P2B.A2: the outer object stays strict — unknown keys are still decode rejections
   ---
-  duration_ms: 0.548787
+  duration_ms: 0.579367
   type: 'test'
   ...
 # Subtest: P2B.A3: a non-empty creates still parses and still flows to authoritative checks
 ok 3 - P2B.A3: a non-empty creates still parses and still flows to authoritative checks
   ---
-  duration_ms: 0.693606
+  duration_ms: 1.350833
   type: 'test'
   ...
 # Subtest: P2B.B1: with zero legal create targets the model-facing schema omits creates entirely
 ok 4 - P2B.B1: with zero legal create targets the model-facing schema omits creates entirely
   ---
-  duration_ms: 0.279548
+  duration_ms: 0.289086
   type: 'test'
   ...
 # Subtest: P2B.B2: absent/true createsAuthorized keeps the ordinary full surface
 ok 5 - P2B.B2: absent/true createsAuthorized keeps the ordinary full surface
   ---
-  duration_ms: 0.1362
+  duration_ms: 0.118706
   type: 'test'
   ...
 # Subtest: P2B.B3: the projection can only narrow — every projected-valid payload is valid under the canonical schema
 ok 6 - P2B.B3: the projection can only narrow — every projected-valid payload is valid under the canonical schema
   ---
-  duration_ms: 1.409664
+  duration_ms: 0.172346
   type: 'test'
   ...
 # Subtest: P2B.B4: the acceptor decodes through the projected schema (and canonicalizes for validate)
 ok 7 - P2B.B4: the acceptor decodes through the projected schema (and canonicalizes for validate)
   ---
-  duration_ms: 0.487949
+  duration_ms: 0.496079
   type: 'test'
   ...
 # Subtest: P2B.C1: boundary-adjacent compatible edits compose — no overlapping-edits defect
 ok 8 - P2B.C1: boundary-adjacent compatible edits compose — no overlapping-edits defect
   ---
-  duration_ms: 0.203007
+  duration_ms: 0.203367
   type: 'test'
   ...
 # Subtest: P2B.C2: staged bytes equal the mechanical merge (A + B[1:] spliced once)
 ok 9 - P2B.C2: staged bytes equal the mechanical merge (A + B[1:] spliced once)
   ---
-  duration_ms: 0.84261
+  duration_ms: 0.840162
   type: 'test'
   ...
 # Subtest: P2B.C3: three-anchor chains compose transitively — every join satisfies the rule
 ok 10 - P2B.C3: three-anchor chains compose transitively — every join satisfies the rule
   ---
-  duration_ms: 0.538979
+  duration_ms: 0.547289
   type: 'test'
   ...
 # Subtest: P2B.C4: overlap of more than one source line still rejects
 ok 11 - P2B.C4: overlap of more than one source line still rejects
   ---
-  duration_ms: 0.172514
+  duration_ms: 0.165648
   type: 'test'
   ...
 # Subtest: P2B.C5: one-line touch with a boundary line differing by one byte still rejects
 ok 12 - P2B.C5: one-line touch with a boundary line differing by one byte still rejects
   ---
-  duration_ms: 0.116904
+  duration_ms: 0.099616
   type: 'test'
   ...
 # Subtest: P2B.C6: different base sha256 across the join still rejects
 ok 13 - P2B.C6: different base sha256 across the join still rejects
   ---
-  duration_ms: 0.092217
+  duration_ms: 0.082662
   type: 'test'
   ...
 # Subtest: P2B.C7: different paths never compose with each other (independent edits)
 ok 14 - P2B.C7: different paths never compose with each other (independent edits)
   ---
-  duration_ms: 0.076885
+  duration_ms: 0.071245
   type: 'test'
   ...
 # Subtest: P2B.C8: nested spans still reject
 ok 15 - P2B.C8: nested spans still reject
   ---
-  duration_ms: 0.071983
+  duration_ms: 0.059231
   type: 'test'
   ...
 # Subtest: P2B.C9: a composed span overlapping a third edit still rejects
 ok 16 - P2B.C9: a composed span overlapping a third edit still rejects
   ---
-  duration_ms: 0.077952
+  duration_ms: 0.071162
   type: 'test'
   ...
 # Subtest: P2B.C10: stage re-checks everything independently — a stale base fails even after a valid composition
 ok 17 - P2B.C10: stage re-checks everything independently — a stale base fails even after a valid composition
   ---
-  duration_ms: 0.154168
+  duration_ms: 0.147175
   type: 'test'
   ...
 # Subtest: P2B.D1: the unknown-anchor repair instruction is truthful about withdrawn tools
 ok 18 - P2B.D1: the unknown-anchor repair instruction is truthful about withdrawn tools
   ---
-  duration_ms: 0.093604
+  duration_ms: 0.087895
   type: 'test'
   ...
 # Subtest: P2B.R1: a genuine multi-line overlap was rejected before P2B and still is (run-1-style regression guard)
 ok 19 - P2B.R1: a genuine multi-line overlap was rejected before P2B and still is (run-1-style regression guard)
   ---
-  duration_ms: 0.070068
+  duration_ms: 0.075662
   type: 'test'
   ...
 # Subtest: P2B.R2: a real on-disk staging of a composed chain writes exactly the composed bytes
 ok 20 - P2B.R2: a real on-disk staging of a composed chain writes exactly the composed bytes
   ---
-  duration_ms: 0.902314
+  duration_ms: 0.888716
   type: 'test'
   ...
-1..20
-# tests 20
+# Subtest: P2B.E1: the narrowed surface carries ZERO create-field teaching
+ok 21 - P2B.E1: the narrowed surface carries ZERO create-field teaching
+  ---
+  duration_ms: 0.930315
+  type: 'test'
+  ...
+# Subtest: P2B.E2: the canonical surface still teaches creates (filter is projection-driven, not global)
+ok 22 - P2B.E2: the canonical surface still teaches creates (filter is projection-driven, not global)
+  ---
+  duration_ms: 0.453729
+  type: 'test'
+  ...
+# Subtest: P2B.E3: staging emits the authoritative two-anchor composition record with correct-byte hashes
+ok 23 - P2B.E3: staging emits the authoritative two-anchor composition record with correct-byte hashes
+  ---
+  duration_ms: 0.368296
+  type: 'test'
+  ...
+# Subtest: P2B.E4: a three-anchor chain emits ONE record with three source anchor ids
+ok 24 - P2B.E4: a three-anchor chain emits ONE record with three source anchor ids
+  ---
+  duration_ms: 0.245901
+  type: 'test'
+  ...
+# Subtest: P2B.E5: two separate compositions in one file stay separate records; result hash is the final file
+ok 25 - P2B.E5: two separate compositions in one file stay separate records; result hash is the final file
+  ---
+  duration_ms: 0.28037
+  type: 'test'
+  ...
+1..25
+# tests 25
 # suites 0
-# pass 20
+# pass 25
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 186.941672
+# duration_ms 228.314566

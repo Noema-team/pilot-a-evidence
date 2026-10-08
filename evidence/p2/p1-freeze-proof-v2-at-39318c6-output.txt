@@ -1,0 +1,21 @@
+PASS [1] BUILD resolves actionArtifact.type = build-changeset — declared="build-changeset"
+PASS [2a] projection declares exactly required {edits}, optional creates (v1.1 canonical default []), closed objects
+PASS [2b] golden projection hashed — sha256 e71a300cff4df1d8… → /home/theo/Documents/coding/repos/pilot-a/evidence/v1-p1-freeze/golden-submit-result-schema.json
+PASS [3] investigation turn 1 exposes exactly AGENT_TOOLS + submit_result — tools=[read_file, read_source_slice, list_directory, submit_result]
+PASS [3b] investigation submit_result schema === golden projection
+PASS [5] synthesis turn exposes ONLY submit_result — turn2 tools=[submit_result]
+PASS [4] read_source_slice anchor is exact-binding and run-scoped — anchor_id=src_a5f542b9293f7856 (fresh-registry resolve → undefined: run-scoped)
+PASS [6] BUILD receives no SLE-PATCH / unified-diff publication teaching — scanned 2 request(s), 6071 chars
+PASS [11b] audit diff + anchor manifest are post-hoc evidence, never model-visible — manifest=true diff=true leak=false anchored_edits=2
+PASS [run] happy-path BUILD run succeeds with staged publication — disk bytes verified
+PASS [7] unknown / cross-run / duplicate / overlapping / stale anchors fail closed; disjoint anchors validate; collisions dedupe to the fail-closed duplicate rule — unknown=true crossRun=true duplicate=true overlap=true stale=true disjoint=true collision→duplicate=true
+PASS [7b] same id + identical full binding dedupes; same id + DIFFERENT full binding throws and leaves the registry unchanged — dedupe=true threw=true registered records unchanged=true
+PASS [7c] collision during a live read: the read is delivered WITHOUT an anchor, no anchor is issued, a proposal referencing one fails closed, disk untouched — unanchored=true noAuthority=true step success=false error=Submitted result was rejected by output contract 'build-changeset' and
+PASS [8] staging a create onto an existing path fails closed — error: Create target 'apps/x.py' already exists on disk — anchored protocol v1 creates new files only; to change an existing file, read it with read_source_slice and submit an anchored edit
+PASS [9a] valid proposal WITHOUT the required path cannot satisfy requiredEditPaths — step success=false error=This task requires an authorized edit to [apps/ai-server/rag-worker-service/main applied-edit rows=0 base untouched
+PASS [9b] schema-valid proposal with a stale base fails closed — only a SUCCESSFULLY STAGED edit satisfies — step success=false error=Anchored edit for 'apps/ai-server/rag-worker-service/main.py' is stale: anchor base sha256 applied-edit rows=0
+PASS [10] action staging performs NO disk mutation (in-memory changeset only; publication boundary remains the sole writer) — tree identical=true, staged entries=2
+PASS [11a] anchored-edit modules contain no unified-diff applier or SLE-PATCH syntax (evidence diff is Stratum-generated, never applied) — scanned 3 module(s)
+PASS [12] legacy non-action path: no submission tool, no anchors, no anchored_edits, unchanged provenance — success=true error= report="# Test Report\n\nAll checks passed." submit_result offered=false anchor fields=0 refs=[produced-file:test:docs/test-report.md]
+
+P1 FREEZE PROOF: 19/19 checks passed

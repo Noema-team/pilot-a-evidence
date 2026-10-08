@@ -1,0 +1,38 @@
+{
+ "artifact": "P2 preregistration ADDENDUM 1 — dated clarification; the original preregistration bytes are unchanged",
+ "amendment_utc": "2026-10-08T10:40:00Z",
+ "amends": {
+  "path": "evidence/p2/p2-preregistration.json",
+  "sha256_unchanged": "3e871b77ffcdbf59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa",
+  "note": "Additive only. Nothing in the original preregistration or freeze manifest was regenerated, corrected, or re-preregistered. This addendum is itself part of the frozen record and was written BEFORE any live P2 opportunity exists."
+ },
+ "operator_request": "Identify (a) the preregistered disposition if nine evaluable workflows produce fewer than three BUILD opportunities, and (b) the objective rules distinguishing model-caused repair exhaustion from a reproducible implementation defect.",
+ "A1_insufficient_opportunities_disposition": {
+  "trigger": "the 9-workflow cap is reached with fewer than 3 evaluable BUILD opportunities (sampling_plan.stop_rule first arm exhausted without the endpoint reachable)",
+  "preregistered_disposition": "the P2 block CLOSES UNEVALUABLE_FOR_ENDPOINT: H-protocol-closure is decided as NEITHER SUPPORTED NOR FALSIFIED",
+  "reporting": "the block report states publications/evaluable-opportunities as observed context (with the full per_opportunity_reporting_fields for every opportunity that did occur, and the abort taxonomy for every non-opportunity), explicitly marked underpowered/unevaluable — never as an efficacy claim in either direction",
+  "campaign_effect": "STOP and return to the operator. Any continuation (more slots, redesign, or abandonment) requires a NEW operator directive and a NEW dated preregistration; the slot budget is never silently extended",
+  "precedent": "the P1 block was closed OBSERVATIONAL/UNEVALUABLE on the same principle (journal b095e98)"
+ },
+ "A2_exhaustion_classification_rules": {
+  "scope": "applies whenever a BUILD opportunity ends with result-repair exhaustion (MAX_RESULT_REPAIRS = 1 consumed on schema/decode or validate rejections) — the event class that ended P1-R opportunities 2 and 3",
+  "procedure": [
+   "archive every rejected payload verbatim and the loop-reported defect codes per repair turn (node-outputs/build-rejected-result.json — the E8/A2 channel used in P1-R)",
+   "replay each payload OFFLINE at the frozen implementation commit 9f298f2 through the frozen mechanics in sequence: projected-schema decode -> canonicalization -> contract.validate -> (where the loop reached it) contract.stage against the recorded base bytes and anchor/authority state",
+   "run the replay twice: once in the working tree, once from a clean checkout of 9f298f2 — both runs must agree"
+  ],
+  "model_caused_exhaustion": {
+   "verdict": "evaluable experimental OUTCOME (an opportunity failure under the endpoint taxonomy); no STOP",
+   "objective_rule": "the offline replay REPRODUCES the loop's rejection with the SAME defect class(es) — i.e. the frozen mechanics deterministically reject the archived payload — AND the repair lane was expressible: at least one payload exists that the frozen mechanics would accept under the recorded anchor/authority state"
+  },
+  "implementation_defect": {
+   "verdict": "S7 STOP — campaign halts and returns to the operator; never counted as an experimental outcome",
+   "objective_rules": "ANY of: (a) the offline replay ACCEPTS a payload the loop rejected; (b) the replay rejects with a DIFFERENT defect class than the loop reported; (c) the two replays disagree (the loop's verdict is not deterministically reproducible at the frozen commit); (d) a payload satisfying the preregistered narrowed schema and the authoritative checks is rejected by the loop at all"
+  },
+  "boundary_cases": [
+   "a submitted explicit `creates` under the narrowed surface (unknown-key decode rejection) is MODEL-CAUSED by construction: the payload is invalid under the preregistered wire surface (prereg: expected_wire_surface_under_freeze), and the replay necessarily reproduces the unknown-key rejection",
+   "a fabricated anchor_id (unknown-anchor) is MODEL-CAUSED by construction: the truthful-instruction mechanic D keeps it a genuine error; the replay reproduces it from the same unresolvable id",
+   "exhaustion where the repair turn was TRUNCATED by the completion-token budget (finish='length', P1-R op2 precedent) is classified by replaying the FULL corrected payload the model was attempting, if reconstructible; if not reconstructible, the event is reported as budget-censored and does NOT count as an evaluable opportunity failure — it consumes neither slot nor opportunity (transport-censoring treatment)"
+  ]
+ }
+}

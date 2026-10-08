@@ -1,0 +1,51 @@
+{
+ "context_length": 1048576,
+ "default_effort": "max",
+ "model_id": "z-ai/glm-5.3-flash",
+ "name": "Z.ai: GLM 5.3 Flash",
+ "reasoning_metadata": {
+  "mandatory": true,
+  "default_enabled": true,
+  "supported_efforts": [
+   "max",
+   "high",
+   "low"
+  ],
+  "default_effort": "max"
+ },
+ "snapshot_utc": "2026-10-08T09:31:21.158Z",
+ "source": "GET /api/v1/models (list) — same source as v11-model-metadata.json; API nests the reasoning object under `reasoning`",
+ "supported_efforts": [
+  "max",
+  "high",
+  "low"
+ ],
+ "supported_parameters": [
+  "frequency_penalty",
+  "include_reasoning",
+  "logit_bias",
+  "logprobs",
+  "max_tokens",
+  "min_p",
+  "parallel_tool_calls",
+  "presence_penalty",
+  "reasoning",
+  "reasoning_effort",
+  "repetition_penalty",
+  "response_format",
+  "seed",
+  "stop",
+  "structured_outputs",
+  "temperature",
+  "tool_choice",
+  "tools",
+  "top_k",
+  "top_logprobs",
+  "top_p"
+ ],
+ "pricing": {
+  "prompt": "0.00000015",
+  "completion": "0.0000005",
+  "input_cache_read": "0.00000003"
+ }
+}

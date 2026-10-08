@@ -1,0 +1,151 @@
+{
+ "artifact": "P2 freeze manifest \u2014 independently auditable pin bundle for the H-protocol-closure experiment",
+ "generated_at_utc": "2026-10-08T09:50:00Z",
+ "preregistration": {
+  "path": "evidence/p2/p2-preregistration.json",
+  "sha256": "3e871b77ffcdbf59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa"
+ },
+ "verification": {
+  "checksum_file": "evidence/p2/p2-freeze-manifest.sha256",
+  "how_to": "cd <pilot-a repo root> && sha256sum -c evidence/p2/p2-freeze-manifest.sha256 ; plus the git/CI checks below",
+  "stratum_implementation": "git -C <stratum repo> rev-parse p1-collision-guard  # must equal 9f298f219db927d5065876cf99cdec11e462aa04",
+  "target_repository": "git -C <student-platform repo> rev-parse HEAD  # must equal 86ec0871d64ecca8732434c11d015fd8e08ddc7e, tracked tree clean",
+  "ci": "gh run view 37751982897 --repo Noema-team/stratum  # conclusion=success at the frozen head"
+ },
+ "pins": [
+  {
+   "name": "implementation_commit",
+   "value": "9f298f219db927d5065876cf99cdec11e462aa04",
+   "repo": "stratum",
+   "branch": "p1-collision-guard",
+   "parent": "39318c617d29ce1287e39b3d4581330c0a2bb721",
+   "ci_run": "37751982897",
+   "purpose": "the exact code that executes every P2 run"
+  },
+  {
+   "name": "frozen_config",
+   "path": "evidence/v11-frozen-config/settings.json",
+   "sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+   "purpose": "model/routing/budget/reasoning regime \u2014 unchanged since V11"
+  },
+  {
+   "name": "canonical_schema_v1_1",
+   "path": "evidence/p2/canonical-submit-result-schema.json",
+   "sha256": "8712077a1c087b7c1b56623e2efa7e25d48261386e06db783d3819346d25fd29",
+   "purpose": "the authoritative submit_result projection (mechanic A)"
+  },
+  {
+   "name": "narrowed_schema_no_creates",
+   "path": "evidence/p2/narrowed-submit-result-schema-no-creates.json",
+   "sha256": "481f7edc1606e322b2360fe3998b44e8068fbb80d506c9e985a82025f2a2409f",
+   "purpose": "the wire surface under the frozen main.py-only policy (mechanic B)"
+  },
+  {
+   "name": "v1_1_golden_copy",
+   "path": "evidence/p2/golden-submit-result-schema.v1.1-canonical.json",
+   "sha256": "e71a300cff4df1d8027f3e8c01561156aba7082f0813da175a5eb0e769ba8d2c",
+   "purpose": "frozen v1.1 canonical golden"
+  },
+  {
+   "name": "p1_era_golden_preserved",
+   "path": "evidence/v1-p1-freeze/golden-submit-result-schema.json",
+   "sha256": "54ce6c07a8454877fb99b32867d525ceb9ba481b35010c2805dd72973559d6c4",
+   "purpose": "P1-R archived record \u2014 untouched; documents the mechanic-A schema delta"
+  },
+  {
+   "name": "capability_metadata",
+   "path": "evidence/p2/capability-metadata.json",
+   "sha256": "bf3559678a4691af743e4b68bd5f6b1982a75ab37fc01676c678efc373e2a771",
+   "purpose": "fresh live model-capability snapshot 2026-10-08T09:31:21Z"
+  },
+  {
+   "name": "capability_preflight_output",
+   "path": "evidence/p2/capability-preflight-output.txt",
+   "sha256": "db9def23fc13ff343acc73d4ae4b979b9792299be59ae4c9d3676872b9c49b2f",
+   "purpose": "preflight verdict vs the frozen config"
+  },
+  {
+   "name": "gate_b_output",
+   "path": "evidence/p2/gate-b-output.txt",
+   "sha256": "e166f5c0daa1679e4b4598d0d1371e88c95f4eece35fe4b8ba5cf114bb307e70",
+   "purpose": "context-budget gate at the frozen definition (PASS, 4213/4000, verbatim)"
+  },
+  {
+   "name": "definition_authority_fixture",
+   "path": "evidence/pilot-a8-sle-archive.tgz",
+   "sha256": "5154844fba1abd25d41ecf3fdf6825a0d1542aa6573e58d5d160f2bf1700e96f",
+   "purpose": "frozen prior authority restored via driver instantiate; yields definition 71f1c39c\u2026 / readiness b5a96b17\u2026"
+  },
+  {
+   "name": "op2_rejected_proposal",
+   "path": "evidence/p1-r/p1-r-3/99100d24-2150-4380-925c-936eb4c82869/node-outputs/build-rejected-result.json",
+   "sha256": "02db3ebf6b7fa7ff5d12dbf5e8c52c9c84b49e844bffe8197b316cc0849f1f02",
+   "purpose": "P1-R forensic fixture \u2014 offline qualification input (operator evidence note)"
+  },
+  {
+   "name": "op3_rejected_proposal",
+   "path": "evidence/p1-r/p1-r-5/fb79af13-ac2c-4ff1-a871-0461fdef5da8/node-outputs/build-rejected-result.json",
+   "sha256": "c4afc3cd51863ab65b4ece7fbf52c0f98996996f716ff51ce5985a73ae4902f5",
+   "purpose": "P1-R forensic fixture \u2014 offline qualification input (operator evidence note)"
+  },
+  {
+   "name": "repair_forensics_report",
+   "path": "evidence/p1-r/repair-forensics/repair-lane-forensics.md",
+   "sha256": "f673a5286c91f2627a4565a5923209c50ed50fae9d8595293fd111e86f4c9d0c",
+   "purpose": "the forensic basis of mechanics A-D"
+  },
+  {
+   "name": "offline_qualification_script",
+   "path": "evidence/p2/p2b-offline-qualification.mts",
+   "sha256": "0a087f510024efec8d8dea1df940cd3b2b2b3654369e12c296d588bcd6a1da1e",
+   "purpose": "replayable fixture qualification (zero model traffic)"
+  },
+  {
+   "name": "qualification_typecheck",
+   "path": "evidence/p2/qualification/typecheck.txt",
+   "sha256": "b1529e1fca3e460468b4a349ec524126c52c631cd454605422539a5116fbdbe6",
+   "purpose": "tsc --noEmit clean at the frozen commit"
+  },
+  {
+   "name": "qualification_suite",
+   "path": "evidence/p2/qualification/suite.txt",
+   "sha256": "0c4dc8a68a7a47c4bc3657a6eba6bacab74d173bee00d731a864ae1d04a98bef",
+   "purpose": "full suite 1877/0 at the frozen commit"
+  },
+  {
+   "name": "qualification_p1_freeze_proof",
+   "path": "evidence/p2/qualification/p1-freeze-proof.txt",
+   "sha256": "e3a928091f13bbf120c4d32227d85da09fd4cf377340a8f9d247c5926dd598fc",
+   "purpose": "P1 freeze proof 19/19 at the frozen commit"
+  },
+  {
+   "name": "qualification_p1r_seam_proof",
+   "path": "evidence/p2/qualification/p1r-seam-proof.txt",
+   "sha256": "8fc97cb0bfe7f3309604e0cec50f9e27f38684563dee87c88b008fea8d54c722",
+   "purpose": "P1-R seam pins at the frozen commit"
+  },
+  {
+   "name": "qualification_p2b_units",
+   "path": "evidence/p2/qualification/p2b-unit.txt",
+   "sha256": "68bd38b1984fa9b28c9845ce6a55de6d6db1b6422bc0b697db9f6d9b6ba21789",
+   "purpose": "P2-B unit pins 25/25"
+  },
+  {
+   "name": "qualification_p2b_runner",
+   "path": "evidence/p2/qualification/p2b-runner.txt",
+   "sha256": "3f83e91615f4ebec1c35d1f74b1a6d72c6c43557580fe1810701936efeb5c865",
+   "purpose": "real-AgentRunner qualification 3/3"
+  },
+  {
+   "name": "qualification_op2_op3_fixtures",
+   "path": "evidence/p2/qualification/op2-op3-fixtures.txt",
+   "sha256": "4661556d10fc4fc17e7fadda0d1b21a23776abfe99da0b10e9fa4742f9d2a268",
+   "purpose": "archived-fixture qualification output"
+  }
+ ],
+ "target_pins": {
+  "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "execution_status": "HOLD \u2014 no live P2 workflow until operator GO"
+}

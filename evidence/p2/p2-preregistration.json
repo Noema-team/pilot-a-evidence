@@ -1,0 +1,147 @@
+{
+ "experiment": "P2",
+ "title": "H-protocol-closure — BUILD Edit Protocol v1.1 deterministic closure under the P1-R frozen operating regime",
+ "preregistered_at_utc": "2026-10-08T09:45:00Z",
+ "directive": "Operator P2-B Correction Review (commit 9f298f2): APPROVE — GO TO PREREGISTRATION / FREEZE. Implementation approved; live P2 execution remains on HOLD. Prepare the frozen H-protocol-closure experiment with the same P1-R model, routing, reasoning effort, token budgets, repair budget, target repository identity, edit authority, and workflow configuration. Preregister the primary endpoint (>= 2/3 published BUILD opportunities), stopping rules, eligible-vs-aborted opportunities, and all per-opportunity reporting fields before execution. Pin implementation SHA, configuration identity, target source SHA, schema projections, qualification results, and archived op2/op3 evidence. Make the freeze manifest independently auditable, including explicit rules for implementation/evidence failures that STOP the campaign. STOP and return the completed preregistration and freeze manifest for separate review. Do not execute any live P2 workflow.",
+ "review_chain": {
+  "p2_b_implementation": "39318c617d29ce1287e39b3d4581330c0a2bb721 (P2-B deterministic closure; parent c0060f0 = P1-R frozen identity)",
+  "p2_b_review_1": "REQUEST CHANGES — five corrections (teaching filter, composition evidence, single projection, real-runner qualification, evidence qualification)",
+  "p2_b_corrections_commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "p2_b_review_2": "APPROVE — GO TO PREREGISTRATION / FREEZE; all findings Fixed/Added/Covered; CI run 37751982897 success at exact head 9f298f2",
+  "operator_evidence_note": "Review limitation recorded by the operator: CI independently confirmed green, but archived forensic fixtures were not independently executed in the review environment — their output and hashes are therefore included in the freeze evidence bundle (see freeze_manifest.pins: op2/op3 payloads, offline-qualification script + output)"
+ },
+ "model_regime_frozen": {
+  "note": "identical to V11/P1/P1-R — the model configuration is NOT an experimental variable",
+  "provider": "openrouter",
+  "model": "z-ai/glm-5.3-flash",
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_tokens_global": 16384,
+  "per_step": {
+   "full-build/design": { "max_tokens": 32768, "reasoning_effort": null },
+   "full-build/plan": { "max_tokens": 32768, "reasoning_effort": null },
+   "full-build/test": { "max_tokens": 32768, "reasoning_effort": "low" },
+   "full-build/build": { "max_tokens": 32768, "reasoning_effort": "low" }
+  },
+  "repair_budget": "MAX_RESULT_REPAIRS = 1 (unchanged from P1-R); MAX_AGENT_TURNS = 24; debug caps at 24 turns",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2"
+ },
+ "capability_preflight": {
+  "status": "PASS",
+  "detail": "Fresh live snapshot 2026-10-08T09:31:21Z: supported_efforts ['max','high','low'], default 'max' — BUILD/TEST effort 'low' supported. Source endpoint GET /api/v1/models; reasoning nested under `reasoning` (same as the P1-R snapshot).",
+  "metadata_file": "evidence/p2/capability-metadata.json",
+  "metadata_sha256": "bf3559678a4691af743e4b68bd5f6b1982a75ab37fc01676c678efc373e2a771",
+  "preflight_output": "evidence/p2/capability-preflight-output.txt"
+ },
+ "sole_intervention_relative_to_p1_r": {
+  "name": "BUILD Edit Protocol v1.1 deterministic closure (P2-B)",
+  "kind": "protocol mechanics change — the experimental treatment cell; everything else frozen at the P1-R regime",
+  "mechanics": {
+   "A_creates_canonicalization": "an omitted `creates` key parses identically to an explicit empty list (canonical []); the outer object stays strict (unknown keys remain decode rejections)",
+   "B_policy_specialized_surface": "when the frozen edit authority leaves zero legal create targets (every allowedEditPaths entry already exists on disk — computed by the runner BEFORE any model call), the MODEL-FACING submit_result schema omits `creates` entirely and the teaching carries zero create-field text; the projection can only NARROW; a submitted creates is an unknown-key DECODE rejection (repairable, never silently discarded); the projected schema instance is computed once per execution and drives wire projection, teaching, and in-loop acceptor; authoritative validate/stage re-check everything regardless; no-policy workflows keep the full surface",
+   "C_boundary_composition": "same path + same base sha256 + B.start === A.end (exactly ONE overlapping source line) + A's replacement final line === B's replacement first line byte-for-byte -> validate composes span=[A.start,B.end], replacement=A+B[1:]; chains compose transitively; any other overlap keeps the overlapping-edits rejection; stage applies the SAME composition and re-checks every gate on the composed spans; the model still owns every replacement byte — no new source authority, no guessed bytes",
+   "D_truthful_unknown_anchor": "the unknown-anchor repair instruction names the previously-issued-anchor rule and the fail-closed outcome; the withdrawn-tool demand is gone; unknown-anchor remains a genuine error (no normalization of fabricated anchors)"
+  },
+  "composition_evidence": "authoritative staging emits per-composition records {path, source_anchor_ids, start_line, end_line, replacement_sha256 (composed replacement bytes), result_file_sha256 (final staged file bytes)}; the runner persists them verbatim in build-anchors.json (compositions[])",
+  "explicitly_unchanged": "model configuration, routing, budgets, reasoning effort, repair budget, MAX_AGENT_TURNS, anchors and their minting, TEST->BUILD handoff, DEBUG loop, publication boundary, provenance rows, requiredEditPaths/unauthorized-create-path enforcement, no-overwrite and base-staleness gates",
+  "frozen_policy_that_binds": {
+   "appliesToSteps": ["build"],
+   "allowedEditPaths": ["apps/ai-server/rag-worker-service/main.py"],
+   "requiredEditPaths": ["apps/ai-server/rag-worker-service/main.py"]
+  },
+  "expected_wire_surface_under_freeze": "NARROWED: submit_result input_schema declares edits only (creates omitted, required=['edits']); teaching text carries no '/properties/creates' line — pinned end-to-end at 9f298f2 by tests/p2b-runner-qualification.test.ts Q1"
+ },
+ "treatment": {
+  "name": "BUILD publication protocol v1.1 (anchored semantic edits + deterministic closure)",
+  "detail": "structured build-changeset ActionContract: run-scoped opaque anchors minted by Stratum on read_source_slice; the model submits {edits:[{anchor_id,replacement}], creates:[{path,content}]?} through submit_result; Stratum decodes through the policy-projected schema, canonicalizes, validates (anchor resolution, boundary composition, overlaps, authorization), stages (independent re-derivation + re-checks + authoritative composition evidence), and publishes through the unchanged publication boundary; unified diffs exist only as Stratum-generated audit evidence"
+ },
+ "primary_hypothesis": {
+  "id": "H-protocol-closure",
+  "statement": "Under the P1-R authority-preserving frozen regime, BUILD successfully stages and publishes its required authorized source edit in at least 2/3 evaluable BUILD opportunities, with the v1.1 deterministic closure mechanics in force.",
+  "publication_definition": "identical to P1-R: submit_result accepted -> staged -> passed all publication gates -> applied-edit provenance row written + disk bytes updated. Downstream test/validation failures do NOT un-publish (P1-R precedent: op1 counted as PUBLISHED despite the downstream IndentationError).",
+  "decision_rule": "SUPPORTED if >= 2/3 evaluable BUILD opportunities publish; FALSIFIED if < 2/3. Absolute rule — no comparator required. P1-R (1/3 under v1.0 mechanics) is the immediately-prior block, reported as context, not a statistical comparator.",
+  "interpretation_guard": "A SUPPORTED verdict claims the closure mechanics improve real BUILD publication reliability under the same frozen operating regime WITHOUT sacrificing authority enforcement or evidence integrity. Authority/enforcement/evidence-integrity observations are reported per opportunity and gate the interpretation (see stop rules S1/S2 and reporting field integrity)."
+ },
+ "secondary_outcome_taxonomy": [
+  "submission failure: missing/malformed submit_result, schema or result-repair exhaustion",
+  "projection interaction: explicit-creates unknown-key decode rejection under the narrowed surface (repairable; counts as surface-binding evidence, not a defect of the campaign)",
+  "anchor failure: unknown/stale/duplicate/overlapping/unavailable anchor",
+  "authority/staging rejection: editPolicy, required-path, create-exists, base-state or ownership rejection",
+  "composition outcome: composed vs rejected-at-overlap vs not-applicable, with authoritative records",
+  "downstream semantic failure: BUILD publication succeeds but EXEC/tests/validation fail",
+  "end-to-end success: BUILD publishes and the downstream workflow completes successfully"
+ ],
+ "per_opportunity_reporting_fields": {
+  "note": "ALL fields below are reported for every evaluable BUILD opportunity, extracted from the run archives (node-outputs, anchors manifest, loop JSONs) — never from memory.",
+  "identity": ["run_id", "slot", "opportunity_index", "reached_build", "abort_class"],
+  "wire_surface": ["wire_surface_offered (narrowed|full — read from the archived provider request tools[].input_schema for submit_result)", "teaching_carries_create_field (bool — searched in the archived request text)"],
+  "submissions": [
+   "initial_submission: {payload_shape: {has_creates_key, edits_count, creates_count}, decode: accepted|rejected, defect_codes[]}",
+   "repairs: {count, per_turn_defect_codes[]}",
+   "final_accepted_submission: {has_creates_key, edits_count}"
+  ],
+  "composition": ["occurred (bool)", "n_records", "records_verbatim (from build-anchors.json compositions[])", "recomputed_hashes_match (bool — replacement_sha256 and result_file_sha256 recomputed from base + archived proposal and from disk bytes)"],
+  "staging_publication": ["staged_edits", "staged_creates", "staging_failure_reason?", "published (bool)", "applied_edit_refs[]", "published_disk_sha256s"],
+  "downstream": ["validation_outcome (downstream workflow/tests result)", "end_to_end_success (bool)"],
+  "integrity": ["authority_bypass (none-observed|detail)", "evidence_integrity (pass|fail + detail)", "target_drift (bool — HEAD/main.py hash re-verified pre/post run)"],
+  "accounting": ["tokens_used_per_step", "agent_turns_used", "result_repairs_used", "format_repairs_used"]
+ },
+ "sampling_plan": {
+  "stop_rule": "stop after 3 evaluable BUILD opportunities or 9 evaluable workflows, whichever occurs first (identical to P1-R)",
+  "eligible_opportunity": "a run contributes one evaluable BUILD opportunity iff it reaches the BUILD step of the frozen full-build workflow with the execution WorkItem live (scoping/plan/design completed; BUILD loop started). BUILD fail-closed outcomes (submission rejection, repair exhaustion, staging rejection) ARE evaluable opportunities — they are the endpoint's failure modes (P1-R precedent: op2/op3).",
+  "aborted_run": "a run that fails BEFORE the BUILD loop starts contributes NO opportunity: pre-BUILD infra failure (killed process, transport outage — P1-R precedent 5f79a128, operator-excluded) or pre-BUILD max_tokens exhaustion (P1-R precedent ef573d80/32b96f25: consumed the slot, produced no opportunity, slot re-queued).",
+  "rules": [
+   "upstream (pre-BUILD) failures consume workflow slots",
+   "transport censoring consumes neither slots nor opportunities",
+   "implementation/evidence/procedure defects trigger the STOP rules below and halt the campaign immediately"
+  ]
+ },
+ "stop_rules": {
+  "note": "Distinct from experimental outcomes: each rule below is an IMPLEMENTATION, EVIDENCE, or PROCEDURE failure. On trigger: journal {event: 'stop_campaign', rule, evidence_file}, archive the run, consume no further slots, and return to the operator. None of these count as FALSIFIED outcomes.",
+  "S1_authority_bypass": "any disk write outside allowedEditPaths, any publication on an unauthorized path, or any create reaching disk under the narrowed surface — STOP",
+  "S2_evidence_integrity": "a composed publication whose composition records are absent/unretrievable from build-anchors.json, or whose recomputed replacement_sha256/result_file_sha256 mismatch the manifest — STOP",
+  "S3_surface_binding_failure": "a BUILD run under the frozen policy whose archived provider requests show a submit_result input_schema WITH creates (the narrowed surface failed to bind at runtime) — STOP",
+  "S4_target_drift": "student-platform HEAD != 86ec0871d64ecca8732434c11d015fd8e08ddc7e or worker main.py sha256 != 7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988 at run start or after a run — STOP",
+  "S5_capability_regression": "capability preflight FAIL or supported_efforts no longer contains 'low' — STOP",
+  "S6_fixture_restore_failure": "fixture restore yields definition sha256 != 71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5 or readiness sha256 != b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7 — STOP",
+  "S7_implementation_defect_in_loop": "a reproducible acceptance/decoding bug (the loop rejects a proposal the narrowed schema and canonical checks accept, or accepts one they reject), distinguished from model-caused exhaustion by offline replay of the archived payload — STOP"
+ },
+ "freeze_chain": {
+  "implementation_commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "implementation_branch": "p1-collision-guard (remote head = frozen commit; parent 39318c6 = approved P2-B; grandparent c0060f0 = P1-R frozen identity; CI run 37751982897 conclusion success)",
+  "config_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2 (evidence/v11-frozen-config/settings.json — unchanged since V11)",
+  "schema_projections": {
+   "canonical_v1_1": "evidence/p2/canonical-submit-result-schema.json sha256 8712077a1c087b7c1b56623e2efa7e25d48261386e06db783d3819346d25fd29 (required=['edits']; creates optional with canonical default []; SUPERSEDES the P1-era golden for P2)",
+   "narrowed_no_creates": "evidence/p2/narrowed-submit-result-schema-no-creates.json sha256 481f7edc1606e322b2360fe3998b44e8068fbb80d506c9e985a82025f2a2409f (the wire surface under the frozen policy)",
+   "p1_era_golden_preserved": "54ce6c07a8454877fb99b32867d525ceb9ba481b35010c2805dd72973559d6c4 (evidence/v1-p1-freeze/golden-submit-result-schema.json — untouched archived P1-R record; the documented schema delta of mechanic A)",
+   "v1_1_golden_copy": "evidence/p2/golden-submit-result-schema.v1.1-canonical.json sha256 e71a300cff4df1d8027f3e8c01561156aba7082f0813da175a5eb0e769ba8d2c"
+  },
+  "capability_metadata_sha256": "bf3559678a4691af743e4b68bd5f6b1982a75ab37fc01676c678efc373e2a771",
+  "gate_b": {
+   "status": "PASS",
+   "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+   "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+   "probe_token_count": 4213,
+   "output": "evidence/p2/gate-b-output.txt"
+  },
+  "target_pins": {
+   "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e (tracked tree clean at freeze; .sle removed after freeze prep)",
+   "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+  },
+  "archived_op2_op3_evidence": {
+   "op2_rejected_proposal": "evidence/p1-r/p1-r-3/99100d24-2150-4380-925c-936eb4c82869/node-outputs/build-rejected-result.json sha256 02db3ebf6b7fa7ff5d12dbf5e8c52c9c84b49e844bffe8197b316cc0849f1f02",
+   "op3_rejected_proposal": "evidence/p1-r/p1-r-5/fb79af13-ac2c-4ff1-a871-0461fdef5da8/node-outputs/build-rejected-result.json sha256 c4afc3cd51863ab65b4ece7fbf52c0f98996996f716ff51ce5985a73ae4902f5",
+   "repair_forensics_report": "evidence/p1-r/repair-forensics/repair-lane-forensics.md sha256 f673a5286c91f2627a4565a5923209c50ed50fae9d8595293fd111e86f4c9d0c",
+   "offline_qualification_script": "evidence/p2/p2b-offline-qualification.mts sha256 0a087f510024efec8d8dea1df940cd3b2b2b3654369e12c296d588bcd6a1da1e",
+   "offline_qualification_output": "evidence/p2/qualification/op2-op3-fixtures.txt"
+  }
+ },
+ "qualification_at_freeze": {
+  "suite": "1877 tests, 0 failures, 4 pre-existing skips; typecheck clean (evidence/p2/qualification/suite.txt, typecheck.txt) — run at the exact frozen commit",
+  "p1_freeze_proof": "19/19 PASS (evidence/p2/qualification/p1-freeze-proof.txt; script evidence/v1-p1-freeze/p1-freeze-proof-v2.mts with dated v1.1 amendment to check 2a)",
+  "p1r_seam_proof": "ALL PINS PASS (evidence/p2/qualification/p1r-seam-proof.txt; pin 2+3 re-expressed in the narrowed surface with dated amendment)",
+  "p2b_units": "25/25 PASS (evidence/p2/qualification/p2b-unit.txt)",
+  "p2b_runner_qualification": "3/3 PASS (evidence/p2/qualification/p2b-runner.txt) — real AgentRunner: Q1 narrowed policy end-to-end incl. verbatim evidence retrieval; Q2 nonexistent-authorized-target create support; Q3 no-policy invariance",
+  "op2_op3_fixtures": "ALL PINS PASS (evidence/p2/qualification/op2-op3-fixtures.txt): op2 -> narrowed surface rejects the illegal create explicitly; composition succeeds; zero defects; staged main.py bytes == forensic mechanical merge; op3 -> missing creates canonicalizes; first and only defect = unknown-anchor"
+ },
+ "execution_hold": "NO live P2 workflow may start until the operator reviews this preregistration and the freeze manifest (evidence/p2/p2-freeze-manifest.json) and issues an explicit GO. The very next agent action after this file was written was STOP."
+}

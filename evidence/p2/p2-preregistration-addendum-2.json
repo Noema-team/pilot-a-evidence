@@ -1,0 +1,37 @@
+{
+ "artifact": "P2 preregistration ADDENDUM 2 — dated correction to the A2 exhaustion/truncation boundary (operator P2 launch review: REQUEST CHANGES); all historical artifacts preserved byte-for-byte",
+ "amendment_utc": "2026-10-08T11:30:00Z",
+ "amends": {
+  "original_preregistration_sha256_unchanged": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa",
+  "freeze_manifest_sha256_unchanged": "21814ac04b286d67ae60cd74b173f6db654d3d5fd1e5748b14d49456a46d5a1a",
+  "addendum_1_sha256_unchanged": "d9e9bb83da38a7e3af695fc6ce32b7f99dc17f723117a240e59b57202386278f",
+  "note": "Additive and dated. No prior artifact was regenerated, rewritten, or re-preregistered. No qualification was rerun; the implementation is unchanged (stratum 9f298f219db927d5065876cf99cdec11e462aa04). No live P2 workflow has started, so this correction precedes the first live opportunity."
+ },
+ "operator_ruling": "Protecting the denominator is essential: the experiment must be allowed to fail because the model runs out of tokens. A model exhausting its fixed output budget during a BUILD repair is an observed failure of that workflow, not an infrastructure abort. P1-R opportunity 2 experienced a truncated repair at 32,768 tokens and WAS included in P1-R's 1/3 publication result; excluding the same failure class in P2 would break comparability and introduce outcome-dependent censoring.",
+ "A2_correction_truncated_repairs": {
+  "supersedes": "the addendum-1 boundary case 'token-truncated repairs are budget-censored (consume neither slot nor opportunity)' is RETRACTED. The addendum-1 record itself remains in the frozen history, unchanged; this addendum defines the effective rule.",
+  "effective_rule": "a BUILD repair (or initial BUILD submission) truncated by the FROZEN model output budget — finish='length' / max_tokens exhaustion at the configured per-step budget (32768 for BUILD) — is an EVALUABLE FAILURE: it counts toward the workflow slot AND as a failure of that BUILD opportunity in the endpoint denominator, exactly consistent with the P1-R treatment of opportunity 2.",
+  "rationale": "the experiment measures whether the frozen model, using the frozen budget and protocol, publishes a BUILD proposal. Output-budget exhaustion is model-attributable under the frozen regime; censoring it would be outcome-dependent."
+ },
+ "effective_disposition_table": {
+  "infrastructure_failure_before_any_model_call": "non-evaluable abort (P1-R precedent 5f79a128); consumes neither slot nor opportunity",
+  "pre_build_step_failure_including_its_max_tokens_exhaustion": "consumes the workflow slot; produces NO BUILD opportunity; slot re-queued (P1-R precedent ef573d80/32b96f25; unchanged from the original preregistration's aborted_run definition and the design the operator approved in principle)",
+  "model_produces_malformed_or_unauthorized_proposal": "evaluable (counts toward slot + opportunity)",
+  "bounded_repair_exhausts_its_token_budget": "EVALUABLE FAILURE (this addendum's correction; P1-R op2-consistent)",
+  "model_fabricates_an_unknown_anchor": "evaluable failure (mechanic D keeps it a genuine error; addendum-1 boundary case stands)",
+  "stratum_rejects_a_valid_authoritative_payload_because_of_an_implementation_defect": "S7 STOP (objective offline-replay rules of addendum 1, unchanged)",
+  "evidence_integrity_fails": "STOP (rule S2 of the original preregistration, unchanged)"
+ },
+ "post_model_infrastructure_malfunction_narrow_definition": {
+  "note": "the only censoring class that may occur AFTER model calls begin; deliberately narrow, and any ambiguity resolves to EVALUABLE (fail-closed toward the denominator) so censoring can never be outcome-dependent",
+  "all_conditions_required": [
+   "the archived loop log shows a transport/provider error class verbatim (HTTP 5xx, connection reset/timeout, process kill) for the affected turn — never a completed model message",
+   "the archived turn carries NO budget signal (no finish='length', no max_tokens stop reason) and NO model-attributable content (no partial proposal text entering the archive)",
+   "the failure is recorded as an infra-censoring event in the run archive with the provider error evidence attached"
+  ],
+  "if_any_condition_fails_or_is_ambiguous": "the event is EVALUABLE — it counts toward the slot and the BUILD opportunity denominator under the endpoint taxonomy",
+  "scope_limit": "a censored BUILD turn is censored, not the whole opportunity, unless the malfunction prevents any recordable BUILD outcome; in that case the opportunity is censored with the same evidence bar and the event is journaled for operator inspection"
+ },
+ "comparability_note": "with this correction, the BUILD-opportunity denominator in P2 is defined identically to P1-R's: every run that reaches the BUILD loop yields an evaluable opportunity whose outcome includes output-budget exhaustion, malformed/unauthorized proposals, fabricated anchors, and fail-closed staging rejections. P1-R (1/3) remains context, not a statistical comparator.",
+ "effective_freeze_binding": "see evidence/p2/p2-effective-freeze.json (the ordered artifact chain and verification command); the effective-freeze head is the p2-freeze-evidence branch commit carrying this file."
+}

@@ -1,0 +1,28 @@
+{
+ "artifact": "P2 EFFECTIVE FREEZE BINDING — the ordered, hash-pinned artifact chain in force for the H-protocol-closure experiment (supersedes nothing silently: every element listed, historical records preserved)",
+ "generated_at_utc": "2026-10-08T11:35:00Z",
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "ci_run": "37751982897 (success)"
+ },
+ "target": {
+  "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "chain": [
+  {"order": 1, "role": "preregistration (original, unchanged)", "path": "evidence/p2/p2-preregistration.json", "sha256": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa"},
+  {"order": 2, "role": "freeze manifest (original, unchanged)", "path": "evidence/p2/p2-freeze-manifest.json", "sha256": "21814ac04b286d67ae60cd74b173f6db654d3d5fd1e5748b14d49456a46d5a1a"},
+  {"order": 3, "role": "original checksum file (21 pins + prereg; unchanged)", "path": "evidence/p2/p2-freeze-manifest.sha256", "sha256": "e92e43555e06b0332ac17a45ac6c2f9c5bc1ba98c144c06bc4147bbdbb97bbe9"},
+  {"order": 4, "role": "addendum 1 (A1 disposition + A2 replay rules; unchanged)", "path": "evidence/p2/p2-preregistration-addendum-1.json", "sha256": "d9e9bb83da38a7e3af695fc6ce32b7f99dc17f723117a240e59b57202386278f"},
+  {"order": 5, "role": "addendum 2 (A2 correction: output-budget-truncated BUILD repairs are EVALUABLE failures; narrow post-model infra censoring; effective disposition table)", "path": "evidence/p2/p2-preregistration-addendum-2.json", "sha256": "aeb6288d72efbb326ffa1a92adc663b2c8b11d1c6a7729793712d7a40e4048d9"},
+  {"order": 6, "role": "supersession ledger", "detail": "addendum-1 boundary case 'token-truncated repairs are budget-censored' is RETRACTED by addendum 2; the addendum-1 file itself is preserved unchanged in the chain"}
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p2/p2-effective-freeze.sha256",
+  "how_to": "clone this branch and run: sha256sum -c evidence/p2/p2-effective-freeze.sha256  (covers all original pins + all addenda + this binding); the original 21-pin chain also verifies independently: sha256sum -c evidence/p2/p2-freeze-manifest.sha256",
+  "implementation_check": "git -C <stratum> rev-parse p1-collision-guard == 9f298f219db927d5065876cf99cdec11e462aa04; gh run view 37751982897 --repo Noema-team/stratum"
+ },
+ "execution_status": "HOLD — no live P2 until operator GO at this effective-freeze identity"
+}

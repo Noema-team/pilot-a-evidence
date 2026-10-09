@@ -1,21 +1,19 @@
-PASS Q1 (guard): pass-through verified; 10/9 mismatch dimensions blocked with 0 provider calls
-PASS Q2 (settings provenance): frozen passes; reduced P2-seed file and tampered budget map fail closed
+PASS Q1 (guard): pass-through verified; 12 mismatch dimensions blocked with 0 provider calls; 6 schema mutations all change tools_sha256; complete/completeStructured blocked+archived pre-call
+PASS Q2 (settings provenance): frozen passes; reduced P2-seed file and tampered budget map fail closed (construction refused)
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-09T19:22:44.001Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-09T19:22:44.007Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-09T19:22:44.008Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-09T19:22:44.048Z","event":"p3_fixture_decision","decisionId":"fcf31ee7-22d4-49be-94e7-4689436d121a","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-09T19:22:44.099Z","event":"p3_fixture_confirm_gate_pending","decisionId":"551ec216-b327-432f-b929-cde068c67b2c","type":"checkpoint"}
-[p3] {"ts":"2026-10-09T19:22:44.129Z","event":"p3_fixture_built","fixture_sha256":"2bb805feb665","cursor":"confirm","replayed":4}
-PASS Q3 (fixture): confirm-gate boundary; editPolicy+definitionSource persisted; 88 guarded requests all conform to the frozen per-step budgets/effort; upstream artifacts byte-identical to P1-R op1; main.py pristine; gate-B assembly verbatim (4214 tokens)
-  info: downstream fence verified (max_tokens expected 32768 got 16384...)
-  info: synthesis-only tool shape not reached (submission accepted at the gate threshold was not crossed — legitimate)
-PASS Q4 (BUILD-entry dry run): 3 guarded requests all PASS; publication on apps/ai-server/rag-worker-service/main.py with disk==provenance (bf33c108fe1b)
+[p3] {"ts":"2026-10-09T19:51:29.667Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T19:51:29.669Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T19:51:29.670Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T19:51:29.718Z","event":"p3_fixture_decision","decisionId":"bea8cd00-28cb-4f8a-9c4c-dc7dba36358a","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T19:51:29.782Z","event":"p3_fixture_confirm_gate_pending","decisionId":"127c1006-0adc-4845-91e3-675147186957","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T19:51:29.836Z","event":"p3_fixture_built","fixture_sha256":"204a386bac45","cursor":"confirm","replayed":4}
+PASS Q3 (fixture): confirm-gate boundary; editPolicy+definitionSource persisted; 4 guarded requests (isolated capture, exact reconciliation, 4 upstream steps) conform to the frozen per-step budgets/effort; issue input pinned; upstream artifacts byte-identical to P1-R op1; main.py pristine; gate-B assembly verbatim (4214 tokens)
+PASS Q4 (BUILD-entry dry run): publication on apps/ai-server/rag-worker-service/main.py with disk==provenance (bf33c108fe1b); positive boundary halted exec after exactly 1 refusal; capture isolated+reconciled (2 requests, 0 downstream); work tree carries ONLY the publication
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
@@ -23,5 +21,19 @@ fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
 PASS Q4b (restore): target pristine at 86ec0871
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T19:51:30.025Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T19:51:30.027Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T19:51:30.028Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T19:51:30.047Z","event":"p3_fixture_decision","decisionId":"71342f2a-72e0-4633-819c-d6e9db65cf64","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T19:51:30.092Z","event":"p3_fixture_confirm_gate_pending","decisionId":"a52722f1-0a75-4f15-93d5-65ce60ac8077","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T19:51:30.121Z","event":"p3_fixture_built","fixture_sha256":"19d1b6767cd8","cursor":"confirm","replayed":4}
+PASS Q5a (G1 surfacing): BUILD guard violation classified G1 from the capture; 0 model calls; 0 publications; attempt is procedure-class, not model-class
+PASS Q5b (G2 integrity): dropped pairing, corrupted line detected; untouched capture classifies clean
 
 P3 OFFLINE QUALIFICATION: ALL PASS

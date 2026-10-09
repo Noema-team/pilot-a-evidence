@@ -1,12 +1,12 @@
 {
  "experiment": "P3",
- "title": "BUILD-entry isolation — deterministic closure of the BUILD boundary under a request-time configuration guard",
- "status": "DRAFT — submitted for operator review; NOT binding until approved; live execution remains unauthorized",
- "drafted_at_utc": "2026-10-09T20:05:00Z",
+ "title": "BUILD-entry isolation \u2014 deterministic closure of the BUILD boundary under a request-time configuration guard",
+ "status": "DRAFT v2 \u2014 revised per the P3 design review (REQUEST CHANGES, 5 corrections); NOT binding until approved; live execution remains unauthorized",
+ "drafted_at_utc": "2026-10-09T20:40:00Z",
  "directive": "Operator P2 forensic closure (binding v5 accepted at 4c124b0): GO to P3 design and offline qualification only. Build and qualify a deterministic BUILD-entry fixture with a request-time configuration guard; preregister P3; execute only after separate review.",
  "motivation": {
-  "p2_outcome": "UNEVALUABLE_FOR_ENDPOINT — 9/9 workflow slots, 0 BUILD opportunities; additionally the frozen per-step budgets never reached any request (campaign driver seed() overwrote the frozen settings), so P2 measured a degraded regime, not the preregistered one",
-  "lesson_1": "the runtime must verify EFFECTIVE configuration — the invariant is what reaches the provider request, not the settings file on disk",
+  "p2_outcome": "UNEVALUABLE_FOR_ENDPOINT \u2014 9/9 workflow slots, 0 BUILD opportunities; additionally the frozen per-step budgets never reached any request (campaign driver seed() overwrote the frozen settings), so P2 measured a degraded regime, not the preregistered one",
+  "lesson_1": "the runtime must verify EFFECTIVE configuration \u2014 the invariant is what reaches the provider request, not the settings file on disk",
   "lesson_2": "upstream workflow reliability and BUILD protocol reliability are separate measurements; a full-workflow campaign can exhaust its budget without testing its intervention",
   "lesson_3": "provider observability must include resolved execution parameters (outbound max_tokens, reasoning configuration, routing), not only schemas and responses"
  },
@@ -21,20 +21,29 @@
    "editPolicy + definitionSource persisted on the run row (the P1 unpolicied-run flaw is structurally closed)",
    "main.py pristine 7d7718bc; target HEAD 86ec0871",
    "frozen settings 5634b2e8 installed and guard-verified at request time"
-   ],
-  "qualification": "evidence/p3/p3-qualification.mts — ALL PASS offline (Q1 guard matrix 10/10 dimensions blocked pre-call; Q2 settings provenance incl. the exact P2 seed() output rejected; Q3 fixture gates incl. real-runner budget observations 16384/32768/32768+low; Q4 BUILD-entry dry run: confirm gate -> guarded BUILD loop -> real anchor mint -> submit_result -> staging -> PUBLICATION (applied-edit row, disk==provenance) -> downstream fence verified -> target restored pristine)"
+  ],
+  "qualification": "evidence/p3/p3-qualification.mts v2 \u2014 ALL PASS offline (Q1 guard matrix 12/12 dimensions blocked pre-call incl. later-message creates-teaching + 6 tool-schema mutations all changing tools_sha256 + complete/completeStructured blocked+archived pre-call; Q2 settings provenance incl. the exact P2 seed() output rejected at construction; Q3 fixture gates incl. isolated per-instantiation capture with EXACT reconciliation (4 replay calls == 4 archived PASS == 4 archived responses) and the pinned issue input; Q4 BUILD-entry dry run: confirm gate -> guarded BUILD loop (2 requests, both PASS, archived with responses) -> real anchor mint -> submit_result -> staging -> PUBLICATION (applied-edit row bf33c108, disk==provenance) -> POSITIVE boundary halt at exec (1 refusal, 0 downstream model calls, work tree carries ONLY the publication) -> target restored pristine; Q5a G1 surfacing: a genuine BUILD guard violation (deliberately wrong contract) classified G1 from the capture with 0 model calls, 0 publications, no attempt consumed; Q5b G2: dropped pairing and corrupted-line tampering detected, untouched capture clean)",
+  "capture_isolation": "per-instantiation capture under .sle/p3-captures/<instantiation_id>/ archived inside the fixture tgz and sha-pinned in the manifest; the builder fails unless archived PASS count == provider call count == per-step sequence (C1)"
  },
  "request_time_configuration_guard": {
   "artifact": "evidence/p3/config-guard.mts",
   "verification_points": [
    "construction: settings sha256 == frozen 5634b2e8 (the P2 defect class cannot recur silently)",
-   "every request, BEFORE forwarding: model, max_tokens (frozen per-step value), reasoning.effort (presence AND value), temperature, tool-name set (investigation vs synthesis shapes), submit_result surface (narrowed: edits-only, required [edits], no creates) with teaching markers (edits line present, creates line absent), non-empty system + messages",
-   "every verified request archived to the capture JSONL with the guard verdict (evidence accrues even when passing)",
-   "any mismatch -> 'config-guard: STOP — ...' and the model call is NEVER made; classification: experiment STOP (config-guard class), never a model failure"
+   "every completeMultiTurn request, BEFORE forwarding: model, max_tokens (frozen per-step value), reasoning.effort (presence AND value), temperature, tool-name set (investigation vs synthesis shapes), submit_result surface (narrowed: edits-only, required [edits], no creates) with LINE-FORM teaching markers (`- /properties/edits: ` present, `- /properties/creates: ` absent) scanned across ALL model-visible user messages and the system prompt, non-empty system + messages",
+   "tools_sha256: recursive deterministic serialization of the FULL tool definitions \u2014 every material schema mutation changes the hash (6/6 proven in Q1)",
+   "complete and completeStructured are EXPLICITLY BLOCKED (fail closed pre-call; the attempt is archived as a guard STOP naming the denied wire) \u2014 the guarded multi-turn wire is the only channel in P3 scope",
+   "every verified request is archived BEFORE the verdict is applied, followed by its response (full text + sha + stop_reason + usage) or error record \u2014 the P2 wire-capture composition, so a future transport-censoring decision has response-side evidence",
+   "any mismatch -> 'config-guard: STOP \u2014 ...' and the model call is NEVER made; classification: experiment STOP (config-guard class G1), never a model failure"
   ],
   "frozen_contracts_live": {
-   "build": { "max_tokens": 32768, "reasoning_effort": "low", "temperature": 0.7, "submit_result": "narrowed (edits-only)" }
-  }
+   "build": {
+    "max_tokens": 32768,
+    "reasoning_effort": "low",
+    "temperature": 0.7,
+    "submit_result": "narrowed (edits-only)"
+   }
+  },
+  "campaign_recognition": "after EVERY attempt the campaign classifies the attempt capture (classifyGuardCapture): any guard STOP -> G1 STOP (procedure class, attempt NOT consumed, zero model calls proven by provider_calls_observed); any pairing/parse defect -> G2 STOP; both demonstrated in Q5 on real capture shapes"
  },
  "primary_endpoint": {
   "id": "H-build-entry-publication",
@@ -42,35 +51,43 @@
   "publication_definition": "identical to P1-R/P2: submit_result accepted -> staged -> publication gates passed -> applied-edit provenance row written AND disk bytes == provenance hash",
   "decision_rule": ">=2/3 publications => SUPPORTED; <=1/3 => FALSIFIED; guard STOP, evidence-integrity failure, authority bypass, surface-binding failure, or target drift => STOP and return to the operator (never a model-attributed failure)",
   "denominator_rule": "each attempt = one fixture instantiation + confirm-gate approval + one BUILD execution. A config-guard STOP, capture-integrity failure, or fixture-restore failure consumes NO attempt (procedure class, re-queue after operator-visible journal entry). A model-caused BUILD failure (submission rejection, repair exhaustion, staging rejection) IS an evaluable attempt (P1-R precedent). Transport failure mid-BUILD: journal + re-queue, consumes no attempt (addendum-2 discipline: ambiguity is NOT censored; the archived capture decides).",
-  "deliberate_divergence_from_p2": "P3 does NOT inherit P2's full-workflow sampling plan (9 workflows). The denominator is BUILD-entry attempts only; upstream progression is out of scope by construction."
+  "deliberate_divergence_from_p2": "P3 does NOT inherit P2's full-workflow sampling plan (9 workflows). The denominator is BUILD-entry attempts only; upstream progression is out of scope by construction.",
+  "execution_boundary": "POSITIVE publication halt: the campaign runs BUILD under a boundary wrapper that refuses every step dispatch after BUILD completes \u2014 the run halts at the first downstream step with an explicit sentinel BEFORE any downstream model call or side effect (proven in Q4: exactly 1 refusal, 0 downstream requests, work tree carries only the publication). A rejected downstream request is never part of the procedure."
  },
  "per_attempt_reporting_fields": [
-  "wire_surface_offered (from the guard capture: tools, submit_result schema, teaching markers)",
-  "resolved parameters per request (model, max_tokens, reasoning_effort, temperature) — guard-verified",
+  "wire_surface_offered (from the guard capture: tools, full-def tools_sha256, submit_result schema, line-form teaching markers, message counts)",
+  "resolved parameters per request (model, max_tokens, reasoning_effort, temperature) \u2014 guard-verified pre-call",
+  "provider responses and errors (full text sha + bytes, stop_reason, usage, tool-use names, duration) \u2014 archived per request",
   "anchors minted and used",
   "submission outcome (accepted / rejected + defects) and repair consumption",
   "staging + composition evidence (composed_from anchors)",
   "publication outcome (applied-edit row sha, disk==provenance verification)",
-  "post-publication target state (HEAD, main.py sha, tree cleanliness)"
+  "capture reconciliation (archived PASS count == provider call count; classifyGuardCapture verdict)",
+  "post-publication target state (HEAD, main.py sha, tree cleanliness) and the boundary refusal evidence"
  ],
  "stop_rules": {
-  "G1_config_guard": "any config-guard STOP during a BUILD attempt -> STOP campaign, return to operator",
-  "G2_evidence_integrity": "capture write failure, dual-failure class, or composition-evidence absence -> STOP (S2 class)",
+  "G1_config_guard": "any config-guard STOP during a BUILD attempt (request-time violation OR blocked completion path) -> STOP campaign, return to operator; classified from the capture after the attempt (demonstrated Q5a)",
+  "G2_evidence_integrity": "capture write failure, pairing/parse defect, reconciliation mismatch, dual-failure class, or composition-evidence absence -> STOP (S2 class; tamper detection demonstrated Q5b)",
   "G3_surface_binding": "archived requests showing a creates-bearing submit_result -> STOP (S3 class)",
   "G4_target_drift": "HEAD != 86ec0871 or main.py != 7d7718bc at attempt start or after restore -> STOP (S4 class)",
   "G5_capability_regression": "preflight fail or supported_efforts losing 'low' -> STOP (S5 class)",
   "G6_fixture_restore": "definition/readiness sha mismatch or boundary-property verification failure on instantiate -> STOP (S6 class)"
  },
  "scope_boundaries": {
-  "in_scope": "BUILD entry -> investigation -> structured submission -> validation -> publication; the downstream workflow (exec/validation_gate/debug/evaluate) is NOT driven — after publication the target is restored pristine",
+  "in_scope": "BUILD entry -> investigation -> structured submission -> validation -> publication; the downstream workflow (exec/validation_gate/debug/evaluate) is NOT driven \u2014 after publication the target is restored pristine",
   "out_of_scope": "upstream progression (P4's question), downstream test outcomes (do not un-publish, P1-R precedent), model quality beyond the protocol boundary"
  },
  "model_regime": "identical frozen configuration: provider openrouter, model z-ai/glm-5.3-flash, base_url https://openrouter.ai/api/v1, settings 5634b2e8 (global 16384; BUILD 32768 @ effort low); capability preflight re-run required before GO",
  "execution_preconditions": [
   "operator approval of THIS preregistration (draft -> binding with a dated freeze manifest)",
-  "fixture + guard + qualification sources hash-pinned in a binding chain and pushed to the public evidence repository",
+  "fixture + guard + qualification sources, the pinned issue input, and the qualification captures hash-pinned in a binding chain and pushed to the public evidence repository",
   "pre-execution verification: stratum 9f298f2 clean, target 86ec0871 pristine, binding checksums verified from a fresh public clone, capability preflight PASS, API key present",
   "no live attempt before the operator's GO"
  ],
- "qualification_at_draft": "evidence/p3/p3-qualification-output.txt — Q1-Q4 + restore ALL PASS, zero live model traffic, stratum tree clean at 9f298f2 throughout"
+ "qualification_at_draft": "evidence/p3/p3-qualification-output.txt v2 \u2014 7 gates ALL PASS, zero live model traffic, stratum tree clean at 9f298f2 throughout",
+ "review_history": [
+  "v1 reviewed at d4e894d: REQUEST CHANGES \u2014 C1 capture isolation, C2 tool-hash/teaching repair, C3 positive publication boundary + G1 surfacing, C4 complete provider observability + campaign recognition, C5 fixture-input pinning; architecture accepted",
+  "v2: all five corrections implemented and qualified (evidence/p3/p3-qualification-output.txt, 7 gates ALL PASS, zero live traffic)"
+ ],
+ "sample_size_caveat": "2/3 is an engineering qualification threshold, not a precise estimate of general BUILD reliability; results must not be read as a generalization measurement"
 }

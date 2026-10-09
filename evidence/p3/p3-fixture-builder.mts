@@ -26,7 +26,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, cpSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 
 import { ContextManager } from '/home/theo/Documents/coding/repos/stratum/src/context-manager.js';
 import { resolveLLMProvider, buildAgentRunner } from '/home/theo/Documents/coding/repos/stratum/src/application.js';
@@ -56,7 +56,7 @@ import {
 } from '/home/theo/Documents/coding/repos/stratum/src/storage/repositories.js';
 import type { WorkflowEngineDeps } from '/home/theo/Documents/coding/repos/stratum/src/workflow/engine.js';
 import type { MultiTurnParams, MultiTurnResult } from '/home/theo/Documents/coding/repos/stratum/src/agent-loop.js';
-import { createConfigGuardProvider, type StepContract } from './config-guard.mts';
+import { createConfigGuardProvider, classifyGuardCapture, reconcileCapture, type StepContract } from './config-guard.mts';
 
 const STRATUM = '/home/theo/Documents/coding/repos/stratum';
 const ROOT = '/home/theo/Documents/coding/repos/student-platform';
@@ -70,7 +70,9 @@ const EXEC_WI = 'wi-exec-108';
 const WORKSPACE_ID = 'ws-pilot-a';
 const PROJECT_ID = 'proj-pilot-a';
 const OBJECTIVE_ID = 'obj-108';
-const ISSUE = '/tmp/opencode/pilot-a/issue-108.json';
+// C5 — the issue input is PINNED with the qualification sources (evidence/p3/inputs/);
+// the ephemeral /tmp copy is no longer consulted.
+const ISSUE = `${P3}/inputs/issue-108.json`;
 const WORKER_MAIN = 'apps/ai-server/rag-worker-service/main.py';
 // frozen task configuration (identical to the P1-R/P2 dispatch shape)
 const ATTEMPT19_EDIT_POLICY = {
@@ -257,12 +259,19 @@ export async function buildFixture(): Promise<Record<string, unknown>> {
   const harness: ReplayHarness = { currentStep: () => undefined, calls: [] };
   const runRepo = new WorkflowRunRepository(d);
   const replay = makeReplayProvider(harness, model);
+  // C1 — the replay guard capture is UNIQUE to this instantiation and lives
+  // inside the fixture workspace (archived in the tgz, sha-pinned in the
+  // manifest). No append-only shared file exists anymore.
+  const instantiationId = randomUUID();
+  const captureRel = path.join('.sle', 'p3-captures', instantiationId, 'fixture-replay-guard.jsonl');
+  const capturePath = path.join(ROOT, captureRel);
+  rmSync(capturePath, { force: true });
   const guard = createConfigGuardProvider(replay, () => {
     const step = harness.currentStep();
     const mk = step ? STEP_CONTRACTS[step] : undefined;
     if (!mk) throw new Error(`config-guard: no frozen contract for step ${step}`);
     return mk(model);
-  }, { capturePath: '/tmp/opencode/p3/fixture-replay-guard.jsonl' });
+  }, { capturePath, phase: `fixture-replay:${instantiationId}` });
 
   const artifactRepository = new ArtifactRepository(d);
   const decisionRepository = new DecisionRepository(d);
@@ -366,7 +375,32 @@ export async function buildFixture(): Promise<Record<string, unknown>> {
     run_resolved_parameters: (run as unknown as { resolvedParameters?: Record<string, unknown> }).resolvedParameters ?? {},
     wi_state: wi?.state ?? null,
     replayed_steps: harness.calls.map((c) => ({ step: c.step, max_tokens: c.max_tokens, reasoning_effort: c.reasoning_effort ?? null, tools: c.tools })),
-    guard_capture: readFileSync('/tmp/opencode/p3/fixture-replay-guard.jsonl', 'utf-8').trim().split('\n').map((l) => JSON.parse(l)),
+    instantiation_id: instantiationId,
+    issue_input: { path: 'evidence/p3/inputs/issue-108.json', sha256: sha256(ISSUE) },
+    // C1 — capture identity + EXACT reconciliation against this
+    // instantiation's provider calls (the builder fails otherwise)
+    guard_capture: (() => {
+      const cls = classifyGuardCapture(capturePath);
+      const discrepancies = reconcileCapture(cls, harness.calls.map((c) => ({ step: c.step })));
+      if (discrepancies.length > 0) throw new Error(`fixture capture reconciliation failed: ${discrepancies.join('; ')}`);
+      if (cls.stops.length > 0) throw new Error(`fixture capture contains guard STOPs: ${cls.stops.length}`);
+      const perStep: Record<string, number> = {};
+      for (const r of cls.passes) perStep[r.step as string] = (perStep[r.step as string] ?? 0) + 1;
+      return {
+        path: captureRel,
+        sha256: sha256(capturePath),
+        phase: `fixture-replay:${instantiationId}`,
+        request_count: cls.requests.length,
+        pass_count: cls.passes.length,
+        stop_count: cls.stops.length,
+        response_count: cls.responses.length,
+        error_count: cls.errors.length,
+        provider_calls_observed: cls.provider_calls_observed,
+        integrity_failures: cls.integrity_failures,
+        per_step: perStep,
+        reconciled_with_replay_calls: true,
+      };
+    })(),
     published_files: published.map((p) => ({ path: p, sha256: sha256(path.join(ROOT, p)) })),
     fixture_sha256: sha256(tgz),
   };

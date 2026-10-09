@@ -1,0 +1,4 @@
+[journal] {"ts":"2026-10-09T10:43:40.327Z","event":"provider_resolved","model":"z-ai/glm-5.3-flash","maxTokens":16384,"wire_capture":"/tmp/opencode/pilot-a/wire-capture.jsonl"}
+[journal] {"ts":"2026-10-09T10:43:40.332Z","event":"decision_resolving","decisionId":"e9701114-58bc-4063-8dad-40be54ec88b6","optionId":"approve","rationale":"Charter accepted; proceed under the frozen P2-B contract (deterministic closure, v1.1)"}
+[journal] {"ts":"2026-10-09T10:55:18.106Z","event":"decision_resumed","decisionId":"e9701114-58bc-4063-8dad-40be54ec88b6"}
+[journal] {"ts":"2026-10-09T10:55:18.109Z","event":"drive_terminal","wiId":"wi-exec-108","wiState":"failed","runs":[{"status":"halted","step":"design","iteration":1}]}

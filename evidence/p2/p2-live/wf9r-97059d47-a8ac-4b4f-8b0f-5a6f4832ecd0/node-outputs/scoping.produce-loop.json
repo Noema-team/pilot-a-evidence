@@ -1,0 +1,35 @@
+{
+  "node_id": "scoping.produce",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 2,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 1
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 18,
+    "reasoning_bytes": 1428,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 12306,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 2713,
+    "reasoning_tokens": 80,
+    "prompt_tokens": 5122,
+    "total_tokens": 7835,
+    "stream_id": "gen-1791542534-8CGsTeWF3o2S4CTfbgE3",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "OpenInference"
+  }
+}

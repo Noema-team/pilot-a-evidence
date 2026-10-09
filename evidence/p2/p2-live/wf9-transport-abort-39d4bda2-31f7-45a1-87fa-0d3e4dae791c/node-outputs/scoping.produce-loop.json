@@ -1,0 +1,65 @@
+{
+  "node_id": "scoping.produce",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 8,
+  "tool_calls": [
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server",
+      "turn": 1
+    },
+    {
+      "tool": "read_file",
+      "path": "docs/cycle-charter.md",
+      "turn": 1
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/docs",
+      "turn": 2
+    },
+    {
+      "tool": "list_directory",
+      "path": "docs",
+      "turn": 3
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/rag-worker-service/main.py",
+      "turn": 4
+    },
+    {
+      "tool": "list_directory",
+      "path": "apps/ai-server/tests/integration",
+      "turn": 5
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 6
+    },
+    {
+      "tool": "read_source_slice",
+      "path": "apps/ai-server/tests/integration/test_api_contracts.py",
+      "turn": 7
+    }
+  ],
+  "wire_observation": {
+    "reasoning_chunks": 12,
+    "reasoning_bytes": 792,
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_details"
+    ],
+    "content_bytes": 8305,
+    "tool_call_fragments": 0,
+    "finish_reason": "stop",
+    "completion_tokens": 1830,
+    "reasoning_tokens": 45,
+    "prompt_tokens": 9487,
+    "total_tokens": 11317,
+    "stream_id": "gen-1791541937-zrSGDzofjdC5LtXaPL1R",
+    "model": "z-ai/glm-5.3-flash",
+    "provider": "OpenInference"
+  }
+}

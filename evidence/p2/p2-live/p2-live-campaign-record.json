@@ -1,0 +1,67 @@
+{
+ "experiment": "P2 H-protocol-closure — live campaign record",
+ "executed_at_utc": "2026-10-09T08:44–11:05Z",
+ "frozen_implementation": "stratum 9f298f219db927d5065876cf99cdec11e462aa04 (tracked tree clean before, during, after)",
+ "effective_freeze_identity": "a22c44485bb29576451eb4cf99d95cf58088ef80 (binding v4, 34/34 checksums verified pre-execution)",
+ "target": {
+  "start_head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "end_head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256_end": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988 (unchanged — no BUILD ever executed)",
+  "post_campaign_tree": "clean (workflow doc artifacts removed after each run; only campaign .sle infra remains)"
+ },
+ "primary_verdict": "UNEVALUABLE_FOR_ENDPOINT",
+ "endpoint": {
+  "rule": ">= 2 publications in 3 evaluable BUILD opportunities",
+  "publications": 0,
+  "evaluable_build_opportunities": 0,
+  "denominator_note": "the model never reached the BUILD step in any of the 9 workflow slots; the endpoint was never measured",
+  "preregistered_disposition": "Fewer than three BUILD opportunities by the nine-workflow cap produces UNEVALUABLE_FOR_ENDPOINT"
+ },
+ "workflow_slots": {
+  "consumed": 9,
+  "excluded_transport_censored": 1,
+  "note": "wf9 (run 39d4bda2) is EXCLUDED from slots and opportunities per the frozen rule 'transport censoring consumes neither slots nor opportunities' (P1-R precedent 5f79a128, excluded); its retry consumed slot 9"
+ },
+ "workflows": [
+  {"slot": 1, "run": "33534473", "archive": "wf1-33534473", "terminal_step": "design", "classification": "pre-BUILD model failure: format-repair exhaustion (1 repair; never a valid SLE result block; 20 turns; end_turn)", "precedent": "P1-R ef573d80/32b96f25 class"},
+  {"slot": 2, "run": "ac29ceb7", "archive": "wf2-ac29ceb7", "terminal_step": "plan", "classification": "pre-BUILD max_tokens exhaustion (turn 2, finish=length)", "precedent": "P1-R ef573d80/32b96f25"},
+  {"slot": 3, "run": "8d355222", "archive": "wf3-8d355222", "terminal_step": "scoping.produce", "classification": "pre-BUILD max_tokens exhaustion (final synthesis: 16384/16384 completion tokens on reasoning, 1-byte content, finish=length; synthesis-continuation did not rescue)", "precedent": "P1-R ef573d80/32b96f25"},
+  {"slot": 4, "run": "2da9dcb3", "archive": "wf4-2da9dcb3", "terminal_step": "scoping.produce", "classification": "pre-BUILD model failure: charter artifact written to role-forbidden path (docs/cycles/...) -> parser dropped the section -> E25 zero-usable-sections fail-closed", "precedent": "attempt-16 pilot failure class (cited in agent-runner.ts E25 comment)"},
+  {"slot": 5, "run": "78307be3", "archive": "wf5-78307be3", "terminal_step": "design", "classification": "pre-BUILD max_tokens exhaustion (turn 2, finish=length)", "precedent": "P1-R ef573d80/32b96f25"},
+  {"slot": 6, "run": "e293ff8a", "archive": "wf6-e293ff8a", "terminal_step": "scoping.produce", "classification": "pre-BUILD model failure: format-repair exhaustion (1 repair; 20 turns; end_turn; step-failure-observation artifact)", "precedent": "P1-R ef573d80/32b96f25 class"},
+  {"slot": 7, "run": "595c3661", "archive": "wf7-595c3661", "terminal_step": "design", "classification": "pre-BUILD max_tokens exhaustion (turn 19, finish=length, 1-byte text)", "precedent": "P1-R ef573d80/32b96f25"},
+  {"slot": 8, "run": "49477531", "archive": "wf8-49477531", "terminal_step": "plan", "classification": "pre-BUILD max_tokens exhaustion (turn 3, finish=length)", "precedent": "P1-R ef573d80/32b96f25"},
+  {"excluded": true, "run": "39d4bda2", "archive": "wf9-transport-abort-39d4bda2", "terminal_step": "plan", "classification": "TRANSPORT CENSORING: provider stream error mid-generation (wire_observation finish_reason='error'; 2046 content + 3485 reasoning bytes accumulated then stream failed; no transport retry surfaced — the transport returned the partial content as end_turn and the step failed on the truncated text). Consumes neither slot nor opportunity per the frozen sampling rules", "precedent": "P1-R 5f79a128 (infrastructure abort, excluded)"},
+  {"slot": 9, "run": "97059d47", "archive": "wf9r-97059d47", "terminal_step": "design", "classification": "pre-BUILD max_tokens exhaustion (turn 19; 16384/16384 completion tokens on reasoning, 0-byte content)", "precedent": "P1-R ef573d80/32b96f25"}
+ ],
+ "secondary_taxonomy": {
+  "A_accepted / B_staged / C_published / D_validation_reached / E_cleared / F_end_to_end": "0/0 for all — no BUILD opportunity occurred",
+  "checkpoint_decisions_resolved": 5,
+  "resolution_policy": "every scoping checkpoint resolved 'approve' with the recorded frozen-contract rationale (identical to the P1-R operating regime)"
+ },
+ "wire_capture_integrity": {
+  "total_records": 400,
+  "request_response_pairs": "200/200 paired by request_id across all 10 archived captures",
+  "capture_errors": 0,
+  "wrapper": "v3 (21fd6ddc…, binding v4 order 8) — capability-parity Proxy + dual-failure surfacing; no dual-failure or capture-integrity event occurred",
+  "request_side_evidence": "every archived request carries the verbatim tools array (sha-pinned) + submit_result surface (offered:false on all pre-BUILD steps — correct: submit_result only exists on BUILD steps) + teaching markers",
+  "response_side": "response_finish_reason + response_prompt_tokens captured per turn and cross-checked against loop-json wire_observation (spot-checked wf3/wf9: exact match)"
+ },
+ "s_rule_audit": {
+  "S1_authority_bypass": "NOT TRIGGERED — no BUILD ran; zero writes outside workflow doc paths (restored after each run)",
+  "S2_evidence_integrity": "NOT TRIGGERED — no publication occurred; capture integrity verified (200/200 pairs, 0 errors)",
+  "S3_surface_binding": "NOT TRIGGERED — no BUILD run; all archived pre-BUILD requests correctly show no submit_result surface",
+  "S4_target_drift": "NOT TRIGGERED — HEAD 86ec0871 and worker main.py 7d7718bc… verified after every run and at close",
+  "S5_capability_regression": "NOT TRIGGERED — pre-execution preflight: supported_parameters identical to the frozen snapshot; live probe accepted the frozen reasoning.effort='low' shape (reasoning returned, content OK)",
+  "S6_fixture_restore": "NOT TRIGGERED — gate-b PASS (definition 71f1c39c…, 4213/4000 verbatim) on every one of the 9 instantiations",
+  "S7_implementation_defect": "NOT TRIGGERED — no proposal was ever accepted or rejected (no BUILD); all failures are model-caused exhaustion/format classes in frozen mechanics with direct P1-R precedents"
+ },
+ "integrity_observations": [
+  "MODEL REGIME OBSERVATION (not a regression): the OpenRouter /models listing no longer exposes the reasoning_metadata convenience object for z-ai/glm-5.3-flash; supported_parameters (the operative capability list) is byte-identical to the frozen snapshot and a live probe confirmed reasoning.effort handling. Recorded per the honesty rule; no S5.",
+  "DRIVER PROCEDURE CORRECTION (no model traffic, no slot): the first wf2 reset reused the stale .sle DB; drive exited instantly on the previous run's failed WI state. Corrected to P1-R's fresh-DB-per-workflow procedure (rm stratum.db + re-instantiate). The affected attempt made zero provider calls and consumed nothing; its console log was overwritten by the real wf2 attempt.",
+  "BUDGET-CENSORING BOUNDARY: per addendum 2, a token-truncated BUILD repair would have been an evaluable opportunity — moot this campaign (no BUILD step was reached; all max_tokens failures occurred pre-BUILD and follow the ef573d80/32b96f25 slot-consumption precedent).",
+  "EFFORT OBSERVATION: 5 of 9 slot-consuming failures were max_tokens exhaustions dominated by reasoning tokens (16384/16384 on reasoning with zero visible content twice) — consistent with the frozen regime's mandatory reasoning behavior under effort settings; recorded as observation, not intervention."
+ ],
+ "no_intervention_statement": "No mid-campaign code, configuration, prompt, budget, or protocol change occurred. The frozen sampling plan and stop rules were applied without modification; the transport-censoring exclusion is the preregistered rule, not a judgment call made post hoc.",
+ "archives": "evidence/p2/p2-live/wf*/ (per-run node-outputs + full wire-capture.jsonl + console logs); driver journal entries in evidence/run-journal.jsonl"
+}

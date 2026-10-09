@@ -1,0 +1,90 @@
+{
+ "artifact": "P3 QUALIFICATION FREEZE \u2014 draft-phase hash pins for the operator's P3 design review (binding follows at preregistration approval)",
+ "generated_at_utc": "2026-10-09T20:10:00Z",
+ "implementation": {
+  "stratum": "9f298f219db927d5065876cf99cdec11e462aa04 (untouched throughout)",
+  "target": "86ec0871d64ecca8732434c11d015fd8e08ddc7e (pristine after qualification)"
+ },
+ "fixture_identity": {
+  "note": "the tgz is rebuilt per instantiation (uuid/timestamp-bearing); its IDENTITY is pinned by the manifest's deterministic fields, all re-verified on every rebuild by the qualification",
+  "fixture_sha256_at_qualification": "2bb805feb6654658f131ffd283b850e366f5dc4cc0141d5acd213f702a8267d4",
+  "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+  "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+  "published_files": [
+   {
+    "path": "docs/cycle-charter.md",
+    "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62"
+   },
+   {
+    "path": "docs/requirements.md",
+    "sha256": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e"
+   },
+   {
+    "path": "docs/architecture.md",
+    "sha256": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57"
+   },
+   {
+    "path": "docs/plan.md",
+    "sha256": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222"
+   },
+   {
+    "path": "docs/test-plan.md",
+    "sha256": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e"
+   },
+   {
+    "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+    "sha256": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293"
+   }
+  ],
+  "run_cursor": "confirm",
+  "run_resolved_parameters": {
+   "planning_depth": "minimal",
+   "max_iterations": 5,
+   "on_cap_hit": "halt",
+   "definitionSource": {
+    "workItemId": "wi-define-108-a8"
+   },
+   "editPolicy": {
+    "appliesToSteps": [
+     "build"
+    ],
+    "allowedEditPaths": [
+     "apps/ai-server/rag-worker-service/main.py"
+    ],
+    "requiredEditPaths": [
+     "apps/ai-server/rag-worker-service/main.py"
+    ]
+   }
+  }
+ },
+ "pins": [
+  {
+   "path": "evidence/p3/config-guard.mts",
+   "sha256": "7f49bc41d31faf30f0c7025ac2d9baa8044bd848358b1a8f7aabfd04dd897f19"
+  },
+  {
+   "path": "evidence/p3/p3-fixture-builder.mts",
+   "sha256": "5762d6b0b8227cfd4c5a8de638264debdfa7e46a3f6076464e4519b61fe7dc10"
+  },
+  {
+   "path": "evidence/p3/p3-qualification.mts",
+   "sha256": "b01bdb99cb9ca9a8e15096d8a391cc81403cb3e8d3a463357f2c5781f8ce4710"
+  },
+  {
+   "path": "evidence/p3/p3-qualification-output.txt",
+   "sha256": "3a2ac30eb22b5a10ce062d043148a7df85e27c92ff8d352dbb18c738bfcb4e02"
+  },
+  {
+   "path": "evidence/p3/p3-build-entry-fixture-manifest.json",
+   "sha256": "d1d5615d18040b32d91cc329aaf3d746840484be443236d72dc20fb4810f015f"
+  },
+  {
+   "path": "evidence/p3/p3-preregistration.json",
+   "sha256": "93005999ca22ba93a70c8e4c75a780694466c83a2683aa8d49e4061141d2af6f"
+  }
+ ],
+ "verification": "sha256sum -c evidence/p3/p3-qualification-freeze.sha256 from a fresh clone of Noema-team/pilot-a-evidence (branch p2-freeze-evidence)",
+ "execution_status": "DRAFT \u2014 no live P3 execution until the operator approves this preregistration and issues GO"
+}

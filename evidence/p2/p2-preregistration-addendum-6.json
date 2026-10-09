@@ -1,0 +1,39 @@
+{
+ "artifact": "P2 preregistration ADDENDUM 6 — dated corrections per the operator's P2 experiment review: (a) classification correction of run 39d4bda2 (the transport-censoring exclusion did not satisfy addendum 2 as written), (b) out-of-protocol disclosure of the wf9r retry, (c) frozen-regime deviation disclosure (per-step budgets absent campaign-wide). No historical artifact is modified; the primary verdict is unchanged.",
+ "amendment_utc": "2026-10-09T13:30:00Z",
+ "amends": {
+  "original_preregistration_sha256_unchanged": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa",
+  "addenda_1_through_5_unchanged": "all prior hashes re-pinned identically in binding v5",
+  "campaign_record_preserved_byte_identical": "evidence/p2/p2-live/p2-live-campaign-record.json (sha d137262bdf3ca71e...) — its wf9 classification and 'no_intervention' claims are SUPERSEDED by this addendum, not rewritten"
+ },
+ "correction_1_censored_run_adjudication": {
+  "run": "39d4bda2-31f7-45a1-87fa-0d3e4dae791c (wf9, terminal step plan)",
+  "original_classification": "transport censoring — excluded from slots and opportunities (journal 653efc5)",
+  "corrected_classification": "slot-consuming pre-BUILD failure (ninth workflow slot)",
+  "basis": "operator ruling accepted: 2,046 bytes of model-attributable content entered the archive; plan-loop.json records stop_reason=end_turn; the wrapper recorded a normally-paired request/response (no thrown provider exception); the step failed through the ordinary format-repair path. Addendum 2 permits post-model infrastructure censoring only under narrow conditions including NO model-attributable content in the archive, and ambiguous cases are NOT to be censored. The exclusion did not satisfy the frozen rule as written.",
+  "wire_note_preserved": "the wire_observation finish_reason='error' remains a genuine observation (the stream terminated abnormally mid-generation); under addendum 2 it does not license censoring given the archived model content — it is recorded as an integrity observation on a slot-consuming run"
+ },
+ "correction_2_out_of_protocol_retry": {
+  "run": "97059d47-a8ac-4b4f-8b0f-5a6f4832ecd0 (wf9r, terminal step design)",
+  "disposition": "OUT-OF-PROTOCOL tenth workflow: under the corrected accounting the campaign consumed its ninth and final slot with 39d4bda2 and should have STOPPED at the preregistered boundary; the retry exceeded the nine-workflow limit because of the run-time misclassification. Records preserved in full; the run is excluded from every denominator and from all reported counts."
+ },
+ "correction_3_frozen_regime_deviation": {
+  "summary": "ALL TEN P2 runs executed with the REDUCED five-key settings file (global max_tokens 16384; no workflow_max_tokens; no workflow_reasoning_effort) instead of the frozen 5634b2e8 bytes — the per-step 32768 budgets for design/plan/test/build never reached any request",
+  "root_cause": "the untracked campaign driver's seed() (pilot-a-driver.ts:76-83) unconditionally overwrites ROOT/.sle/settings.json with the reduced config on every instantiate; the frozen file was verified only BEFORE the first instantiate and was silently replaced from wf1 onward",
+  "evidence": "forensic report evidence/p2/forensics/p2-upstream-forensics.md — six length-termini at exactly 16384 (never 32768) vs P1-R termini at exactly 32768 under the same settings sha; P1-R archives carry the full frozen file in all five runs; the runtime file equals the seed() output byte-for-byte",
+  "classification": "campaign-procedure defect in campaign tooling. Stratum src/ at 9f298f2 is byte-identical to the P1-R frozen commit (c0060f09) in every budget-plumbing path and was never modified",
+  "impact_on_results": "the campaign's dominant failure class (5/9 slot-consuming failures: max_tokens termini at 16384) sits exactly on the perturbed parameter; P2 therefore did not measure the preregistered frozen regime — it measured a degraded-budget variant. The endpoint remains UNEVALUABLE_FOR_ENDPOINT a fortiori (zero BUILD opportunities under a regime strictly harder for upstream progression than the frozen one)",
+  "not_an_s_trigger_determination": "this is disclosed as a frozen-regime deviation discovered post hoc, not adjudicated under S1-S7 (no rule contemplates silent campaign-config corruption; the operator's review governs the disposition)"
+ },
+ "primary_verdict": {
+  "verdict": "UNEVALUABLE_FOR_ENDPOINT — UNCHANGED",
+  "accounting": "slots 1-9 = wf1..wf9 (0 BUILD opportunities); wf9r excluded as out-of-protocol",
+  "publications": 0
+ },
+ "wire_capture_wrapper_gap": "the wrapper does not record outbound max_tokens (operator-noted); any successor campaign's wrapper MUST archive the resolved per-step budget (and ideally the full outbound parameter set) per request so request-side budget compliance is directly verifiable",
+ "unchanged": [
+  "the frozen implementation 9f298f2 (untouched; tree clean)",
+  "the preregistration, addenda 1-5, and every previously frozen artifact",
+  "the wire-capture archive set (400 records, 200/200 pairs, 0 capture errors) — its classification layer is corrected by this addendum, its bytes are untouched"
+ ]
+}

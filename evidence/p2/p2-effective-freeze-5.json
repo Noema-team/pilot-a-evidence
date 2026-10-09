@@ -1,0 +1,57 @@
+{
+ "artifact": "P2 EFFECTIVE FREEZE BINDING v5 \u2014 additive post-campaign extension: addendum 6 (operator-review corrections) + upstream forensics + the live campaign record; every earlier element re-pinned unchanged",
+ "generated_at_utc": "2026-10-09T13:40:00Z",
+ "supersedes": {
+  "v4_path": "evidence/p2/p2-effective-freeze-4.json",
+  "v4_sha256": "b0f9e8de3d144ea4d1965af0b4ae7cb9b34e2ae1e91edc01646d7ec065994fcf",
+  "scope": "post-campaign corrections only (classification of 39d4bda2; wf9r out-of-protocol; frozen-regime deviation disclosure). Implementation unchanged (9f298f2). No protocol redesign; live P2 remains CLOSED."
+ },
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "verified_untouched_after_campaign_and_audit": true
+ },
+ "campaign_result": {
+  "primary_verdict": "UNEVALUABLE_FOR_ENDPOINT (unchanged)",
+  "slots_1_to_9": "wf1..wf9, 0 BUILD opportunities",
+  "out_of_protocol": "wf9r (excluded from all denominators)"
+ },
+ "chain": [
+  {
+   "order": 1,
+   "role": "preregistration (original)",
+   "path": "evidence/p2/p2-preregistration.json",
+   "sha256": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa"
+  },
+  {
+   "order": 2,
+   "role": "binding v4 chain (orders 1-14 preserved)",
+   "path": "evidence/p2/p2-effective-freeze-4.json",
+   "sha256": "b0f9e8de3d144ea4d1965af0b4ae7cb9b34e2ae1e91edc01646d7ec065994fcf"
+  },
+  {
+   "order": 3,
+   "role": "live campaign record (bytes preserved; classification superseded by addendum 6)",
+   "path": "evidence/p2/p2-live/p2-live-campaign-record.json",
+   "sha256": "d137262bdf3ca71e0ed75fc02356448f1fe62648643b3c76ac5b0a0eceba67dd"
+  },
+  {
+   "order": 4,
+   "role": "upstream forensics (budget/settings/routing/token-accounting audit)",
+   "path": "evidence/p2/forensics/p2-upstream-forensics.md",
+   "sha256": "017d46c91ce9c7ab6feb27dbd0ff960ad1406a11c422a291c417d42f62c83c99"
+  },
+  {
+   "order": 5,
+   "role": "addendum 6 (operator-review corrections)",
+   "path": "evidence/p2/p2-preregistration-addendum-6.json",
+   "sha256": "610d5606148053e12b458a8c2d64e260a2795023d962519f086b53245f565f7e"
+  }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p2/p2-effective-freeze-5.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public) and run sha256sum -c evidence/p2/p2-effective-freeze-5.sha256; all earlier chains verify against their historical commits"
+ },
+ "execution_status": "CLOSED \u2014 P2 complete (UNEVALUABLE_FOR_ENDPOINT). No live execution until the operator preregisters a successor experiment."
+}

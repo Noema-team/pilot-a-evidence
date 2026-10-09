@@ -23,7 +23,7 @@ import type { WorkflowEngineDeps } from '/home/theo/Documents/coding/repos/strat
 import type { StepRunner, StepRunContext, StepRunOutcome } from '/home/theo/Documents/coding/repos/stratum/src/workflow/types.js';
 import { resolveLLMProvider } from '/home/theo/Documents/coding/repos/stratum/src/application.js';
 import {
-  createConfigGuardProvider, classifyGuardCapture,
+  createConfigGuardProvider, classifyGuardCapture, ConfigGuardViolation,
   type StepContract, type CaptureClassification,
 } from './config-guard.mts';
 
@@ -88,8 +88,29 @@ export function mapCaptureToStop(cls: CaptureClassification): CampaignStop {
   return null;
 }
 
+// Launch review §3 — a capture-write failure surfaces as an EXCEPTION even
+// when no readable capture record exists. The campaign must classify that as
+// G2 directly from the exception, never depend exclusively on reading a file.
+export function classifyViolation(err: unknown): CampaignStop {
+  if (err instanceof ConfigGuardViolation) {
+    return err.dimension === 'evidence-integrity' ? 'G2' : 'G1';
+  }
+  return null;
+}
+
 export function classifyAttempt(capturePath: string): { cls: CaptureClassification; stop: CampaignStop } {
-  const cls = classifyGuardCapture(capturePath);
+  let cls: CaptureClassification;
+  try {
+    cls = classifyGuardCapture(capturePath);
+  } catch (err) {
+    // unreadable/missing capture is itself a G2 integrity failure
+    cls = {
+      total_lines: 0, parse_failures: [], requests: [], passes: [], stops: [], responses: [],
+      errors: [], provider_calls_observed: 0,
+      integrity_failures: [`capture unreadable (${err instanceof Error ? err.message : String(err)}) — G2`],
+      g1: false, g2: true,
+    };
+  }
   return { cls, stop: mapCaptureToStop(cls) };
 }
 
@@ -104,13 +125,20 @@ export interface ComposedBuildAttempt {
   classifyAttempt: () => { cls: CaptureClassification; stop: CampaignStop };
 }
 
-export function composeBuildAttempt(projectRoot: string, attemptId: string = randomUUID()): ComposedBuildAttempt {
+export function composeBuildAttempt(
+  projectRoot: string,
+  attemptId: string = randomUUID(),
+  // offline-test overrides ONLY — the live campaign never passes these; the
+  // live path is exactly: real provider + buildContract, unchanged
+  overrides?: { innerProvider?: unknown; contract?: () => StepContract },
+): ComposedBuildAttempt {
   const { provider, model } = resolveLLMProvider(projectRoot);
   if (model !== P3_MODEL_REGIME.model) {
     throw new Error(`p3-live-driver: resolved model ${model} != frozen ${P3_MODEL_REGIME.model}`);
   }
   const capturePath = join(projectRoot, '.sle', 'p3-captures', attemptId, 'build-attempt-guard.jsonl');
-  const guarded = createConfigGuardProvider(provider, () => buildContract(model), {
+  const inner = (overrides?.innerProvider ?? provider) as Parameters<typeof createConfigGuardProvider>[0];
+  const guarded = createConfigGuardProvider(inner, overrides?.contract ?? (() => buildContract(model)), {
     capturePath,
     phase: `build-attempt:${attemptId}`,
     settingsPath: join(projectRoot, '.sle', 'settings.json'),
@@ -118,6 +146,46 @@ export function composeBuildAttempt(projectRoot: string, attemptId: string = ran
   });
   return {
     attemptId,
+    capturePath,
+    model,
+    provider: guarded,
+    classifyAttempt: () => classifyAttempt(capturePath),
+  };
+}
+
+// Launch review §3 — the preflight probe is a DISTINCT composed path: its own
+// capture namespace (preflight-*), its own contract (tiny budget, no tools),
+// never counted as a BUILD attempt. At GO the driver dials ONE tiny
+// completion through it and enforces that the wire accepted the frozen
+// 'low' effort (the guard enforces it on the request; acceptance is proven
+// by a successful response archived with wire_observation).
+export interface ComposedPreflight {
+  probeId: string;
+  capturePath: string;
+  model: string;
+  provider: unknown;
+  classifyAttempt: () => { cls: CaptureClassification; stop: CampaignStop };
+}
+
+export function composePreflight(
+  projectRoot: string,
+  probeId: string = randomUUID(),
+  overrides?: { innerProvider?: unknown },
+): ComposedPreflight {
+  const { provider, model } = resolveLLMProvider(projectRoot);
+  if (model !== P3_MODEL_REGIME.model) {
+    throw new Error(`p3-live-driver: resolved model ${model} != frozen ${P3_MODEL_REGIME.model}`);
+  }
+  const capturePath = join(projectRoot, '.sle', 'p3-captures', `preflight-${probeId}`, 'preflight-guard.jsonl');
+  const inner = (overrides?.innerProvider ?? provider) as Parameters<typeof createConfigGuardProvider>[0];
+  const guarded = createConfigGuardProvider(inner, () => preflightContract(model), {
+    capturePath,
+    phase: `preflight:${probeId}`,
+    settingsPath: join(projectRoot, '.sle', 'settings.json'),
+    expectedSettingsSha256: P3_MODEL_REGIME.settings_sha256,
+  });
+  return {
+    probeId,
     capturePath,
     model,
     provider: guarded,

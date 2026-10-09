@@ -1,0 +1,129 @@
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:55.236Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:55.240Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:55.242Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:55.305Z","event":"p3_fixture_decision","decisionId":"f58284c3-c5db-4e79-b20c-247452f37ffd","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:55.351Z","event":"p3_fixture_confirm_gate_pending","decisionId":"27aadb39-ac73-43e1-9775-fa1812cf728b","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:55.382Z","event":"p3_fixture_built","fixture_sha256":"2d643e77af26","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+PASS R1 (publication): 1 evaluable PUBLISHED attempt; boundary refused downstream; evidence archived; target restored
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:55.528Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:55.530Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:55.531Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:55.560Z","event":"p3_fixture_decision","decisionId":"035314bc-76e5-4109-8bc3-5baa229abc15","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:55.603Z","event":"p3_fixture_confirm_gate_pending","decisionId":"09a578ad-c5a5-4a78-a585-c4435c4b5113","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:55.630Z","event":"p3_fixture_built","fixture_sha256":"71523a4af125","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+PASS R2 (model failure): 1 evaluable MODEL-FAILURE; clean capture; model reached; no publication; counts against the denominator
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:55.758Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:55.760Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:55.761Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:55.786Z","event":"p3_fixture_decision","decisionId":"a30f632c-928e-4a7d-950d-a7242607aa98","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:55.822Z","event":"p3_fixture_confirm_gate_pending","decisionId":"57e07f30-e287-47c4-88df-98f120b7b990","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:55.860Z","event":"p3_fixture_built","fixture_sha256":"04160c846cee","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+PASS R3 (G1 STOP): immediate abort; attempt not counted; 0 model calls
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:56.005Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:56.007Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:56.008Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:56.033Z","event":"p3_fixture_decision","decisionId":"be3d3f10-1353-4480-8aa2-77af01429591","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.076Z","event":"p3_fixture_confirm_gate_pending","decisionId":"496ff87b-cd09-4bce-a69f-b752e4820f33","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.102Z","event":"p3_fixture_built","fixture_sha256":"db391249a412","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+PASS R4 (G2 from exception): response-archive failure classified G2 from the exception; attempt not counted
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:56.224Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:56.225Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:56.227Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:56.250Z","event":"p3_fixture_decision","decisionId":"0aff680c-f7c5-4644-831e-ebddbbb65225","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.288Z","event":"p3_fixture_confirm_gate_pending","decisionId":"756908c1-b0af-4203-af80-3634bc286e59","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.318Z","event":"p3_fixture_built","fixture_sha256":"5644c15b6b31","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:56.416Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:56.419Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:56.420Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:56.448Z","event":"p3_fixture_decision","decisionId":"110ff2d3-071d-42d5-a803-817fd0e9f78d","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.479Z","event":"p3_fixture_confirm_gate_pending","decisionId":"4a3b5d4f-9dde-4f3a-ad1d-3e3a8c35c3ee","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.507Z","event":"p3_fixture_built","fixture_sha256":"1b6323d5f358","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-09T22:10:56.609Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T22:10:56.611Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T22:10:56.613Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T22:10:56.637Z","event":"p3_fixture_decision","decisionId":"c4f22d5e-7492-4263-9c60-7dbc971437ba","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.671Z","event":"p3_fixture_confirm_gate_pending","decisionId":"42987691-4450-49da-80f1-8f8f906389bb","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T22:10:56.697Z","event":"p3_fixture_built","fixture_sha256":"6cdb4e381fc9","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+PASS R5 (stop-at-three): terminal after exactly 3 evaluable attempts (3 publications)
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+PASS R6 (preflight separation): preflight STOP aborts before attempt 1 counting nothing; probe path is distinct and verified
+PASS R7 (fail-closed evidence): missing capture -> G2; violations classify from the exception alone
+
+P3 RUNNER QUALIFICATION: ALL PASS (zero completion traffic)

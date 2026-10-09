@@ -1,0 +1,117 @@
+{
+ "artifact": "P3 EFFECTIVE FREEZE BINDING v2 \u2014 ADDITIVE launch-integration extension: the executable campaign runner + its offline qualification; freeze-1 re-pinned UNCHANGED",
+ "generated_at_utc": "2026-10-09T21:55:00Z",
+ "approval": {
+  "ruling": "P3 FREEZE-1 REVIEW: BINDING ACCEPTED, LIVE HOLD \u2014 one launch-integration gate: qualify the executable campaign lifecycle",
+  "freeze1_commit": "9828844d0871b62cae46bf92e8407178e92a4080",
+  "freeze1_pins_unchanged": "13/15 re-verified locally"
+ },
+ "additivity": "v2 adds ONLY the executable runner layer (p3-live-runner.mts), two driver additions required by the launch review (composePreflight distinct path; exception-hardened G1/G2 classification), and the runner qualification. The approved hypothesis, denominator, model regime, BUILD protocol, fixture authority, frozen Stratum, and all freeze-1 bytes are untouched.",
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04"
+ },
+ "target": {
+  "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "pristine": true,
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "executable_runner": {
+  "artifact": "evidence/p3/p3-live-runner.mts",
+  "imports": "evidence/p3/p3-live-driver.mts (the pinned composition) \u2014 composeBuildAttempt is the sole model path; publicationBoundaryRunner is the actual step runner",
+  "lifecycle": [
+   "GO-time preflight through the SEPARATE composePreflight path (preflight-* capture namespace, preflightContract tiny budget, never counted; a STOP aborts before attempt 1)",
+   "per attempt: restore + validate the pinned fixture (buildFixture re-verifies all pinned boundary properties; failure = FIXTURE-RESTORE STOP consuming nothing)",
+   "attempt through the real engine under the boundary; classify BEFORE counting: G1/G2 (capture or exception) -> STOP not counted; provenance+disk publication -> PUBLISHED; clean capture + model reached + no publication -> MODEL-FAILURE (evaluable)",
+   "evidence archived per attempt (fail closed on missing/empty capture)",
+   "stops after exactly 3 evaluable attempts or immediately on a campaign STOP; target restored pristine at every terminal state"
+  ]
+ },
+ "runner_qualification": {
+  "artifact": "evidence/p3/p3-runner-qualification-output.txt",
+  "verdict": "ALL PASS (R1-R7), zero completion traffic",
+  "scenarios": {
+   "R1": "successful publication through the runner (1 evaluable PUBLISHED, boundary refusal, evidence archived, target restored)",
+   "R2": "model-attributable failure (clean capture, model reached, no publication; consumes the denominator)",
+   "R3": "G1 STOP (immediate abort, attempt not counted, 0 model calls)",
+   "R4": "G2 STOP from a capture-write failure (exception-hardened classification; attempt not counted)",
+   "R5": "stop-at-three (exactly 3 evaluable attempts, 3 publications, terminal)",
+   "R6": "preflight separation (preflight STOP aborts before attempt 1 counting nothing; probe path distinct)",
+   "R7": "fail-closed evidence (missing capture -> G2; violations classify from the exception alone)"
+  }
+ },
+ "launch_review_details_closed": {
+  "preflight_wiring": "composePreflight() is a distinct composed path (own namespace + preflightContract); the runner wires it separately from counted BUILD attempts; the GO-time probe enforces the frozen 'low' effort on the wire (guard-enforced) and requires an accepted archived response",
+  "evidence_integrity_exceptions": "classifyViolation() classifies ConfigGuardViolation dimensions directly (evidence-integrity -> G2; config/completion-path -> G1) with no readable capture required; classifyAttempt() treats an unreadable/missing capture as G2; the runner consults both"
+ },
+ "chain": [
+  {
+   "path": "evidence/p3/p3-live-driver.mts",
+   "sha256": "d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf"
+  },
+  {
+   "path": "evidence/p3/p3-live-runner.mts",
+   "sha256": "a59f090e262b4f4bd15bbbb132ddfb06c9d324e23ec9cef733bd1aa688adb3b1"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification.mts",
+   "sha256": "4ff63768462855f59d7a469a1ccfa4588b189d6c86b1f2261185e0406f73e3b5"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification-output.txt",
+   "sha256": "9efd8757c156f778eca17f93a6b41955aded740d6da1924be96d4c56b0521df7"
+  }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p3/p3-effective-freeze-2.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public); run sha256sum -c evidence/p3/p3-effective-freeze-2.sha256 (v2) and sha256sum -c evidence/p3/p3-effective-freeze-1.sha256 (freeze-1, unchanged)"
+ },
+ "execution_status": "BOUND v2 \u2014 awaiting the operator's final live-GO review. No live P3 executed (zero completion traffic).",
+ "supersedes": {
+  "v1_path": "evidence/p3/p3-effective-freeze-1.sha256",
+  "v1_sha256": "86e1011a126393331804feb422072c216a41c068c1487c77cab4f3925c715d2d",
+  "v1_binding_file_unchanged": true,
+  "pin_status": "13/15 pins byte-identical; TWO pins moved, both accounted:",
+  "moved_pins": [
+   {
+    "path": "evidence/p3/p3-live-driver.mts",
+    "freeze1_sha256": "3337964f8043db1bc704f01777696d9d8941f872df75580bcc94aa9958586a17",
+    "current_sha256": "d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf",
+    "reason": "the launch review's TWO REQUIRED additions: composePreflight (distinct preflight path, wired separately from counted attempts) and exception-hardened classification (classifyViolation + classifyAttempt failing closed on unreadable captures). No other change to the composition; the live model path (composeBuildAttempt default) is byte-identical in behavior."
+   },
+   {
+    "path": "evidence/p3/p3-build-entry-fixture-manifest.json",
+    "freeze1_sha256": "7af9c68f667a88f0864a7f9b12a0172641618b1d50d7c94ef6ba050d7c5fe369",
+    "current_sha256": "9fe3f68762e664407bc46746a8034639db02822e13bcd3c7d9ca521cff02f32d",
+    "reason": "the manifest is REGENERATED on every fixture instantiation by design (uuid/timestamp-bearing snapshot); the runner qualification's rebuilds rewrote it. Its DETERMINISTIC identity fields are unchanged and remain the binding authority:",
+    "identity_fields_unchanged": {
+     "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+     "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+     "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+     "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+     "run_cursor": "confirm",
+     "run_resolved_parameters": {
+      "planning_depth": "minimal",
+      "max_iterations": 5,
+      "on_cap_hit": "halt",
+      "definitionSource": {
+       "workItemId": "wi-define-108-a8"
+      },
+      "editPolicy": {
+       "appliesToSteps": [
+        "build"
+       ],
+       "allowedEditPaths": [
+        "apps/ai-server/rag-worker-service/main.py"
+       ],
+       "requiredEditPaths": [
+        "apps/ai-server/rag-worker-service/main.py"
+       ]
+      }
+     }
+    }
+   }
+  ]
+ }
+}

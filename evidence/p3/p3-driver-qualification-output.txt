@@ -1,0 +1,6 @@
+PASS D1 (composition): real OpenRouter provider under the guard; mismatched/blocked requests STOP pre-call (0 dialing); construction fails closed; frozen contracts carry the approved values
+PASS D2 (recognition): clean->null, config STOP->G1, evidence-integrity STOP->G2, unpaired PASS->G2
+PASS D3 (boundary): publication detected; 3/3 downstream dispatches refused with the sentinel before execution
+PASS D4 (zero-completion preflight): OpenRouter reachable; key valid; model listed; supported_parameters include reasoning controls: true (21 params)
+
+P3 LIVE-DRIVER QUALIFICATION: ALL PASS (zero completion traffic)

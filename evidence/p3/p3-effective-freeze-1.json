@@ -1,0 +1,114 @@
+{
+ "artifact": "P3 EFFECTIVE FREEZE BINDING v1 \u2014 dated binding of the APPROVED P3 preregistration (draft v3) and all launch-preparation artifacts",
+ "generated_at_utc": "2026-10-09T21:25:00Z",
+ "approval": {
+  "ruling": "P3 FINAL PREREGISTRATION: APPROVED \u2014 GO TO FREEZE (live execution remains unauthorized until a separate GO)",
+  "approved_draft_commit": "d02a88296e7b1ba8e03cec47b5bdd48fcdc017bb",
+  "approved_draft_unchanged": true
+ },
+ "supersedes": {
+  "v_path": "evidence/p3/p3-qualification-freeze.sha256 (v3 draft pins)",
+  "v_sha256": "13a72b0d76beb9801f525bea54acbcf233d6d18c7a956764c761ab7901220c28",
+  "scope": "binding only; the approved draft bytes are re-pinned UNCHANGED (additivity verified: 10/10)",
+  "chain_continuity": {
+   "p2_effective_freeze_5_sha256": "6feac51ce76a37ab017ac8d8469398cdc199173a6c9e502ea5e500c29efffedf"
+  }
+ },
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "verified_untouched": true
+ },
+ "target": {
+  "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "pristine": true,
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "experimental_contract": {
+  "id": "H-build-entry-publication",
+  "endpoint": ">=2 successful publications in 3 evaluable BUILD-entry attempts",
+  "boundary": "validated upstream fixture -> confirm approval -> BUILD -> publication -> positive halt -> pristine restoration",
+  "model_regime": {
+   "provider": "openrouter",
+   "model": "z-ai/glm-5.3-flash",
+   "build_max_tokens": 32768,
+   "build_reasoning_effort": "low",
+   "temperature": 0.7,
+   "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2"
+  },
+  "stop_rules": "G1 config-guard STOP; G2 capture-integrity; S2-S6 as preregistered; procedure-class attempts consume no denominator",
+  "criterion_interpretation": "narrow engineering qualification threshold, not a general statistical reliability estimate"
+ },
+ "campaign_tooling": {
+  "composition": "evidence/p3/p3-live-driver.mts \u2014 the ONLY provider/guard/boundary/recognition wiring the live driver may use",
+  "composition_qualification": "evidence/p3/p3-driver-qualification-output.txt \u2014 ALL PASS, zero completion traffic"
+ },
+ "chain": [
+  {
+   "path": "evidence/p3/p3-preregistration.json",
+   "sha256": "f940f0b84f25db7a7ed3e831813cb2dbaee77b93228db0df988e78fe0b94802a"
+  },
+  {
+   "path": "evidence/p3/config-guard.mts",
+   "sha256": "64214721f3618ce7ce8375689788aeca61a74a176cff24350b096f0ba7cf1c62"
+  },
+  {
+   "path": "evidence/p3/p3-fixture-builder.mts",
+   "sha256": "c14cd64dae5364c29fde8536e9401af54910bb9bd81de4e6a53a6768d4ecd399"
+  },
+  {
+   "path": "evidence/p3/p3-qualification.mts",
+   "sha256": "03df9bad457c202e142170c501341c850579dfa5987a765ecfae469ecaa4d20c"
+  },
+  {
+   "path": "evidence/p3/p3-qualification-output.txt",
+   "sha256": "62f9d4943afe14f14b3f5da6d1981e3170f3d3a8fb1a27507a3e354d96c89b4b"
+  },
+  {
+   "path": "evidence/p3/p3-build-entry-fixture-manifest.json",
+   "sha256": "7af9c68f667a88f0864a7f9b12a0172641618b1d50d7c94ef6ba050d7c5fe369"
+  },
+  {
+   "path": "evidence/p3/inputs/issue-108.json",
+   "sha256": "dd40147291edb7412eb0ccf57c3cadbd3f19ac8d7299306c0bc880419eb124c5"
+  },
+  {
+   "path": "evidence/p3/p3-q4-build-attempt-capture.jsonl",
+   "sha256": "811a61af6713c0f448f103fb1763d231445c7b98b83962b6f55c2d4a2430625d"
+  },
+  {
+   "path": "evidence/p3/p3-q5-g1-probe-capture.jsonl",
+   "sha256": "ef1b3e14e9bfe793674edb9081a848743046210e26e99bccd0b94c61e4fb383c"
+  },
+  {
+   "path": "evidence/p3/p3-qualification-freeze.json",
+   "sha256": "eae52b6f2bec44d397f50ce95a32ee8995f11c462b0a02cf4d3e2b12aa3c207c"
+  },
+  {
+   "path": "evidence/p3/p3-qualification-freeze.sha256",
+   "sha256": "13a72b0d76beb9801f525bea54acbcf233d6d18c7a956764c761ab7901220c28"
+  },
+  {
+   "path": "evidence/p3/p3-live-driver.mts",
+   "sha256": "3337964f8043db1bc704f01777696d9d8941f872df75580bcc94aa9958586a17"
+  },
+  {
+   "path": "evidence/p3/p3-driver-qualification.mts",
+   "sha256": "5481c0ab297f7c16204b74efab3e9091fba9b0d21f6b03e77cb18f97d7046f04"
+  },
+  {
+   "path": "evidence/p3/p3-driver-qualification-output.txt",
+   "sha256": "32eda6e2423bd8f67f9e8ddfa8a3a9ffee0d5f4a15ccf2e8274d1296af18aaf4"
+  },
+  {
+   "path": "evidence/p3/p3-pre-execution-verification.json",
+   "sha256": "b1c4749f60429cf2c4d0cca6931c239c6367b5e6e6a52c43d44383f67c42e176"
+  }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p3/p3-effective-freeze-1.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public) and run sha256sum -c evidence/p3/p3-effective-freeze-1.sha256"
+ },
+ "execution_status": "BOUND \u2014 awaiting the operator's separate live GO. No live P3 executed during freeze preparation (zero completion traffic)."
+}

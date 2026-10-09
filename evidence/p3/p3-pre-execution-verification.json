@@ -1,0 +1,62 @@
+{
+ "artifact": "P3 PRE-EXECUTION VERIFICATION \u2014 freeze-identity and launch-readiness report for the operator's final live-GO decision",
+ "generated_at_utc": "2026-10-09T21:25:00Z",
+ "approved_prereg": {
+  "commit": "d02a88296e7b1ba8e03cec47b5bdd48fcdc017bb",
+  "status": "APPROVED (final ruling); no changes since approval \u2014 bytes re-pinned in this freeze"
+ },
+ "implementation": {
+  "stratum": {
+   "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+   "clean_tree": true,
+   "matches_frozen": true
+  },
+  "target": {
+   "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+   "matches_pristine": true,
+   "tree_clean_excluding_sle": true,
+   "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+   "worker_main_matches_pristine": true
+  }
+ },
+ "evidence_bindings": {
+  "qualification_freeze_v3": {
+   "pins_verified_locally": "10/10",
+   "note": "operator independently verified 10/10 at d02a882; re-verified locally unchanged"
+  },
+  "effective_freeze_1": "evidence/p3/p3-effective-freeze-1.sha256 (this freeze; verify from a fresh public clone)"
+ },
+ "model_regime_checks": {
+  "resolved_model": "z-ai/glm-5.3-flash",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "api_key_present": true,
+  "openrouter_models_preflight": {
+   "method": "GET /models (ZERO completion traffic)",
+   "http_status": 200,
+   "model_listed": true,
+   "reasoning_controls_supported": true
+  }
+ },
+ "driver_composition_qualification": {
+  "artifact": "evidence/p3/p3-driver-qualification-output.txt",
+  "verdict": "ALL PASS (D1-D4), zero completion traffic",
+  "proves": [
+   "the exact live composition (p3-live-driver.mts) resolves the real OpenRouter provider from the frozen fixture settings and wraps it with the approved guard",
+   "mismatched and blocked-path requests STOP pre-call on the real composition (0 dialing; the forward path is the only dialing path and its mechanics are proven in Q1/Q4)",
+   "construction fails closed on divergent settings",
+   "campaign-loop recognition: config STOP -> G1, evidence-integrity STOP / unpaired PASS -> G2, clean -> null",
+   "the driver's publicationBoundaryRunner refuses every post-publication dispatch with the exact sentinel before execution",
+   "OpenRouter connectivity, key validity, frozen-model listing, reasoning-control support (GET /models only)"
+  ]
+ },
+ "offline_qualification": {
+  "artifact": "evidence/p3/p3-qualification-output.txt",
+  "verdict": "10 gates ALL PASS (Q1-Q6), zero live traffic"
+ },
+ "remaining_preconditions_for_live_go": [
+  "operator issues the separate live GO",
+  "at GO: one preflightContract completion probe through the composed guard (tiny budget, archived; G1-class if it STOPs)",
+  "at GO: target restored pristine and binding checksums re-verified from a fresh clone before attempt 1"
+ ],
+ "constraint_compliance": "no live P3, no frozen-Stratum modification, no model-regime change, no sampling/decision-rule change; ZERO completion traffic during freeze preparation"
+}

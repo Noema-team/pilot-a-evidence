@@ -1,0 +1,119 @@
+{
+ "artifact": "P2 EFFECTIVE FREEZE BINDING v4 \u2014 supersedes v3 for the chain extension ONLY (wrapper v3 + addendum 5 + qualification v3 incl. the qualification SOURCE); every earlier element re-pinned unchanged",
+ "generated_at_utc": "2026-10-08T15:55:00Z",
+ "supersedes": {
+  "v3_path": "evidence/p2/p2-effective-freeze-3.json",
+  "v3_sha256": "ca28ff9e3eca97e19eb37ba2f19617cdc15c8eaf86c345a6e8357905720ac6ac",
+  "scope": "chain extension only: wrapper bytes corrected per the operator's two final findings (capability parity; dual-failure surfacing), qualification extended (A-G) and its SOURCE now hash-pinned. Implementation unchanged (9f298f2). No experiment redesign."
+ },
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "ci_run": "37751982897 (success)",
+  "verified_untouched_after_addendum_5": true
+ },
+ "target": {
+  "student_platform_commit": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "chain": [
+  {
+   "order": 1,
+   "role": "preregistration (original)",
+   "path": "evidence/p2/p2-preregistration.json",
+   "sha256": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa"
+  },
+  {
+   "order": 2,
+   "role": "freeze manifest (original)",
+   "path": "evidence/p2/p2-freeze-manifest.json",
+   "sha256": "21814ac04b286d67ae60cd74b173f6db654d3d5fd1e5748b14d49456a46d5a1a"
+  },
+  {
+   "order": 3,
+   "role": "original checksum file (21 pins)",
+   "path": "evidence/p2/p2-freeze-manifest.sha256",
+   "sha256": "e92e43555e06b0332ac17a45ac6c2f9c5bc1ba98c144c06bc4147bbdbb97bbe9"
+  },
+  {
+   "order": 4,
+   "role": "addendum 1",
+   "path": "evidence/p2/p2-preregistration-addendum-1.json",
+   "sha256": "d9e9bb83da38a7e3af695fc6ce32b7f99dc17f723117a240e59b57202386278f"
+  },
+  {
+   "order": 5,
+   "role": "addendum 2",
+   "path": "evidence/p2/p2-preregistration-addendum-2.json",
+   "sha256": "aeb6288d72efbb326ffa1a92adc663b2c8b11d1c6a7729793712d7a40e4048d9"
+  },
+  {
+   "order": 6,
+   "role": "binding v1 (preserved)",
+   "path": "evidence/p2/p2-effective-freeze.json",
+   "sha256": "ae23eb3c63041b1a3bb3f3d6113f51caaf4e545fc6c6c8b9b9add5b31048fba0"
+  },
+  {
+   "order": 7,
+   "role": "addendum 3 (S3 mechanism + S1 scope + S4 drift)",
+   "path": "evidence/p2/p2-preregistration-addendum-3.json",
+   "sha256": "df69a3fa01fce1bc43e85a98b3684a76ab421a87e941380495369bf14ac2959a"
+  },
+  {
+   "order": 8,
+   "role": "S3 wire-capture wrapper v3 (capability-parity Proxy + dual-failure surfacing + fail-closed capture)",
+   "path": "evidence/p2/wire-capture-wrapper.mts",
+   "sha256": "21fd6ddc8ac73f81d20da709e43d6a97480a1541f8675a9d4c3a468422102982"
+  },
+  {
+   "order": 9,
+   "role": "S3 qualification SOURCE (now hash-pinned per operator archival correction)",
+   "path": "evidence/p2/s3-request-observability.mts",
+   "sha256": "f98fc6908f618927b46b11326260a7f83c4d2c9e4c25c6e2830860c4ed5f1cfb"
+  },
+  {
+   "order": 10,
+   "role": "S3 qualification v3 output (A-G all pass)",
+   "path": "evidence/p2/qualification/s3-request-observability.txt",
+   "sha256": "8bf3ef273f4fbea51b702d28c68edefe1b01bb8da923b3f81984eb97f601808b"
+  },
+  {
+   "order": 11,
+   "role": "addendum 4 (wrapper defect corrections round 1)",
+   "path": "evidence/p2/p2-preregistration-addendum-4.json",
+   "sha256": "a04d8d34f5ed0e10553916f5974ac522c2cbbf0d404199e50f75f5c82578fc91"
+  },
+  {
+   "order": 12,
+   "role": "addendum 5 (final two S3 findings + archival completeness)",
+   "path": "evidence/p2/p2-preregistration-addendum-5.json",
+   "sha256": "05ec4907912a6a3d5f6e8521c8e0a82d38dee7a579b5daff342924f36f601a10"
+  },
+  {
+   "order": 13,
+   "role": "binding v2 (preserved)",
+   "path": "evidence/p2/p2-effective-freeze-2.json",
+   "sha256": "5ffa9c6918f926e211caeba604c26279a7d7ce78154a2ca17e8bb2dbc9081dda"
+  },
+  {
+   "order": 14,
+   "role": "binding v3 (superseded by this binding, preserved)",
+   "path": "evidence/p2/p2-effective-freeze-3.json",
+   "sha256": "ca28ff9e3eca97e19eb37ba2f19617cdc15c8eaf86c345a6e8357905720ac6ac"
+  }
+ ],
+ "supersession_ledger": [
+  "addendum-1 'token-truncated repairs budget-censored' RETRACTED by addendum 2",
+  "binding v1 -> v2 -> v3 -> v4 (extension only; orders 1-7 hashes identical throughout)",
+  "wrapper v2 bytes superseded by v3: capability parity (override only when the inner genuinely implements; absence preserved \u2014 no manufactured capabilities) and dual-failure surfacing ('wire-capture: evidence-integrity failure \u2026 capture-integrity STOP' with the provider error preserved as cause)",
+  "S3 qualification output v2 superseded by v3 (seven qualifications A-G, frozen openrouter config, absence parity, dual-failure test)",
+  "wire_surface_offered mechanism (addendum 3) unchanged; addendum-4 fail-closed policy extended by the dual-failure STOP classification above"
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p2/p2-effective-freeze-4.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public) and run sha256sum -c evidence/p2/p2-effective-freeze-4.sha256; earlier chains (v3 31, v2 27, v1 24, original 21) still verify against their historical commits",
+  "implementation_check": "git -C <stratum> rev-parse p1-collision-guard == 9f298f219db927d5065876cf99cdec11e462aa04; tracked tree clean"
+ },
+ "execution_status": "HOLD \u2014 no live P2 until the operator's final launch ruling at this effective-freeze identity"
+}

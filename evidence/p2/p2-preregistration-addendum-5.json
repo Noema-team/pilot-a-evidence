@@ -1,0 +1,28 @@
+{
+ "artifact": "P2 preregistration ADDENDUM 5 — dated resolution of the two final S3 findings (capability parity; dual-failure surfacing) plus the archival completeness correction; all historical artifacts preserved byte-for-byte",
+ "amendment_utc": "2026-10-08T15:45:00Z",
+ "amends": {
+  "original_preregistration_sha256_unchanged": "3e871b77ffcdb59f68932e1954f652f60d96736e249fe5a042f4012b5ce7dfa",
+  "addenda_1_through_4_unchanged": "all prior artifact hashes re-pinned identically in binding v4",
+  "implementation_unchanged": "stratum 9f298f219db927d5065876cf99cdec11e462aa04 — src/ byte-identical, working tree clean (verified after all changes)",
+  "scope": "campaign-side measurement tooling only (the wire-capture wrapper and its qualification); no Stratum change, no model/configuration/budget/sampling change, no live execution"
+ },
+ "P1_capability_parity": {
+  "finding": "qualification F built the provider with 'openai_compatible', but the frozen configuration specifies 'openrouter' — a different capability path (openrouter -> OpenAICompatibleStructuredProvider: multi-turn AND structured-output; openai_compatible -> single-turn only). Worse, the v2 Proxy returned wrappedMultiTurn/wrappedComplete whenever those property names were requested, REGARDLESS of inner-provider capability — manufacturing capabilities the inner provider lacks.",
+  "correction_wrapper": "the Proxy now overrides complete/completeMultiTurn ONLY when the inner provider genuinely implements them (typeof check on the target); an absent capability stays absent through the wrapper. Capability probing by presence remains honest — the same discipline DynamicLLMProvider itself applies.",
+  "correction_qualification": "qualification F now resolves the provider with the EXACT frozen configuration (provider 'openrouter', base_url https://openrouter.ai/api/v1, model z-ai/glm-5.3-flash, api_key_env OPENROUTER_API_KEY) via resolveLLMProvider() and verifies presence/absence/behavior: presence truth {complete:true, completeMultiTurn:true, completeStructured:true} on the frozen-resolution provider (DynamicLLMProvider over OpenAICompatibleStructuredProvider); all three present through the wrapper (overrides + ORIGINAL completeStructured reference); ABSENCE parity proven with an openai_compatible provider (lacks completeMultiTurn/completeStructured -> wrapper exposes NEITHER, while the present complete stays wrapped)."
+ },
+ "P1_dual_failure_surfacings": {
+  "finding": "on a failed provider request, a failure to write the error record was silently swallowed (original error rethrown only) — contradicting addendum 4's fail-closed policy and hiding a capture-integrity failure, which matters because P2 has an explicit infrastructure-censoring taxonomy",
+  "correction_wrapper": "the dual-failure path now throws: 'wire-capture: evidence-integrity failure — the provider request failed (<original provider error>) and its error record could not be archived (<write error>); capture-integrity STOP' — the original provider error is preserved as the cause, and the capture-integrity failure SURFACES",
+  "effective_stop_classification": "a 'wire-capture: evidence-integrity failure' surfacing in a live run is an EVIDENCE-INTEGRITY STOP (S2 class): the campaign halts and returns to the operator. It is NEVER recorded as an ordinary censored provider outcome, never treated as transport/infra censoring, and never silently absorbed into the abort taxonomy",
+  "qualification_G": "provider 503 injected together with sabotage of the capture target between the request record and the error record -> the dual-failure error surfaces with all three properties verified (marker, provider cause preserved, capture-integrity STOP classification); the observed failure class also proves the request record was archived before the sabotage (a request-phase write failure would have thrown the plain pre-call marker instead)"
+ },
+ "archival_completeness": "evidence/p2/s3-request-observability.mts (the qualification SOURCE) is now hash-pinned in the effective chain (binding v4); previously it was pinned only indirectly through the git commit",
+ "qualification_v3": "evidence/p2/qualification/s3-request-observability.txt — A-G ALL PASS at stratum 9f298f2 (zero model traffic): A narrowed surface, B full surface, C wire_observation metadata, D fail-closed capture, E failure archiving, F capability parity (frozen openrouter config + absence parity), G dual-failure surfacing",
+ "unchanged": [
+  "the frozen implementation 9f298f2 (all changes are campaign tooling in the evidence repository)",
+  "the primary endpoint, decision rule, sampling plan, stop rules S1-S7 (S7's objective replay rules; addendum-2 disposition table; addendum-3 S1/S4 texts)",
+  "all previously frozen artifacts remain byte-identical in the public evidence repository"
+ ]
+}

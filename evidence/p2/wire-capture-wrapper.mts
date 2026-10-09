@@ -139,9 +139,16 @@ export function createWireCaptureProvider<P extends object>(inner: P, capturePat
     try {
       result = await (inner as { completeMultiTurn: (p: unknown) => Promise<unknown> }).completeMultiTurn(params);
     } catch (err) {
+      const cause = err instanceof Error ? err.message : String(err);
       try {
-        writeRecord(capturePath, { ts: new Date().toISOString(), request_id: requestId, phase: 'error', kind: 'multi-turn', model, error: err instanceof Error ? err.message : String(err) });
-      } catch { /* the original error outranks the evidence-write failure */ }
+        writeRecord(capturePath, { ts: new Date().toISOString(), request_id: requestId, phase: 'error', kind: 'multi-turn', model, error: cause });
+      } catch (writeErr) {
+        // dual failure: the provider error must stay visible as the cause,
+        // but the capture-integrity failure MUST surface (evidence-integrity
+        // STOP for the campaign — never an ordinary censored provider outcome)
+        const w = writeErr instanceof Error ? writeErr.message : String(writeErr);
+        throw new Error(`wire-capture: evidence-integrity failure — the provider request failed (${cause}) and its error record could not be archived (${w}); capture-integrity STOP`);
+      }
       throw err;
     }
     observeResponse(capturePath, requestId, 'multi-turn', result); // fail-closed after a successful call
@@ -158,22 +165,34 @@ export function createWireCaptureProvider<P extends object>(inner: P, capturePat
     try {
       result = await (inner as { complete: (x: unknown) => Promise<unknown> }).complete(params);
     } catch (err) {
+      const cause = err instanceof Error ? err.message : String(err);
       try {
-        writeRecord(capturePath, { ts: new Date().toISOString(), request_id: requestId, phase: 'error', kind: 'single-turn', model, error: err instanceof Error ? err.message : String(err) });
-      } catch { /* the original error outranks the evidence-write failure */ }
+        writeRecord(capturePath, { ts: new Date().toISOString(), request_id: requestId, phase: 'error', kind: 'single-turn', model, error: cause });
+      } catch (writeErr) {
+        const w = writeErr instanceof Error ? writeErr.message : String(writeErr);
+        throw new Error(`wire-capture: evidence-integrity failure — the provider request failed (${cause}) and its error record could not be archived (${w}); capture-integrity STOP`);
+      }
       throw err;
     }
     observeResponse(capturePath, requestId, 'single-turn', result);
     return result;
   };
 
-  // Proxy delegation: every property NOT explicitly overridden resolves on
-  // the inner provider with its original function reference and original
-  // `this` — prototype methods like completeStructured survive untouched.
+  // Proxy delegation: overridden ONLY when the inner provider genuinely
+  // implements the method — a capability the inner lacks stays absent through
+  // the wrapper (no manufactured capabilities; capability probing by
+  // presence stays honest, mirroring DynamicLLMProvider's own discipline).
+  // Every other property resolves on the inner provider with its original
+  // function reference and original `this` — prototype methods like
+  // completeStructured survive untouched.
   return new Proxy(inner, {
     get(target, prop, receiver) {
-      if (prop === 'completeMultiTurn') return wrappedMultiTurn;
-      if (prop === 'complete') return wrappedComplete;
+      if (prop === 'completeMultiTurn' && typeof (target as { completeMultiTurn?: unknown }).completeMultiTurn === 'function') {
+        return wrappedMultiTurn;
+      }
+      if (prop === 'complete' && typeof (target as { complete?: unknown }).complete === 'function') {
+        return wrappedComplete;
+      }
       return Reflect.get(target, prop, receiver);
     },
   }) as P;

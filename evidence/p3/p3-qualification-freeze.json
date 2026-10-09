@@ -1,13 +1,18 @@
 {
- "artifact": "P3 QUALIFICATION FREEZE v2 \u2014 hash pins for the final preregistration review (design-review corrections C1-C5 implemented and qualified; binding follows at approval)",
- "generated_at_utc": "2026-10-09T20:45:00Z",
+ "artifact": "P3 QUALIFICATION FREEZE v3 \u2014 ADDITIVE revision (v2 pins preserved in git history at 1b972c7); evidence-path corrections of the final preregistration review implemented and qualified",
+ "generated_at_utc": "2026-10-09T21:05:00Z",
+ "additivity": "v3 changes ONLY the evidence path (config-guard capture records, fixture acceptance gate, qualification regressions). The approved experiment design, positive BUILD-publication boundary, sample rule, frozen Stratum identity, and fixture authority are byte-identical in intent; stratum remains 9f298f2.",
+ "prior_revision": {
+  "v2_head": "1b972c70e02f95a8e2c3ebe5299f2388fb9bf0ec",
+  "v2_pins": "10/10 verified by the operator"
+ },
  "implementation": {
   "stratum": "9f298f219db927d5065876cf99cdec11e462aa04 (untouched throughout)",
   "target": "86ec0871d64ecca8732434c11d015fd8e08ddc7e (pristine after qualification)"
  },
  "fixture_identity": {
   "note": "the tgz is rebuilt per instantiation (uuid/timestamp-bearing); its IDENTITY is pinned by the manifest's deterministic fields, all re-verified on every rebuild by the qualification",
-  "fixture_sha256_at_qualification": "19d1b6767cd81807fdb86ab84cb52df948a2079f3267f3367db2e36be4083c70",
+  "fixture_sha256_at_qualification": "04756cbe5b28f470b7b6509e54741e9e725e57a247f0832f5900b7a0f7973f04",
   "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
   "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
   "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
@@ -58,11 +63,11 @@
     ]
    }
   },
-  "instantiation_id": "1cb954ff-a867-4f86-8840-36bf4769bbba",
+  "instantiation_id": "ed293f6a-fde5-4de4-b9f5-63cb02934db6",
   "guard_capture": {
-   "path": ".sle/p3-captures/1cb954ff-a867-4f86-8840-36bf4769bbba/fixture-replay-guard.jsonl",
-   "sha256": "06c1ff24c2788f5ba8f5f2ec421a23067dae40f85f7075de561b9fc109da2440",
-   "phase": "fixture-replay:1cb954ff-a867-4f86-8840-36bf4769bbba",
+   "path": ".sle/p3-captures/ed293f6a-fde5-4de4-b9f5-63cb02934db6/fixture-replay-guard.jsonl",
+   "sha256": "fe2a7b2b640b13a91b741b0870ac384674bdba2d3d5d169296c9e20f8b1799cc",
+   "phase": "fixture-replay:ed293f6a-fde5-4de4-b9f5-63cb02934db6",
    "request_count": 4,
    "pass_count": 4,
    "stop_count": 0,
@@ -86,23 +91,23 @@
  "pins": [
   {
    "path": "evidence/p3/config-guard.mts",
-   "sha256": "25fb74b914bdd38737c1ade24240bd249b897cb48cb6e77fb60024b139c19a00"
+   "sha256": "64214721f3618ce7ce8375689788aeca61a74a176cff24350b096f0ba7cf1c62"
   },
   {
    "path": "evidence/p3/p3-fixture-builder.mts",
-   "sha256": "77799075a05cd65813d4ee51cfe30eaa65ee9b9998a6b90970e338d61b435600"
+   "sha256": "c14cd64dae5364c29fde8536e9401af54910bb9bd81de4e6a53a6768d4ecd399"
   },
   {
    "path": "evidence/p3/p3-qualification.mts",
-   "sha256": "46bd8f16b5f9f291dfed97578f5a43ce3c00a6d25fe515dca11f84e40f8c0c39"
+   "sha256": "03df9bad457c202e142170c501341c850579dfa5987a765ecfae469ecaa4d20c"
   },
   {
    "path": "evidence/p3/p3-qualification-output.txt",
-   "sha256": "09db83d204a7c2b3f3c21fd5e5d7870aa7b459c3703cb9b18d9b5ed91cb302e1"
+   "sha256": "62f9d4943afe14f14b3f5da6d1981e3170f3d3a8fb1a27507a3e354d96c89b4b"
   },
   {
    "path": "evidence/p3/p3-build-entry-fixture-manifest.json",
-   "sha256": "bd6d48a5a8d554051158ee93dfd6d1ac0f93940caddd4bacbf03fcfef75e5ac4"
+   "sha256": "7af9c68f667a88f0864a7f9b12a0172641618b1d50d7c94ef6ba050d7c5fe369"
   },
   {
    "path": "evidence/p3/inputs/issue-108.json",
@@ -110,17 +115,17 @@
   },
   {
    "path": "evidence/p3/p3-q4-build-attempt-capture.jsonl",
-   "sha256": "1ad497daaad7f8edb7da41ff868f39037d66869581a8154415e335614a04a91d"
+   "sha256": "811a61af6713c0f448f103fb1763d231445c7b98b83962b6f55c2d4a2430625d"
   },
   {
    "path": "evidence/p3/p3-q5-g1-probe-capture.jsonl",
-   "sha256": "7276c0a2ccd9c6a3b57d0d4bb899c6740681fe3c252d1fae0707169f9ad6b1d2"
+   "sha256": "ef1b3e14e9bfe793674edb9081a848743046210e26e99bccd0b94c61e4fb383c"
   },
   {
    "path": "evidence/p3/p3-preregistration.json",
-   "sha256": "c4e56ad1e0c3e56f111c2e178389ff84aa0d87b87985ecbb8be32681ab1f2b5a"
+   "sha256": "f940f0b84f25db7a7ed3e831813cb2dbaee77b93228db0df988e78fe0b94802a"
   }
  ],
  "verification": "sha256sum -c evidence/p3/p3-qualification-freeze.sha256 from a fresh clone of Noema-team/pilot-a-evidence (branch p2-freeze-evidence)",
- "execution_status": "DRAFT v2 \u2014 no live P3 execution until the operator approves this preregistration and issues GO"
+ "execution_status": "DRAFT v3 \u2014 no live P3 execution until the operator's final approval and GO"
 }

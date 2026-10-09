@@ -220,6 +220,9 @@ export function classifyGuardCapture(path: string): CaptureClassification {
         }
       } else if (r.guard_verdict === 'STOP') {
         out.stops.push(r);
+        // an evidence-integrity STOP is itself a G2 fact (archival failed),
+        // not a config violation — the campaign treats it as G2
+        if (r.dimension === 'evidence-integrity') out.integrity_failures.push(`${at}: evidence-integrity STOP (archival failed)`);
         const next = records[i + 1];
         if (next && (next.kind === 'response' || next.kind === 'error')) {
           out.integrity_failures.push(`${at}: STOP request followed by an outcome record (the call must never have been made)`);
@@ -244,7 +247,7 @@ export function classifyGuardCapture(path: string): CaptureClassification {
     }
   }
   out.provider_calls_observed = out.responses.length + out.errors.length;
-  out.g1 = out.stops.length > 0;
+  out.g1 = out.stops.some((s) => s.dimension !== 'evidence-integrity');
   out.g2 = out.integrity_failures.length > 0;
   return out;
 }
@@ -348,6 +351,7 @@ export function createConfigGuardProvider<P extends { completeMultiTurn: (params
       messages_length: params.messages.length,
       system_sha256: sha256(String(params.system ?? '')),
       guard_verdict: violations.length === 0 ? 'PASS' : 'STOP',
+      dimension: violations.length === 0 ? null : 'config',
       violations,
     };
     // fail-closed evidence: the record MUST be archived before the verdict is
@@ -355,20 +359,44 @@ export function createConfigGuardProvider<P extends { completeMultiTurn: (params
     try {
       writeRecord(record);
     } catch (writeErr) {
+      // the request is unarchived: refuse the call AND surface G2 (the
+      // thrown violation's dimension names the class for the classifier)
       throw new ConfigGuardViolation('evidence-integrity', `verified request could not be archived (${writeErr instanceof Error ? writeErr.message : String(writeErr)})`);
     }
     if (violations.length > 0) {
       throw new ConfigGuardViolation(c.stepId, violations.join('; ') + ' — the model call was NOT made');
     }
 
-    // C4 — response-side capture (the P2 wire-capture composition): the
-    // response or the error is archived next to the verified request, so a
-    // future transport-censoring decision has actual response evidence.
+    // C4 v2 — response-side capture with ARCHIVAL/PROVIDER SEPARATION (P3
+    // review round 2, P1-b): a provider execution failure and a capture-write
+    // failure are different facts and must never be conflated — a response
+    // that cannot be archived is a G2 evidence-integrity STOP, never a
+    // provider-looking error record.
     const started = Date.now();
+    let res: {
+      stop_reason?: string; text?: string; tool_uses?: Array<{ name?: string }>; tokens_used?: number;
+      wire_observation?: Record<string, unknown>;
+    };
     try {
-      const res = await inner.completeMultiTurn(params) as {
-        stop_reason?: string; text?: string; tool_uses?: Array<{ name?: string }>; tokens_used?: number;
-      };
+      res = await inner.completeMultiTurn(params) as typeof res;
+    } catch (err) {
+      // PROVIDER failed — archive the error record; if THAT archival fails,
+      // escalate as evidence-integrity with the provider error embedded
+      try {
+        writeRecord({
+          ...baseRecord(), kind: 'error', wire: 'completeMultiTurn', step: c.stepId,
+          error_name: err instanceof Error ? err.name : String(err),
+          error_message: err instanceof Error ? err.message : String(err),
+          duration_ms: Date.now() - started,
+        });
+      } catch (writeErr) {
+        throw new ConfigGuardViolation('evidence-integrity', `provider error could not be archived (${writeErr instanceof Error ? writeErr.message : String(writeErr)}); original provider error: ${err instanceof Error ? err.message : String(err)}`);
+      }
+      throw err;
+    }
+    // PROVIDER succeeded — archive the response; a write failure here is a
+    // G2 evidence-integrity STOP (the response exists but is NOT evidenced)
+    try {
       writeRecord({
         ...baseRecord(), kind: 'response', wire: 'completeMultiTurn', step: c.stepId,
         stop_reason: res?.stop_reason ?? null,
@@ -377,18 +405,16 @@ export function createConfigGuardProvider<P extends { completeMultiTurn: (params
         text: typeof res?.text === 'string' ? res.text : null,
         text_sha256: typeof res?.text === 'string' ? sha256(res.text) : null,
         text_bytes: typeof res?.text === 'string' ? Buffer.byteLength(res.text) : null,
+        // P1-a — the decisive provider-side wire metadata (the P2
+        // transport-censoring adjudication class: stop_reason end_turn with
+        // finish_reason error and partial content) preserved verbatim
+        wire_observation: res?.wire_observation ?? null,
         duration_ms: Date.now() - started,
       });
-      return res;
-    } catch (err) {
-      writeRecord({
-        ...baseRecord(), kind: 'error', wire: 'completeMultiTurn', step: c.stepId,
-        error_name: err instanceof Error ? err.name : String(err),
-        error_message: err instanceof Error ? err.message : String(err),
-        duration_ms: Date.now() - started,
-      });
-      throw err;
+    } catch (writeErr) {
+      throw new ConfigGuardViolation('evidence-integrity', `provider response could not be archived (${writeErr instanceof Error ? writeErr.message : String(writeErr)}) — the response is NOT evidenced; G2 STOP`);
     }
+    return res;
   };
 
   // C4 — explicit blocking of the non-permitted completion paths: the
@@ -407,7 +433,14 @@ export function createConfigGuardProvider<P extends { completeMultiTurn: (params
       tools: null as unknown as string[],
       tools_sha256: null,
     };
-    try { writeRecord(record); } catch { /* fail closed regardless */ }
+    record.dimension = 'completion-path';
+    try {
+      writeRecord(record);
+    } catch (writeErr) {
+      // archival failed: the STOP still happens (no provider call either
+      // way) but it surfaces as evidence-integrity (G2), not as a config STOP
+      throw new ConfigGuardViolation('evidence-integrity', `blocked-completion attempt could not be archived (${writeErr instanceof Error ? writeErr.message : String(writeErr)})`);
+    }
     throw new ConfigGuardViolation('completion-path', `${method} is not a permitted wire in P3 scope — only completeMultiTurn is guarded+captured; the call was blocked BEFORE reaching the provider`);
   };
 

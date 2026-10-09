@@ -46,7 +46,7 @@ import {
   createConfigGuardProvider, verifySettingsProvenance, classifyGuardCapture, reconcileCapture,
   ConfigGuardViolation, type StepContract,
 } from './config-guard.mts';
-import { buildFixture } from './p3-fixture-builder.mts';
+import { buildFixture, validateFixtureCapture } from './p3-fixture-builder.mts';
 
 const STRATUM = '/home/theo/Documents/coding/repos/stratum';
 const ROOT = '/home/theo/Documents/coding/repos/student-platform';
@@ -124,6 +124,9 @@ const baseParams = (over: Record<string, unknown> = {}) => ({
 });
 
 const frozenSettingsSha = sha256(FROZEN_SETTINGS);
+// every fixture instantiation's manifest, in build order (Q6c reads the
+// CURRENT one — earlier instances' workspaces are wiped by design)
+const fixtureManifests: Array<Record<string, unknown>> = [];
 
 // ─── Q1: pass-through + mismatch matrix + hash sensitivity + blocked paths ──
 {
@@ -271,6 +274,7 @@ const frozenSettingsSha = sha256(FROZEN_SETTINGS);
 
 // ─── Q3: fixture gates (full deterministic rebuild) ─────────────────────────
 const manifest = await buildFixture();
+fixtureManifests.push(manifest);
 {
   assert.equal(manifest.run_cursor, 'confirm');
   assert.equal(manifest.run_status, 'halted');
@@ -589,6 +593,7 @@ const manifest = await buildFixture();
   // engine's absorbed failure is recognized from the capture: zero model
   // calls, zero publications, one STOP record naming the mismatch.
   const m2 = await buildFixture();
+  fixtureManifests.push(m2);
   const { resolveLLMProvider, buildAgentRunner } = await import(`${STRATUM}/src/application.js`);
   const { RunArtifactManager } = await import(`${STRATUM}/src/run-artifacts.js`);
   const { AgentStepRunner } = await import(`${STRATUM}/src/execution/agent-step-runner.js`);
@@ -725,6 +730,109 @@ const manifest = await buildFixture();
   assert.ok(!t3.g2 && !t3.g1, 'the untouched copy stays clean');
   rmSync(tampered);
   console.log('PASS Q5b (G2 integrity): dropped pairing, corrupted line detected; untouched capture classifies clean');
+}
+
+// ─── Q6: evidence-path regressions (review round 2) ─────────────────────────
+{
+  // Q6a — P1-a: the response record preserves wire_observation verbatim; the
+  // P2 transport-censoring adjudication class (stop_reason end_turn +
+  // finish_reason error + nonempty content) is captured and classifiable
+  const anomalousCap = join(tmpdir(), 'p3q6-anomalous.jsonl');
+  rmSync(anomalousCap, { force: true });
+  const anomalousInner = {
+    async completeMultiTurn() {
+      return {
+        stop_reason: 'end_turn', text: 'partial model content before the stream died', tool_uses: [], tokens_used: 512,
+        wire_observation: {
+          reasoning_chunks: 3, reasoning_bytes: 2046, reasoning_fields: ['reasoning_content'],
+          content_bytes: 193, tool_call_fragments: 0,
+          finish_reason: 'error', completion_tokens: 16384, reasoning_tokens: 106,
+          prompt_tokens: 9432, total_tokens: 16922,
+          stream_id: 'wss-obs-4471', model: MODEL, provider: 'openrouter',
+        },
+      } as never;
+    },
+  };
+  const aGuard = createConfigGuardProvider(anomalousInner, BUILD_CONTRACT, { capturePath: anomalousCap, phase: 'q6a-anomalous' });
+  await aGuard.completeMultiTurn(baseParams() as never);
+  const aRecs = readFileSync(anomalousCap, 'utf-8').trim().split('\n').map((l) => JSON.parse(l));
+  const aResp = aRecs.find((r: { kind: string }) => r.kind === 'response');
+  assert.ok(aResp, 'the anomalous response was archived');
+  assert.equal(aResp.stop_reason, 'end_turn');
+  assert.equal(aResp.wire_observation.finish_reason, 'error', 'finish_reason preserved');
+  assert.equal(aResp.wire_observation.reasoning_bytes, 2046, 'reasoning byte count preserved');
+  assert.equal(aResp.wire_observation.prompt_tokens, 9432, 'prompt tokens preserved');
+  assert.equal(aResp.wire_observation.provider, 'openrouter', 'provider identity preserved');
+  assert.equal(aResp.wire_observation.stream_id, 'wss-obs-4471', 'stream identity preserved');
+  assert.equal(aResp.wire_observation.content_bytes, 193, 'provider-side content byte count preserved');
+  assert.ok(aResp.text.length > 0 && aResp.text_bytes === Buffer.byteLength(aResp.text), 'partial content archived with its own byte count (stream bytes vs assembled text are independent measures)');
+  const aCls = classifyGuardCapture(anomalousCap);
+  assert.ok(!aCls.g1 && !aCls.g2, 'an anomalous-but-paired response is not a guard/integrity failure (it is EVIDENCE for adjudication)');
+  console.log('PASS Q6a (wire metadata): wire_observation preserved verbatim; end_turn+finish_reason=error+partial content fully evidenced');
+
+  // Q6b — P1-b: a response-ARCHIVE failure must surface as G2
+  // evidence-integrity STOP, never as a provider-looking error record.
+  // The capture file is turned into a directory FROM INSIDE the provider
+  // call: the request write has already succeeded, the provider then
+  // succeeds, and only the response-record write can fail.
+  const sepCap = join(tmpdir(), 'p3q6-separation.jsonl');
+  rmSync(sepCap, { recursive: true, force: true });
+  const successInner = {
+    n: 0,
+    async completeMultiTurn() {
+      this.n++;
+      if (this.n === 2) {
+        rmSync(sepCap, { recursive: true, force: true });
+        mkdirSync(sepCap);
+      }
+      return { stop_reason: 'end_turn', text: 'ok', tool_uses: [], tokens_used: 1 } as never;
+    },
+  };
+  const sepGuard = createConfigGuardProvider(successInner, BUILD_CONTRACT, { capturePath: sepCap, phase: 'q6b-archive-failure' });
+  await sepGuard.completeMultiTurn(baseParams() as never); // request + response archived cleanly
+  const before = successInner.n;
+  await assert.rejects(
+    () => sepGuard.completeMultiTurn(baseParams() as never),
+    (err: Error) => err instanceof ConfigGuardViolation && err.message.includes('evidence-integrity'),
+    'a response-archive failure must throw an evidence-integrity STOP',
+  );
+  assert.equal(successInner.n, before + 1, 'the PROVIDER succeeded (the failure is archival, not provider)');
+  rmSync(sepCap, { recursive: true, force: true });
+  // reconstruct what the capture held at failure time: request(PASS) with no
+  // outcome -> the classifier must report G2
+  const reconCap = join(tmpdir(), 'p3q6-recon.jsonl');
+  rmSync(reconCap, { force: true });
+  const passLine = JSON.stringify({ ts: 't', capture_version: 2, phase: 'recon', kind: 'request', wire: 'completeMultiTurn', step: 'build', model: MODEL, max_tokens: 1, guard_verdict: 'PASS', dimension: null, violations: [] });
+  const respLine = JSON.stringify({ ts: 't', capture_version: 2, phase: 'recon', kind: 'response', wire: 'completeMultiTurn', step: 'build', stop_reason: 'end_turn' });
+  // first pair (clean), then the unpaired PASS of the failed response write
+  writeFileSync(reconCap, passLine + '\n' + respLine + '\n' + passLine + '\n');
+  const reconCls = classifyGuardCapture(reconCap);
+  assert.ok(reconCls.g2, 'an unpaired PASS request classifies G2');
+  assert.ok(reconCls.integrity_failures.some((f) => f.includes('no paired response/error record')));
+  assert.ok(!reconCls.g1, 'no provider-looking error record exists (provider/error separation held)');
+  console.log('PASS Q6b (archive/provider separation): response-archive failure surfaced evidence-integrity; the provider call succeeded and was never misrepresented');
+
+  // Q6c — P2: trailing-line capture corruption must fail fixture acceptance
+  // even though every call count still reconciles
+  // the CURRENT fixture instantiation's capture (Q5a rebuilt the fixture;
+  // the Q3 instance's workspace no longer exists by design — isolation)
+  const currentFixture = fixtureManifests[fixtureManifests.length - 1];
+  const fixtureCaptureRel = (currentFixture.guard_capture as { path: string }).path;
+  const fixtureCapture = join(ROOT, fixtureCaptureRel);
+  const goodLines = readFileSync(fixtureCapture, 'utf-8').trim().split('\n');
+  assert.equal(goodLines.length, 8, 'the fixture capture holds 4 request/response pairs');
+  const corruptedCopy = join(tmpdir(), 'p3q6-trailing-corrupt.jsonl');
+  rmSync(corruptedCopy, { force: true });
+  writeFileSync(corruptedCopy, goodLines.join('\n') + '\n{corrupted trailing record\n');
+  const counts = classifyGuardCapture(corruptedCopy);
+  assert.equal(counts.passes.length, 4, 'all four call counts still reconcile on the corrupted copy');
+  assert.ok(counts.g2 && counts.integrity_failures.length > 0, 'the classifier detects the corruption');
+  assert.throws(
+    () => validateFixtureCapture(corruptedCopy, [{ step: 'scoping.produce' }, { step: 'design' }, { step: 'plan' }, { step: 'test' }]),
+    (err: Error) => err.message.includes('integrity failures'),
+    'fixture acceptance must REJECT a capture with integrity failures despite intact reconciliation',
+  );
+  console.log('PASS Q6c (fixture acceptance): trailing corruption rejected by fixture acceptance while call counts reconcile');
 }
 
 console.log('\nP3 OFFLINE QUALIFICATION: ALL PASS');

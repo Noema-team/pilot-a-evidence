@@ -56,7 +56,7 @@ import {
 } from '/home/theo/Documents/coding/repos/stratum/src/storage/repositories.js';
 import type { WorkflowEngineDeps } from '/home/theo/Documents/coding/repos/stratum/src/workflow/engine.js';
 import type { MultiTurnParams, MultiTurnResult } from '/home/theo/Documents/coding/repos/stratum/src/agent-loop.js';
-import { createConfigGuardProvider, classifyGuardCapture, reconcileCapture, type StepContract } from './config-guard.mts';
+import { createConfigGuardProvider, classifyGuardCapture, reconcileCapture, type CaptureClassification, type StepContract } from './config-guard.mts';
 
 const STRATUM = '/home/theo/Documents/coding/repos/stratum';
 const ROOT = '/home/theo/Documents/coding/repos/student-platform';
@@ -115,6 +115,20 @@ const REPLAY_TEXTS: Record<string, string> = {
 
 function db() {
   return openDatabase(path.join(ROOT, '.sle', 'stratum.db'));
+}
+
+// Review round 2 (P2) — the FULL fixture-capture acceptance gate, exported so
+// the qualification can regression-test it (a corrupted trailing record must
+// fail acceptance even when every call count still reconciles).
+export function validateFixtureCapture(capturePath: string, replayCalls: Array<{ step?: string }>): CaptureClassification {
+  const cls = classifyGuardCapture(capturePath);
+  const discrepancies = reconcileCapture(cls, replayCalls.map((c) => ({ step: c.step })));
+  if (discrepancies.length > 0) throw new Error(`fixture capture reconciliation failed: ${discrepancies.join('; ')}`);
+  if (cls.stops.length > 0) throw new Error(`fixture capture contains guard STOPs: ${cls.stops.length}`);
+  if (cls.g2 || cls.integrity_failures.length > 0) {
+    throw new Error(`fixture capture has integrity failures: ${cls.integrity_failures.join(' | ')}`);
+  }
+  return cls;
 }
 
 function seed(defineWi: string): void {
@@ -380,10 +394,7 @@ export async function buildFixture(): Promise<Record<string, unknown>> {
     // C1 — capture identity + EXACT reconciliation against this
     // instantiation's provider calls (the builder fails otherwise)
     guard_capture: (() => {
-      const cls = classifyGuardCapture(capturePath);
-      const discrepancies = reconcileCapture(cls, harness.calls.map((c) => ({ step: c.step })));
-      if (discrepancies.length > 0) throw new Error(`fixture capture reconciliation failed: ${discrepancies.join('; ')}`);
-      if (cls.stops.length > 0) throw new Error(`fixture capture contains guard STOPs: ${cls.stops.length}`);
+      const cls = validateFixtureCapture(capturePath, harness.calls);
       const perStep: Record<string, number> = {};
       for (const r of cls.passes) perStep[r.step as string] = (perStep[r.step as string] ?? 0) + 1;
       return {

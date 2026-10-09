@@ -6,12 +6,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-09T19:51:29.667Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-09T19:51:29.669Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-09T19:51:29.670Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-09T19:51:29.718Z","event":"p3_fixture_decision","decisionId":"bea8cd00-28cb-4f8a-9c4c-dc7dba36358a","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-09T19:51:29.782Z","event":"p3_fixture_confirm_gate_pending","decisionId":"127c1006-0adc-4845-91e3-675147186957","type":"checkpoint"}
-[p3] {"ts":"2026-10-09T19:51:29.836Z","event":"p3_fixture_built","fixture_sha256":"204a386bac45","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-09T20:07:41.347Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T20:07:41.349Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T20:07:41.350Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T20:07:41.406Z","event":"p3_fixture_decision","decisionId":"093699ea-4c7a-4136-933e-8c5affb3a918","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T20:07:41.464Z","event":"p3_fixture_confirm_gate_pending","decisionId":"06a9a965-277b-4897-acac-8ee8b5cef550","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T20:07:41.488Z","event":"p3_fixture_built","fixture_sha256":"b453c58b989c","cursor":"confirm","replayed":4}
 PASS Q3 (fixture): confirm-gate boundary; editPolicy+definitionSource persisted; 4 guarded requests (isolated capture, exact reconciliation, 4 upstream steps) conform to the frozen per-step budgets/effort; issue input pinned; upstream artifacts byte-identical to P1-R op1; main.py pristine; gate-B assembly verbatim (4214 tokens)
 PASS Q4 (BUILD-entry dry run): publication on apps/ai-server/rag-worker-service/main.py with disk==provenance (bf33c108fe1b); positive boundary halted exec after exactly 1 refusal; capture isolated+reconciled (2 requests, 0 downstream); work tree carries ONLY the publication
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
@@ -27,13 +27,16 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-09T19:51:30.025Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-09T19:51:30.027Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-09T19:51:30.028Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-09T19:51:30.047Z","event":"p3_fixture_decision","decisionId":"71342f2a-72e0-4633-819c-d6e9db65cf64","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-09T19:51:30.092Z","event":"p3_fixture_confirm_gate_pending","decisionId":"a52722f1-0a75-4f15-93d5-65ce60ac8077","type":"checkpoint"}
-[p3] {"ts":"2026-10-09T19:51:30.121Z","event":"p3_fixture_built","fixture_sha256":"19d1b6767cd8","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-09T20:07:41.720Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-09T20:07:41.722Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-09T20:07:41.723Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-09T20:07:41.765Z","event":"p3_fixture_decision","decisionId":"dfddf2a2-96e8-478f-bf46-b431716e2164","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-09T20:07:41.851Z","event":"p3_fixture_confirm_gate_pending","decisionId":"778e5142-b5a6-4283-9aa2-4e1dd82a2efa","type":"checkpoint"}
+[p3] {"ts":"2026-10-09T20:07:41.883Z","event":"p3_fixture_built","fixture_sha256":"04756cbe5b28","cursor":"confirm","replayed":4}
 PASS Q5a (G1 surfacing): BUILD guard violation classified G1 from the capture; 0 model calls; 0 publications; attempt is procedure-class, not model-class
 PASS Q5b (G2 integrity): dropped pairing, corrupted line detected; untouched capture classifies clean
+PASS Q6a (wire metadata): wire_observation preserved verbatim; end_turn+finish_reason=error+partial content fully evidenced
+PASS Q6b (archive/provider separation): response-archive failure surfaced evidence-integrity; the provider call succeeded and was never misrepresented
+PASS Q6c (fixture acceptance): trailing corruption rejected by fixture acceptance while call counts reconcile
 
 P3 OFFLINE QUALIFICATION: ALL PASS

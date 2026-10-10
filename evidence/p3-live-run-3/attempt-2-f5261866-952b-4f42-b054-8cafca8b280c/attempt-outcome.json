@@ -1,0 +1,20 @@
+{
+ "attempt_id": "f5261866-952b-4f42-b054-8cafca8b280c",
+ "attempt_index": 2,
+ "stop": null,
+ "published": true,
+ "publication_hash": "0473d0910bea4a13221337cdb916de8515c9541faebf30dac6b8961d71140cc0",
+ "boundary_refusals": 1,
+ "engine_error": null,
+ "capture_classification": {
+  "requests": 17,
+  "passes": 17,
+  "responses": 17,
+  "errors": 0,
+  "stops": 0,
+  "provider_calls_observed": 17,
+  "integrity_failures": []
+ },
+ "transport_adjudication": null,
+ "archived_at_utc": "2026-10-10T16:07:06.109Z"
+}

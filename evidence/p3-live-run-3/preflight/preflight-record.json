@@ -1,0 +1,12 @@
+{
+ "probe_id": "a51851b0-d9f4-4bcf-9e00-87222b5013b9",
+ "live_capture_path": "/home/theo/Documents/coding/repos/student-platform/.sle/p3-captures/preflight-a51851b0-d9f4-4bcf-9e00-87222b5013b9/preflight-guard.jsonl",
+ "archived_capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/preflight/preflight-guard.jsonl",
+ "archived_capture_sha256": "ad84001279a220be0fa0246e768b9daf483a3f7df137cc2ecde7255424fde3c9",
+ "adjudication": {
+  "accepted": true,
+  "stop": null,
+  "detail": "preflight ok (stop_reason end_turn, finish_reason stop, 1 guarded provider call)"
+ },
+ "archived_at_utc": "2026-10-10T16:00:33.136Z"
+}

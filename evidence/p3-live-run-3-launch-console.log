@@ -1,0 +1,101 @@
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-10T16:00:33.256Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T16:00:33.260Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T16:00:33.262Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T16:00:33.330Z","event":"p3_fixture_decision","decisionId":"229c2875-e49d-4857-bbf5-25c461533942","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T16:00:33.374Z","event":"p3_fixture_confirm_gate_pending","decisionId":"cd088cc5-b2d0-4c86-b880-1be0a20b3e96","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T16:00:33.401Z","event":"p3_fixture_built","fixture_sha256":"5feba5994c84","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-10T16:03:27.735Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T16:03:27.738Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T16:03:27.739Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T16:03:27.768Z","event":"p3_fixture_decision","decisionId":"aa2b97d3-a7ef-459a-8ed6-a2780cdf51c7","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T16:03:27.807Z","event":"p3_fixture_confirm_gate_pending","decisionId":"2b6c0fa3-6d07-40f8-8279-e4c8b67efd77","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T16:03:27.836Z","event":"p3_fixture_built","fixture_sha256":"6c5388a518a5","cursor":"confirm","replayed":4}
+fatal: pathspec 'docs/cycle-charter.md' did not match any files
+fatal: pathspec 'docs/requirements.md' did not match any files
+fatal: pathspec 'docs/architecture.md' did not match any files
+fatal: pathspec 'docs/plan.md' did not match any files
+fatal: pathspec 'docs/test-plan.md' did not match any files
+fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
+[p3] {"ts":"2026-10-10T16:07:06.171Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T16:07:06.173Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T16:07:06.174Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T16:07:06.200Z","event":"p3_fixture_decision","decisionId":"ff136271-b80f-4a53-8b36-31fe51ae6745","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T16:07:06.242Z","event":"p3_fixture_confirm_gate_pending","decisionId":"97815e8f-59af-4da6-90a6-86a453f64def","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T16:07:06.272Z","event":"p3_fixture_built","fixture_sha256":"cd91556494df","cursor":"confirm","replayed":4}
+=== P3 LIVE CAMPAIGN RESULT ===
+{
+  "attempts": [
+    {
+      "attemptId": "7f083c26-cf2e-451d-aa96-a3d8cb71fce7",
+      "index": 1,
+      "slot": 1,
+      "outcome": "PUBLISHED",
+      "stop": null,
+      "stopDetail": null,
+      "providerCallsObserved": 20,
+      "capturePath": "/home/theo/Documents/coding/repos/student-platform/.sle/p3-captures/7f083c26-cf2e-451d-aa96-a3d8cb71fce7/build-attempt-guard.jsonl",
+      "archivedCapturePath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/attempt-1-7f083c26-cf2e-451d-aa96-a3d8cb71fce7/guard-capture.jsonl",
+      "evidencePackagePath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/attempt-1-7f083c26-cf2e-451d-aa96-a3d8cb71fce7",
+      "evidencePackageSha256": "e062a93d02a04367fb78a5c01fbfddd07642005b3e94a7344481c173ae88643c",
+      "adjudication": null,
+      "publicationHash": "6ea8837c270d240ce3adb2bc597cb0568b4ca066a50c2ffb368cd9097bc6c5f9",
+      "boundaryRefusals": 1,
+      "evaluable": true
+    },
+    {
+      "attemptId": "f5261866-952b-4f42-b054-8cafca8b280c",
+      "index": 2,
+      "slot": 2,
+      "outcome": "PUBLISHED",
+      "stop": null,
+      "stopDetail": null,
+      "providerCallsObserved": 17,
+      "capturePath": "/home/theo/Documents/coding/repos/student-platform/.sle/p3-captures/f5261866-952b-4f42-b054-8cafca8b280c/build-attempt-guard.jsonl",
+      "archivedCapturePath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/attempt-2-f5261866-952b-4f42-b054-8cafca8b280c/guard-capture.jsonl",
+      "evidencePackagePath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/attempt-2-f5261866-952b-4f42-b054-8cafca8b280c",
+      "evidencePackageSha256": "f4ee613081a975016125b211a74ca72c805b046e1315b5ebeacdd80312c021f4",
+      "adjudication": null,
+      "publicationHash": "0473d0910bea4a13221337cdb916de8515c9541faebf30dac6b8961d71140cc0",
+      "boundaryRefusals": 1,
+      "evaluable": true
+    },
+    {
+      "attemptId": "f1f07705-bf69-4b65-a217-040648f245f6",
+      "index": 3,
+      "slot": 3,
+      "outcome": "PUBLISHED",
+      "stop": null,
+      "stopDetail": null,
+      "providerCallsObserved": 20,
+      "capturePath": "/home/theo/Documents/coding/repos/student-platform/.sle/p3-captures/f1f07705-bf69-4b65-a217-040648f245f6/build-attempt-guard.jsonl",
+      "archivedCapturePath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/attempt-3-f1f07705-bf69-4b65-a217-040648f245f6/guard-capture.jsonl",
+      "evidencePackagePath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/attempt-3-f1f07705-bf69-4b65-a217-040648f245f6",
+      "evidencePackageSha256": "4ca7f47f29a45bc930479e2d2bfd7f556c8b337720c4adf49de80bed0c0141bf",
+      "adjudication": null,
+      "publicationHash": "a7dcc2cc9ce694b2c1c0f2d9bba883f4b3ae2a0b60afb9728d3964896ea7461a",
+      "boundaryRefusals": 1,
+      "evaluable": true
+    }
+  ],
+  "published": 3,
+  "modelFailures": 0,
+  "evaluable": 3,
+  "requeues": 0,
+  "stop": null,
+  "stopDetail": null,
+  "complete": true,
+  "targetRestoredPristine": true,
+  "ledgerPath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run-3/campaign-ledger.jsonl"
+}

@@ -1,0 +1,11 @@
+{
+ "attempt_id": "7f083c26-cf2e-451d-aa96-a3d8cb71fce7",
+ "attempt_index": 1,
+ "files": {
+  "guard-capture.jsonl": "fae431b0acce9237d78235c8cc295c1acdcb2bd229800288f2d83d76b95f83cb",
+  "db-records.json": "74ab4bec2607f1afcfc8d133d69fe966889627eec91c37ba133889adda1d8421",
+  "attempt-outcome.json": "f251336e4287b5f754ea09ce3aec10507b0a3d8df843b08cf47589c3b122e5e4",
+  "run-artifacts.tgz": "2b16d7cee90eef108b162657a83fad860126f833162ba98255d29500f9cdbda9"
+ },
+ "package_sha256": "e062a93d02a04367fb78a5c01fbfddd07642005b3e94a7344481c173ae88643c"
+}

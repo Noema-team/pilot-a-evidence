@@ -1,0 +1,84 @@
+{
+ "report": "P3 LIVE CAMPAIGN \u2014 TERMINAL REPORT (freeze-6 execution)",
+ "generated_at_utc": "2026-10-10T16:13:40.635703+00:00",
+ "authorization": "Operator LIVE GO for freeze-6 at 0ecee88; executed at 68493fc (journal addenda only since review; frozen artifacts byte-identical)",
+ "frozen_regime": {
+  "stratum": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "target_head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+  "settings": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "model": "z-ai/glm-5.3-flash (openrouter, effort low, temp 0.7)"
+ },
+ "endpoint_verdict": "SUPPORTED",
+ "hypothesis": "H-build-entry-publication: with the entry fixture and the request-time guard in force, BUILD stages and publishes its required authorized source edit in at least 2 of 3 BUILD-entry attempts",
+ "accounting": {
+  "numerator": 3,
+  "denominator": 3,
+  "publications": 3,
+  "model_attributable_failures": 0,
+  "transport_requeues": 0,
+  "stop_condition": "NONE \u2014 campaign ran to its natural terminal (3/3 evaluable)",
+  "target_restored_pristine": true
+ },
+ "authoritative_campaign": {
+  "evidence_dir": "evidence/p3-live-run-3",
+  "preflight": {
+   "accepted": true,
+   "detail": "preflight ok (stop_reason end_turn, finish_reason stop, 1 guarded provider call)",
+   "note": "the freeze-6 contract-derived 512-token probe"
+  },
+  "attempts": [
+   {
+    "slot": 1,
+    "attempt_id": "7f083c26-cf2e-451d-aa96-a3d8cb71fce7",
+    "outcome": "PUBLISHED",
+    "provider_calls": 20,
+    "publication_hash": "6ea8837c270d240ce3adb2bc597cb0568b4ca066a50c2ffb368cd9097bc6c5f9",
+    "boundary_refusals": 1,
+    "package_sha256": "e062a93d02a04367fb78a5c01fbfddd07642005b3e94a7344481c173ae88643c"
+   },
+   {
+    "slot": 2,
+    "attempt_id": "f5261866-952b-4f42-b054-8cafca8b280c",
+    "outcome": "PUBLISHED",
+    "provider_calls": 17,
+    "publication_hash": "0473d0910bea4a13221337cdb916de8515c9541faebf30dac6b8961d71140cc0",
+    "boundary_refusals": 1,
+    "package_sha256": "f4ee613081a975016125b211a74ca72c805b046e1315b5ebeacdd80312c021f4"
+   },
+   {
+    "slot": 3,
+    "attempt_id": "f1f07705-bf69-4b65-a217-040648f245f6",
+    "outcome": "PUBLISHED",
+    "provider_calls": 20,
+    "publication_hash": "a7dcc2cc9ce694b2c1c0f2d9bba883f4b3ae2a0b60afb9728d3964896ea7461a",
+    "boundary_refusals": 1,
+    "package_sha256": "4ca7f47f29a45bc930479e2d2bfd7f556c8b337720c4adf49de80bed0c0141bf"
+   }
+  ],
+  "integrity": "all three evidence packages re-verified: every manifest entry matches on-disk content, no unexpected files; package shas match the ledger and the campaign result",
+  "duration_utc": "16:00:33 preflight -> 16:11:49 terminal (~11 min)"
+ },
+ "interrupted_campaign_disclosure": {
+  "evidence_dir": "evidence/p3-live-run-2",
+  "status": "INTERRUPTED \u2014 orchestrator process died mid-attempt-2 (operational; no frozen STOP fired; no campaign-terminal event)",
+  "preserved": {
+   "preflight": "accepted",
+   "attempt_1": "PUBLISHED (slot 1 of that run; publication_hash 77f63c6b4ff035b018c001cabf5ba18a1e727720acc38901ce9c800a7b8f1f2c; package archived)",
+   "attempt_2": "mid-flight capture archived and discarded \u2014 never classified, never counted"
+  },
+  "counting": "NOT part of the authoritative denominator; disclosed for complete transparency; restoration verified pristine"
+ },
+ "terminal_state": {
+  "target": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "porcelain": "?? .sle/ only",
+  "worker_main_restored": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "evidence_hashes": {
+  "ledger_p3_live_run_3": "3b2f4d569246b04afb9af8fc2a95e4eb5adde7dba5ebb4f2a9a4a9802820b609",
+  "console_p3_live_run_3": "be0bf7aebba91f2764332d9adff2107c0b5ac36fc36b1ee3b205c580b72c9850",
+  "ledger_p3_live_run_2": "8d8cc23236b756d96ca37c991d3b04347ef7559c0c9284af6603c8b09d47f0e5"
+ },
+ "interpretation_guard": "this 3/3 is ONE complete campaign under the frozen protocol; the evidence review owns the scientific interpretation (incl. comparison against P1-R 1/3 and the fixture-closure question)",
+ "next_step": "STOP \u2014 returned for independent evidence review. No successor experiment, no parameter changes, no framework extension."
+}

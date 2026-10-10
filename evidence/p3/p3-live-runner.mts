@@ -52,7 +52,7 @@ import { randomUUID } from 'node:crypto';
 
 import {
   composeBuildAttempt, composePreflight, publicationBoundaryRunner,
-  classifyAttempt, classifyViolation,
+  classifyAttempt, classifyViolation, preflightContract,
   P3_TARGET, PUBLICATION_BOUNDARY_SENTINEL,
   type CampaignStop,
 } from './p3-live-driver.mts';
@@ -293,7 +293,14 @@ function appendLedger(evidenceDir: string, entry: Record<string, unknown>): void
   appendFileSync(ledgerPath(evidenceDir), JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n', 'utf-8');
 }
 
-async function defaultRunPreflight(evidenceDir: string): Promise<{ stop: CampaignStop; detail: string | null }> {
+// freeze-6 review correction — the outbound request is DERIVED from the
+// frozen preflightContract() so the dial and its enforcement can never
+// diverge again (the freeze-5 amendment changed the contract but this caller
+// still sent the old hardcoded budget, and the guard would have STOPped
+// pre-call: parameter/caller drift, the exact defect class the process
+// charter §5 targets). offlineInner is an offline-test injection ONLY —
+// the live campaign never passes it.
+export async function defaultRunPreflight(evidenceDir: string, offlineInner?: unknown): Promise<{ stop: CampaignStop; detail: string | null }> {
   // GO-time implementation: ONE tiny completion through the SEPARATE
   // preflight composition. The guard enforces the frozen contract on the
   // wire (effort low, tiny budget, no tools); a successful, archived
@@ -301,18 +308,19 @@ async function defaultRunPreflight(evidenceDir: string): Promise<{ stop: Campaig
   // archived OUTSIDE .sle and must pass completion-status adjudication
   // (freeze-3 review P1-2). A preflight STOP aborts the campaign BEFORE
   // attempt 1 and is never counted.
-  const probe = composePreflight(ROOT);
+  const probe = composePreflight(ROOT, undefined, offlineInner ? { innerProvider: offlineInner } : undefined);
+  const contract = preflightContract(probe.model);
   const provider = probe.provider as {
     completeMultiTurn: (p: unknown) => Promise<{ stop_reason?: string; text?: string }>;
   };
   try {
     const res = await provider.completeMultiTurn({
-      model: probe.model,
+      model: contract.model,
       system: 'P3 preflight capability probe. Reply with the single word: ok',
       messages: [{ role: 'user', content: 'Reply with the single word: ok' }],
-      max_tokens: 16,
-      temperature: 0.7,
-      reasoning_effort: 'low',
+      max_tokens: contract.max_tokens,
+      temperature: contract.temperature,
+      reasoning_effort: contract.reasoning_effort,
       tools: [],
     });
     // durable preflight archive BEFORE any verdict — the first fixture

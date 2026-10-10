@@ -60,7 +60,7 @@ const contracts: Record<string, () => StepContract> = {
 interface CallResult {
   label: string; capture: string; capture_sha256: string; ms: number;
   stop_reason: string | null; finish_reason: string | null; text_len: number;
-  reasoning_tokens: number | null; completion_tokens: number | null; tool_calls: number; acceptable: boolean; error?: string;
+  reasoning_tokens: number | null; completion_tokens: number | null; tool_calls: number; tool_names: string[]; acceptable: boolean; error?: string;
 }
 
 async function dial(label: string, params: Record<string, unknown>): Promise<CallResult> {
@@ -76,6 +76,7 @@ async function dial(label: string, params: Record<string, unknown>): Promise<Cal
 
   let stop_reason: string | null = null, finish_reason: string | null = null, text_len = 0,
       reasoning_tokens: number | null = null, completion_tokens: number | null = null, tool_calls = 0;
+  const tool_names: string[] = [];
   if (existsSync(capturePath)) {
     for (const line of readFileSync(capturePath, 'utf-8').split('\n').filter(Boolean)) {
       const r = JSON.parse(line) as Record<string, never>;
@@ -86,13 +87,15 @@ async function dial(label: string, params: Record<string, unknown>): Promise<Cal
         reasoning_tokens = (wo['reasoning_tokens'] as number | null) ?? null;
         completion_tokens = (wo['completion_tokens'] as number | null) ?? null;
         text_len = String(r['text'] ?? '').length;
-        tool_calls = Array.isArray(r['tool_uses']) ? (r['tool_uses'] as unknown[]).length : 0;
+        const uses = Array.isArray(r['tool_uses']) ? (r['tool_uses'] as Array<{ name?: string }>) : [];
+        tool_calls = uses.length;
+        for (const u of uses) if (u?.name) tool_names.push(u.name);
       }
     }
   }
   const acceptable = stop_reason === 'end_turn' && finish_reason === 'stop' && text_len > 0;
   const captureOk = existsSync(capturePath);
-  return { label, capture: capturePath, capture_sha256: captureOk ? sha256File(capturePath) : 'absent', ms, stop_reason, finish_reason, text_len, reasoning_tokens, completion_tokens, tool_calls, acceptable, ...(err ? { error: err.slice(0, 200) } : {}) };
+  return { label, capture: capturePath, capture_sha256: captureOk ? sha256File(capturePath) : 'absent', ms, stop_reason, finish_reason, text_len, reasoning_tokens, completion_tokens, tool_calls, tool_names, acceptable, ...(err ? { error: err.slice(0, 200) } : {}) };
 }
 
 const userMsg = (content: string) => [{ role: 'user', content }];
@@ -128,18 +131,28 @@ const maxProbe = Math.max(...probeReasoning, 0);
 const recommended = Math.ceil((maxProbe * 4) / 64) * 64;
 const currentProbeBudget = 512;
 
-const report = {
-  report: 'L2 OPERATIONAL QUALIFICATION ROUND',
-  round_id: roundId,
-  charter_basis: 'PROCESS-CHARTER.md §3 (L2), §4 (standing engineering-traffic class), §5 (calibration)',
-  purpose: 'validate empirically: wire acceptance of the frozen probe contract; probe-budget reachability; BUILD-shaped tool-call acceptance; reasoning-cost calibration. Engineering evidence only — NEVER counted toward any L3 denominator.',
-  model, settings_sha256: SETTINGS_SHA,
-  verdicts: {
+  // freeze-6 review P2 — a weak predicate (stop_reason !== null) would credit
+  // a plain completion as tool acceptance. Wire acceptance requires an actual
+  // tool_use path: stop_reason tool_use AND >= 1 tool call AND the lead read
+  // tool among them (archive-verified).
+  const qc = results.at(-1)!;
+  const qcWireAccepted = qc.stop_reason === 'tool_use' && qc.tool_calls >= 1 && qc.tool_names.includes('read_file');
+  const verdicts: Record<string, string> = {
     'QA-connectivity': results[0].acceptable ? 'PASS' : `FAIL (${results[0].stop_reason}/${results[0].finish_reason}/text=${results[0].text_len})${results[0].error ? ` err=${results[0].error}` : ''}`,
     'QB-probe-viability': `${results.filter(r => r.label.startsWith('qb') && r.acceptable).length}/3 acceptable` + (results.filter(r => r.label.startsWith('qb')).every(r => r.acceptable) ? ' PASS' : ' FAIL'),
-    'QC-build-tool-smoke': results.at(-1)!.stop_reason !== null ? `PASS (wire accepted; stop_reason=${results.at(-1)!.stop_reason}; tool_calls=${results.at(-1)!.tool_calls})` : `FAIL (no wire response archived${results.at(-1)!.error ? `: ${results.at(-1)!.error}` : ''})`,
-  },
-  calibration: {
+    'QC-build-tool-smoke': qcWireAccepted
+      ? `PASS (wire accepted; stop_reason=${qc.stop_reason}; tool_calls=${qc.tool_calls} [${qc.tool_names.join(', ')}])`
+      : `FAIL (expected tool_use with a read_file call; got stop_reason=${qc.stop_reason}, tool_calls=${qc.tool_calls}${qc.error ? `: ${qc.error}` : ''})`,
+  };
+
+  const report = {
+    report: 'L2 OPERATIONAL QUALIFICATION ROUND',
+    round_id: roundId,
+    charter_basis: 'PROCESS-CHARTER.md §3 (L2), §4 (standing engineering-traffic class), §5 (calibration)',
+    purpose: 'validate empirically: wire acceptance of the frozen probe contract; probe-budget reachability; BUILD-shaped tool-call acceptance; reasoning-cost calibration. Engineering evidence only — NEVER counted toward any L3 denominator.',
+    model, settings_sha256: SETTINGS_SHA,
+    verdicts,
+    calibration: {
     probe_reasoning_tokens_observed: probeReasoning,
     max_reasoning_tokens_any_call: Math.max(...allReasoning, 0),
     rule: 'recommended = max observed probe reasoning x 4 (rounded to 64)',

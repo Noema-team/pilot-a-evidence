@@ -51,7 +51,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
-import { runP3Campaign, restoreTargetPristine, adjudicateTransportFailure, adjudicatePreflightCapture, combineStops, MAX_REQUEUES, type CampaignOptions } from './p3-live-runner.mts';
+import { runP3Campaign, restoreTargetPristine, adjudicateTransportFailure, adjudicatePreflightCapture, combineStops, defaultRunPreflight, MAX_REQUEUES, type CampaignOptions } from './p3-live-runner.mts';
 import { composeBuildAttempt, composePreflight, preflightContract, P3_TARGET } from './p3-live-driver.mts';
 import { ConfigGuardViolation, classifyGuardCapture, type StepContract } from './config-guard.mts';
 
@@ -625,6 +625,47 @@ const ERR = (name: string, msg: string): Record<string, unknown> => ({
   assert.equal(cs(null, 'G1'), 'G1');
   assert.equal(cs(null, null), null);
   console.log('PASS T9 (G2 precedence): capture G2 + exception G1 -> G2 end-to-end; capture G1 + exception G2 -> G2 via the combination matrix (consistent with mapCaptureToStop)');
+}
+
+// ─── T10: production preflight wiring derives its dial from the frozen contract (freeze-6) ─
+{
+  // regression for the freeze-5 defect: preflightContract() said 512 while
+  // defaultRunPreflight() still dialed max_tokens 16 — the guard would have
+  // STOPped the live campaign pre-call. The production function must DERIVE
+  // its outbound request from the contract.
+  const expectedBudget = preflightContract().max_tokens;
+  assert.equal(expectedBudget, 512, 'the frozen probe budget is the freeze-5 value');
+  let seen: Record<string, unknown> | null = null;
+  const scripted = {
+    async completeMultiTurn(p: unknown) {
+      seen = p as Record<string, unknown>;
+      return { stop_reason: 'end_turn', text: 'ok', tool_uses: [], tokens_used: 3,
+        wire_observation: { finish_reason: 'stop', completion_tokens: 3 } };
+    },
+  };
+  const evT10 = join(tmpdir(), 'p3t10');
+  rmSync(evT10, { recursive: true, force: true });
+  const pre = await defaultRunPreflight(evT10, scripted);
+  assert.equal(pre.stop, null, `production preflight accepted a contract-conformant probe (detail: ${pre.detail})`);
+  assert.ok(seen, 'the probe dialed the provider');
+  assert.equal(seen!['max_tokens'], expectedBudget, 'outbound max_tokens derives from preflightContract()');
+  assert.equal(seen!['reasoning_effort'], 'low');
+  assert.deepEqual(seen!['tools'], []);
+  const adjPath = join(evT10, 'preflight', 'preflight-guard.jsonl');
+  assert.ok(existsSync(adjPath), 'probe capture durably archived');
+  const adj = adjudicatePreflightCapture(adjPath);
+  assert.equal(adj.accepted, true, 'archived evidence passes completion-status adjudication');
+  // negative: a drifted budget is STOPped pre-call by the guard (G2), never dialed
+  const drifted = {
+    async completeMultiTurn(p: unknown) {
+      return Promise.reject(new ConfigGuardViolation('preflight', 'max_tokens mismatch (injected)'));
+    },
+  };
+  const evT10b = join(tmpdir(), 'p3t10b');
+  rmSync(evT10b, { recursive: true, force: true });
+  const pre2 = await defaultRunPreflight(evT10b, drifted);
+  assert.equal(pre2.stop, 'G1', 'a contract-divergent dial fails closed as a preflight guard STOP (G1 — configuration violation)');
+  console.log('PASS T10 (preflight wiring): production dial derives from preflightContract() (512, low, no tools); guard PASS; adjudication accepted; evidence archived; divergence -> G1 pre-call');
 }
 
 rmSync(synthDir, { recursive: true, force: true });

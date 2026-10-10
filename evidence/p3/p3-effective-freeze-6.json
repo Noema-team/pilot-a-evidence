@@ -1,0 +1,98 @@
+{
+ "artifact": "P3 EFFECTIVE FREEZE BINDING v6 \u2014 ADDITIVE launch-blocker correction: the production preflight dial now DERIVES from preflightContract() (parameter/caller drift closed); Q-C predicate tightened; L2 traffic accounting corrected. freeze-1..5 binding FILES byte-unchanged.",
+ "generated_at_utc": "2026-10-10T13:05:00Z",
+ "review": {
+  "ruling": "Operator review at 05be779: HOLD \u2014 'Calibrating a correct configuration is not enough. The executable must actually use that configuration.' The production defaultRunPreflight() still dialed max_tokens 16 while the freeze-5 contract requires 512; the guard would have STOPped the live campaign pre-call. Reviewer independently verified all L2 capture hashes (match).",
+  "reviewed_commit": "05be77953c870ae3b0fbb065a3f2b218941a9f73",
+  "frozen_stratum": "9f298f219db927d5065876cf99cdec11e462aa04"
+ },
+ "additivity": "v6 corrects the RUNNER (one function's request derivation + export), the QUALIFICATION (T10 added), the L2 HARNESS (predicate + tool-name capture), and re-runs the OFFLINE suite. UNCHANGED: the driver (byte-identical to freeze-5 \u2014 the 512 budget is NOT modified, per the reviewer's explicit directive), config-guard.mts, p3-fixture-builder.mts, p3-preregistration.json, the model regime, all STOP rules. NO new model dials were made (the L2 corrections are offline; archived observations unchanged).",
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04"
+ },
+ "target": {
+  "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "pristine": true,
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "corrections": {
+  "P1_production_preflight_wiring": {
+   "defect": "defaultRunPreflight() hardcoded max_tokens: 16 in its outbound request while preflightContract() (freeze-5) requires 512 \u2014 the guard enforces contract-vs-request and would have STOPped pre-call ('max_tokens expected 512 got 16'), terminating the campaign before attempt 1. The freeze-5 L2 validation tested the CONTRACT with harness-constructed requests, not the production dial path.",
+   "fix": "the outbound request is now DERIVED from preflightContract(model): model, max_tokens, temperature, reasoning_effort all contract-sourced \u2014 the dial and its enforcement cannot diverge again. defaultRunPreflight is exported with an offline-only inner-provider injection so the exact production path is offline-testable.",
+   "regression": "T10: scripted provider asserts outbound max_tokens == preflightContract().max_tokens == 512, reasoning_effort low, tools []; guard PASS; archived evidence passes completion-status adjudication; durable archival verified. Negative: a divergent dial fails closed pre-call (G1 configuration violation, 0 model calls)."
+  },
+  "P2_qc_predicate": {
+   "defect": "the L2 qualifier credited wire acceptance whenever stop_reason was non-null \u2014 a plain completion without tool use would have passed.",
+   "fix": "wire acceptance now requires stop_reason 'tool_use' AND >= 1 tool call AND 'read_file' among the archived tool names (tool names now parsed from the capture). NO new dials: the archived authoritative round (l2-round-2026-10-10T12-21-57) already satisfies the tightened predicate (stop_reason tool_use, [read_file])."
+  },
+  "P2_l2_accounting": {
+   "defect": "the journal understated cumulative session wire dials as 10.",
+   "correction": "true count across the four archived rounds is 14 (1 + 4 + 4 + 5); the two guard-blocked Q-C requests made NO dial (capture files are not wire traffic). No round exceeded 5 wire dials vs the 10/round cap. Capture-files != wire-dials; future rounds journal the per-round wire-dial count explicitly."
+  }
+ },
+ "runner_qualification": {
+  "artifact": "evidence/p3/p3-runner-qualification-output.txt",
+  "verdict": "ALL PASS (R1-R7 + T1-T10; 17/17), zero completion traffic, target pristine after the run (86ec0871)"
+ },
+ "chain": [
+  { "path": "evidence/p3/p3-live-runner.mts", "sha256": "5f01af550887a79a265c0b1bb5bd3f9bd2320ec930f61049ead1cca449584cad" },
+  { "path": "evidence/p3/p3-runner-qualification.mts", "sha256": "94b651ddf44bd7e3ac06f5ca0b2598dd106918a5529782a093793718e4f5b61d" },
+  { "path": "evidence/p3/p3-runner-qualification-output.txt", "sha256": "ba9a0501f86ac5e3642abb30ba596b52563a39ca01890553462367b6064c3f36" },
+  { "path": "evidence/ops-qual/l2-qualifier.mts", "sha256": "fd29b3965e8f685272f353a0c2113cdcf07b222b7a33a6a799520a0d36036104" }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p3/p3-effective-freeze-6.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public); sha256sum -c evidence/p3/p3-effective-freeze-6.sha256 (v6: 4/4); the freeze-5 driver pin verifies via evidence/p3/p3-effective-freeze-5.sha256 (1/3 \u2014 driver unchanged; qualification and output moved, documented); freeze-1: 13/15 (2 documented moves)"
+ },
+ "execution_status": "BOUND v6 \u2014 P3 live execution remains on HOLD pending the operator's fresh live-GO review. The immediate priority after GO is the first real BUILD observation (charter \u00a79).",
+ "supersedes": {
+  "v5_path": "evidence/p3/p3-effective-freeze-5.sha256",
+  "v5_sha256": "1a4c7b13b94f4377cfe03d42e446822fea8963fa9635488b8a751e062f313349",
+  "v5_binding_file_unchanged": true,
+  "v4_binding_file_unchanged": true,
+  "v3_binding_file_unchanged": true,
+  "v2_binding_file_unchanged": true,
+  "v1_binding_file_unchanged": true,
+  "pin_status": "THREE moved pins + one first-time pin: the runner (the corrected executable), its qualification (T10), the fresh output, and the L2 harness (first time pinned \u2014 predicate fix). The DRIVER is byte-identical to freeze-5 (aaae7dab...) \u2014 the 512 budget stands, empirically tested, unchanged per the reviewer's directive.",
+  "moved_pins": [
+   {
+    "path": "evidence/p3/p3-live-runner.mts",
+    "freeze5_sha256": "4679b399ba369c24875f044406d237b2c2a7b25fc115144090fbc1b793c505dd",
+    "current_sha256": "5f01af550887a79a265c0b1bb5bd3f9bd2320ec930f61049ead1cca449584cad",
+    "reason": "defaultRunPreflight(): outbound request derived from preflightContract(model) (was hardcoded 16 \u2014 the launch blocker); exported with offline-only injection. No other runner behavior changed."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification.mts",
+    "freeze5_sha256": "1c77b7d715542ae866833fdfbb5e7af6d512c044f8a7364bd48a06b9a5031db3",
+    "current_sha256": "94b651ddf44bd7e3ac06f5ca0b2598dd106918a5529782a093793718e4f5b61d",
+    "reason": "T10 added (production preflight wiring regression, positive + negative paths). All other gates byte-unchanged; 17/17 PASS."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification-output.txt",
+    "freeze5_sha256": "d6c02a0e1875b2076c0b76747f465b3390b709be2256d8482e17505669db7c53",
+    "current_sha256": "ba9a0501f86ac5e3642abb30ba596b52563a39ca01890553462367b6064c3f36",
+    "reason": "fresh full-suite run: 17/17 PASS, zero completion traffic."
+   },
+   {
+    "path": "evidence/ops-qual/l2-qualifier.mts",
+    "freeze5_era_sha256": "05be779-era (first pin; prior versions committed but never checksum-pinned)",
+    "current_sha256": "fd29b3965e8f685272f353a0c2113cdcf07b222b7a33a6a799520a0d36036104",
+    "reason": "Q-C predicate tightened (tool_use + read_file required); tool-name capture added. Archived L2 observations unchanged and still valid."
+   }
+  ],
+  "carried_unchanged": {
+   "p3-live-driver.mts": "aaae7dabacd699aaa18813b568353f9632ad1a437915943ae3fd4b8421b630a2 (byte-identical to freeze-5; the 512 probe budget is empirically grounded and NOT modified)",
+   "l2_evidence": "ops-qual round dirs 12-19-54 / 12-20-32 / 12-21-17 / 12-21-57 unchanged (14 wire dials corrected in journal; no re-dial)",
+   "fixture_manifest_identity_fields": {
+    "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+    "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+    "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+    "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+    "run_cursor": "confirm",
+    "issue_input_sha256": "dd40147291edb7412eb0ccf57c3cadbd3f19ac8d7299306c0bc880419eb124c5"
+   }
+  }
+ }
+}

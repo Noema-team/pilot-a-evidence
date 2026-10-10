@@ -1,6 +1,6 @@
 # EVALUATION PROCESS CHARTER — pilot-a / stratum experiment program
 
-**Version:** 1.0 · **Adopted:** 2026-10-10 · **Authority:** operator ratification via journal · **Applies to:** all experiments from P4 onward, and all reviews immediately (including the pending P3 freeze-5 re-launch review)
+**Version:** 1.1 · **Adopted:** 2026-10-10 (v1.0); v1.1 adds §10 (crash-recovery policy, P3 closeout review) and updates §9 priority · **Authority:** operator ratification via journal · **Applies to:** all experiments from P4 onward, and all reviews immediately
 
 ---
 
@@ -89,4 +89,14 @@ A cycle that terminates without obtaining (or being blocked from obtaining) its 
 
 ## 9. Priority statement
 
-The next datum this program owes is a **real BUILD observation** — a success or a classified failure (prompt understanding, anchor usage, repair exhaustion, or staging). Infrastructure work yields to that objective until it is obtained.
+P3 is CLOSED (SUPPORTED — QUALIFIED; see `evidence/p3/p3-closeout.json`). The next objective is **P4: upstream reliability** — whether the upstream workflow can consistently deliver a valid BUILD entry *without* the deterministic fixture replay, directly addressing P2's largest unresolved failure. Infrastructure work yields to that objective until the first upstream-to-BUILD observation is obtained.
+
+## 10. Crash-recovery policy (v1.1 — P3 closeout review)
+
+Codified from the p3-live-run-2 operational interruption and its review ruling (an unplanned full restart is a scientific-procedure deviation even when it hides nothing). Prospective rules for every future campaign:
+
+1. **Durable orchestration logs.** All orchestrator/console output is written under the campaign evidence directory from process start — never under `/tmp` or any cleaned location. A lost log is a protocol defect.
+2. **The ledger is the source of truth for what counts.** An attempt with an `attempt-counted` ledger event is **retained** across any interruption: it is never re-executed, never re-classified, and never double-counted.
+3. **Mid-flight attempts are declared `incomplete`.** If the orchestrator dies before an attempt's classification event, that attempt is archived for forensics, declared incomplete, and consumes NO slot — regardless of how far it progressed.
+4. **Resume, don't restart.** A interrupted campaign resumes from its ledger: the campaign continues its original terminal condition (e.g., until 3 evaluable) with the retained slots carried forward. A full sample restart after an interruption is a registered protocol deviation and must be disclosed as a qualification on the result (as P3's restart now permanently is).
+5. **Resume support is a preregistration item.** Any campaign whose runner lacks ledger-driven resume must say so in its preregistration, together with the rule that will apply if the orchestrator dies (so the recovery path is chosen *before* the interruption, not after).

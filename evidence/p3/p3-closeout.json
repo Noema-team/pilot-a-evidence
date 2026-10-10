@@ -1,0 +1,44 @@
+{
+ "record": "P3 CLOSEOUT \u2014 FINAL RESEARCH STATUS",
+ "generated_at_utc": "2026-10-10T18:08:34.685602+00:00",
+ "final_status": "SUPPORTED \u2014 QUALIFIED",
+ "review_disposition": "RESULT ACCEPTED \u2014 QUALIFIED SUPPORT (independent results review of 60951ca2317ba3f33a9bf05d985765a800e10fab): engineering endpoint met (3/3 >= 2/3), archived evidence internally consistent, 12/12 package files independently hash-verified",
+ "scientific_qualification": {
+  "statement": "The unplanned full restart after the p3-live-run-2 operational interruption was NOT prospectively preregistered; the frozen P3 protocol did not authorize discarding a counted slot and restarting the three-attempt sample. It remains part of the scientific record. The excluded attempt was itself successful (no outcome-dependent selection observed), and the restart caused no detectable change to the BUILD treatment.",
+  "reporting_rule": "the 3/3 result may be reported only as QUALIFIED SUPPORT (confirmatory-with-deviation), never as an unqualified confirmatory result"
+ },
+ "what_it_establishes": "the frozen BUILD protocol publishes reliably under a validated controlled entry fixture: guarded model interaction, investigation, structured submission, staging, publication, controlled downstream termination",
+ "what_it_does_not_establish": "reliable autonomous development from an initial task (upstream workflow delivery \u2014 P2's unresolved failure), downstream functional correctness, production deployment",
+ "p1r_to_p3_contrast_caveat": "1/3 -> 3/3 is encouraging but small, non-randomized, with different entry conditions; attribution between BUILD-protocol changes and upstream fixture closure is not established",
+ "campaigns": {
+  "authoritative": {
+   "dir": "evidence/p3-live-run-3",
+   "result": "3/3 PUBLISHED, 0 model failures, 0 requeues, no STOP",
+   "report": "evidence/p3-live-run-3/campaign-report.json"
+  },
+  "interrupted": {
+   "dir": "evidence/p3-live-run-2",
+   "result": "INTERRUPTED \u2014 1 publication then process death; fully disclosed, never counted"
+  }
+ },
+ "historical_chain": {
+  "P1-R": "1/3 BUILD publications (real model, early protocol)",
+  "P2": "0 BUILD opportunities (upstream failures) \u2014 machinery built from it",
+  "P3": "3/3 under controlled entry \u2014 QUALIFIED SUPPORT"
+ },
+ "maintenance_items_acknowledged_not_actioned": [
+  "T10 negative-case claim wording (G1 vs G2 classification label in the assertion message)",
+  "L2 Q-C tool-name parser strictness (tool_uses shape validation)"
+ ],
+ "reliability_correction_completed": "charter v1.1 \u00a710: durable orchestration logs + explicit crash-recovery policy (retained/resumed/incomplete)",
+ "next_experiment_candidate": {
+  "id": "P4",
+  "theme": "upstream reliability \u2014 can the upstream workflow consistently deliver a valid BUILD entry WITHOUT the deterministic fixture replay (directly addresses P2's largest unresolved failure)?",
+  "status": "candidate scope only \u2014 requires its own design, preregistration, qualification, and GO cycle"
+ },
+ "artifact_hashes": {
+  "campaign_report_3": "be66e458e4a1744d4002255592d29762b5e5127656a814e277ebcebe552dd3d4",
+  "ledger_3": "3b2f4d569246b04afb9af8fc2a95e4eb5adde7dba5ebb4f2a9a4a9802820b609"
+ },
+ "status": "P3 CLOSED"
+}

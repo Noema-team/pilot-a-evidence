@@ -1,0 +1,97 @@
+{
+ "artifact": "P3 EFFECTIVE FREEZE BINDING v5 \u2014 ADDITIVE single-parameter amendment: preflight probe budget 16 -> 512 completion tokens (frozen-artifact amendment authorized by the operator after the live preflight terminal); freeze-1..4 binding FILES byte-unchanged",
+ "generated_at_utc": "2026-10-10T10:20:00Z",
+ "review": {
+  "ruling": "Operator authorization: 'follow your recommendation' \u2014 remediation option 1 (raise the probe budget) from the P3 live terminal report at a101363. The runner, guard, fixture, boundary, model regime, hypothesis, and all STOP rules are NOT reopened.",
+  "reviewed_commit": "a1013632e0892a137535ad5f62b827c7ed27e72e",
+  "frozen_stratum": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "live_terminal_reference": "evidence/p3-live-run/campaign-report.json \u2014 G2 preflight STOP, 0/3 denominator, endpoint UNEVALUABLE, target restored pristine"
+ },
+ "additivity": "v5 amends exactly ONE frozen parameter: preflightContract().max_tokens 16 -> 512 in the pinned driver. UNCHANGED: the BUILD contract (max_tokens 32768, effort low, temperature 0.7, tool sets, submit_result schema \u2014 the scientific regime), the runner (byte-identical to freeze-4), config-guard.mts, p3-fixture-builder.mts, p3-preregistration.json, all STOP rules, the three-evaluable-attempt limit.",
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04"
+ },
+ "target": {
+  "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "pristine": true,
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "amendment": {
+  "parameter": "preflightContract().max_tokens",
+  "old": 16,
+  "new": 512,
+  "rationale": "the live wire observation (evidence/p3-live-run/preflight/preflight-guard.jsonl) proved a 16-token budget is structurally unreachable for a reasoning-mode completion: the model spent the entire budget on the reasoning channel (reasoning_tokens: 16, content_bytes: 0) and terminated finish_reason length \u2014 correctly rejected by the frozen completion-status adjudication. 512 completion tokens gives P99 low-effort reasoning headroom (~30-150 tokens typical) so the probe's success state (stop_reason end_turn, non-empty text) is reachable BY CONSTRUCTION. The probe remains ONE call, once per campaign (<0.1% of expected campaign tokens).",
+  "rejected_alternatives": [
+   "disabling reasoning on the probe \u2014 would no longer validate wire acceptance of the frozen effort:'low' parameter BUILD runs under",
+   "relaxing the completion-status adjudication \u2014 weakens the frozen T5 rule that just protected the experiment"
+  ],
+  "qualification_coupling_fix": "R6(b) now derives its synthetic probe dial FROM the frozen contract (preflightContract(model).max_tokens) instead of hardcoding 16 \u2014 the qualification can never drift from a future amendment again"
+  },
+ "runner_qualification": {
+  "artifact": "evidence/p3/p3-runner-qualification-output.txt",
+  "verdict": "ALL PASS (R1-R7 + T1-T9; 16/16), zero completion traffic, target pristine after the run (86ec0871)"
+ },
+ "chain": [
+  {
+   "path": "evidence/p3/p3-live-driver.mts",
+   "sha256": "aaae7dabacd699aaa18813b568353f9632ad1a437915943ae3fd4b8421b630a2"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification.mts",
+   "sha256": "1c77b7d715542ae866833fdfbb5e7af6d512c044f8a7364bd48a06b9a5031db3"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification-output.txt",
+   "sha256": "d6c02a0e1875b2076c0b76747f465b3390b709be2256d8482e17505669db7c53"
+  }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p3/p3-effective-freeze-5.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public); run sha256sum -c evidence/p3/p3-effective-freeze-5.sha256 (v5: 3/3), sha256sum -c evidence/p3/p3-effective-freeze-4.sha256 (v4: 1/3 \u2014 the runner pin still verifies; qualification and output moved, documented), sha256sum -c evidence/p3/p3-effective-freeze-2.sha256 (v2 driver pin: 0/1 \u2014 superseded by v5's driver pin), sha256sum -c evidence/p3/p3-effective-freeze-1.sha256 (13/15, the two documented moves)"
+ },
+ "execution_status": "BOUND v5 \u2014 awaiting the operator's fresh launch review. NO re-launch executed (the prior STOP stands until new GO).",
+ "supersedes": {
+  "v4_path": "evidence/p3/p3-effective-freeze-4.sha256",
+  "v4_sha256": "55db27a530491be7af5d8553df3f9c30af7df6de990ca50f8ba545d8fb035d67",
+  "v4_binding_file_unchanged": true,
+  "v3_binding_file_unchanged": true,
+  "v2_binding_file_unchanged": true,
+  "v1_binding_file_unchanged": true,
+  "pin_status": "THREE moved pins \u2014 the driver (the amended artifact), its qualification (coupling fix), and the fresh output. The runner remains byte-identical to freeze-4 (4679b399...).",
+  "moved_pins": [
+   {
+    "path": "evidence/p3/p3-live-driver.mts",
+    "freeze4_sha256": "d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf",
+    "current_sha256": "aaae7dabacd699aaa18813b568353f9632ad1a437915943ae3fd4b8421b630a2",
+    "reason": "preflightContract().max_tokens 16 -> 512 (the amendment) + documenting comment. The BUILD contract, model regime, boundary, and all other driver content byte-unchanged."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification.mts",
+    "freeze4_sha256": "3bc9a08abec57f44093248e90fa863e202c5d0fe0e2d73e4e75df6fcf44d70b3",
+    "current_sha256": "1c77b7d715542ae866833fdfbb5e7af6d512c044f8a7364bd48a06b9a5031db3",
+    "reason": "R6(b) derives its probe dial from preflightContract(model).max_tokens (coupling fix). All gate bodies unchanged; 16/16 PASS."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification-output.txt",
+    "freeze4_sha256": "ad80cb3db03095848edde09d51eabce6c34b44b54e503143012f9c5c72c4a6ad",
+    "current_sha256": "d6c02a0e1875b2076c0b76747f465b3390b709be2256d8482e17505669db7c53",
+    "reason": "fresh full-suite run under the amended driver: 16/16 PASS, zero completion traffic."
+   }
+  ],
+  "carried_unchanged": {
+   "p3-live-runner.mts": "4679b399ba369c24875f044406d237b2c2a7b25fc115144090fbc1b793c505dd (byte-identical to freeze-4; still pinned there and verifying)",
+   "config-guard_mts_fixture_builder_prereg": "unchanged (verified in the freeze-1 checksum file)",
+   "fixture_manifest_identity_fields": {
+    "note": "p3-build-entry-fixture-manifest.json is regenerated on every fixture instantiation by design; the deterministic identity fields remain the binding authority:",
+    "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+    "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+    "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+    "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+    "run_cursor": "confirm",
+    "issue_input_sha256": "dd40147291edb7412eb0ccf57c3cadbd3f19ac8d7299306c0bc880419eb124c5"
+   }
+  }
+ }
+}

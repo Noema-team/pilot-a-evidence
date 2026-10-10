@@ -4,12 +4,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:17.578Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:17.580Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:17.581Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:17.628Z","event":"p3_fixture_decision","decisionId":"cae00000-3d4d-40d2-964c-6c4a6afee6c1","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:17.672Z","event":"p3_fixture_confirm_gate_pending","decisionId":"c25e3369-436a-4013-b5d0-45891f262c62","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:17.700Z","event":"p3_fixture_built","fixture_sha256":"5bb43eeade2c","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:09.329Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:09.333Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:09.336Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:09.407Z","event":"p3_fixture_decision","decisionId":"8af3ab94-a137-4002-a7c4-9799ce070237","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:09.518Z","event":"p3_fixture_confirm_gate_pending","decisionId":"754c2277-76e2-42b2-81ec-3d17aec9380d","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:09.565Z","event":"p3_fixture_built","fixture_sha256":"b7fe0d9d7d0c","cursor":"confirm","replayed":4}
 PASS R1 (publication): 1 evaluable PUBLISHED attempt; boundary refused downstream; evidence archived; target restored
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
@@ -17,12 +17,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:17.882Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:17.884Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:17.886Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:17.907Z","event":"p3_fixture_decision","decisionId":"ea154594-9a52-44a3-8f76-c790d5470068","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:17.955Z","event":"p3_fixture_confirm_gate_pending","decisionId":"d0c36578-35e1-4840-a5cb-a94d2c6d3df8","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:17.992Z","event":"p3_fixture_built","fixture_sha256":"c741a8a72e0d","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:09.718Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:09.720Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:09.721Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:09.751Z","event":"p3_fixture_decision","decisionId":"f41d0be2-b7ee-4171-9685-7cb1829f6b15","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:09.794Z","event":"p3_fixture_confirm_gate_pending","decisionId":"c47c4708-fbdb-4cbd-b2a4-763f51d4482b","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:09.825Z","event":"p3_fixture_built","fixture_sha256":"1c4b0f7275d7","cursor":"confirm","replayed":4}
 PASS R2 (model failure): 1 evaluable MODEL-FAILURE; clean capture; model reached; no publication; counts against the denominator
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
@@ -30,12 +30,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:18.167Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:18.168Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:18.169Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:18.190Z","event":"p3_fixture_decision","decisionId":"a0118a74-9421-45f6-a949-e7d8393f1859","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:18.250Z","event":"p3_fixture_confirm_gate_pending","decisionId":"f530a9fb-9736-4bd4-91a2-24cd1c93092a","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:18.285Z","event":"p3_fixture_built","fixture_sha256":"699f3401bcb2","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:10.050Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:10.052Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:10.053Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:10.074Z","event":"p3_fixture_decision","decisionId":"c6007235-6a05-45ce-9b67-71ec06379ed1","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:10.130Z","event":"p3_fixture_confirm_gate_pending","decisionId":"8b4e75bf-54dd-4924-863f-aeaa99a02afd","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:10.172Z","event":"p3_fixture_built","fixture_sha256":"7a98f18a469a","cursor":"confirm","replayed":4}
 PASS R3 (G1 STOP): immediate abort; attempt not counted; 0 model calls
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
@@ -43,12 +43,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:18.465Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:18.466Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:18.467Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:18.493Z","event":"p3_fixture_decision","decisionId":"d0adf6c5-7e4c-4a69-bf7b-afc7691d4911","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:18.546Z","event":"p3_fixture_confirm_gate_pending","decisionId":"d7e1df8a-6194-4daa-a21b-248628763c08","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:18.573Z","event":"p3_fixture_built","fixture_sha256":"c5f8d6f276e6","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:10.356Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:10.357Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:10.358Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:10.385Z","event":"p3_fixture_decision","decisionId":"e577e423-7155-4f3b-ac67-93ea9d108a94","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:10.437Z","event":"p3_fixture_confirm_gate_pending","decisionId":"5bcff282-67ce-4997-925d-562a76d1bb56","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:10.468Z","event":"p3_fixture_built","fixture_sha256":"5d7bc97c83c1","cursor":"confirm","replayed":4}
 PASS R4 (G2 from exception): response-archive failure classified G2 from the exception; attempt not counted
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
@@ -56,36 +56,36 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:18.723Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:18.725Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:18.725Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:18.747Z","event":"p3_fixture_decision","decisionId":"2d3ea9cb-a9f3-47f2-a590-8d6119cb5298","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:18.780Z","event":"p3_fixture_confirm_gate_pending","decisionId":"76ca4367-043f-4821-a89c-30a9178a8396","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:18.811Z","event":"p3_fixture_built","fixture_sha256":"35c373db4b7d","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:10.635Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:10.638Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:10.639Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:10.663Z","event":"p3_fixture_decision","decisionId":"43b05106-4526-4f67-9f77-7312dc3d383a","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:10.707Z","event":"p3_fixture_confirm_gate_pending","decisionId":"50f4d054-221a-4e64-b3ee-0a5ebec567d7","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:10.747Z","event":"p3_fixture_built","fixture_sha256":"e4d62c2c3a3a","cursor":"confirm","replayed":4}
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:18.979Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:18.982Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:18.984Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:19.031Z","event":"p3_fixture_decision","decisionId":"a4155b3a-f4ac-4a8a-ac60-c00c761ba320","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.087Z","event":"p3_fixture_confirm_gate_pending","decisionId":"aff526dc-c0ed-4313-8b20-6295c461135d","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.128Z","event":"p3_fixture_built","fixture_sha256":"7b88cd6c71f5","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:10.918Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:10.919Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:10.921Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:10.948Z","event":"p3_fixture_decision","decisionId":"a3a5ee63-7655-403e-9d5f-6bee2dde9ef0","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:11.014Z","event":"p3_fixture_confirm_gate_pending","decisionId":"98e65c92-65d8-478d-9935-f95c566b6af8","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:11.050Z","event":"p3_fixture_built","fixture_sha256":"7585f00cdd9e","cursor":"confirm","replayed":4}
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:19.278Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:19.283Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:19.286Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:19.324Z","event":"p3_fixture_decision","decisionId":"e1b95bc0-8b2b-4a93-bac9-7c8c51c19de3","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.381Z","event":"p3_fixture_confirm_gate_pending","decisionId":"543ea1d7-cc71-4e17-9b15-c9aa4956e5cb","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.411Z","event":"p3_fixture_built","fixture_sha256":"23844a85fd4d","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:11.200Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:11.206Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:11.210Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:11.232Z","event":"p3_fixture_decision","decisionId":"06a7c4f9-be9b-4b1d-815b-75c05623f081","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:11.282Z","event":"p3_fixture_confirm_gate_pending","decisionId":"a13d389d-8e36-42ea-8fff-a42c848f5098","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:11.354Z","event":"p3_fixture_built","fixture_sha256":"df223b6346aa","cursor":"confirm","replayed":4}
 PASS R5 (stop-at-three): terminal after exactly 3 evaluable attempts (3 publications)
 PASS R6 (preflight separation): preflight STOP aborts before attempt 1 counting nothing; probe path is distinct and verified
 PASS R7 (fail-closed evidence): missing capture -> G2; violations classify from the exception alone
@@ -95,24 +95,24 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:19.625Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:19.626Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:19.627Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:19.650Z","event":"p3_fixture_decision","decisionId":"d7b4fd48-2712-48e2-8b46-3014f7d549f7","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.705Z","event":"p3_fixture_confirm_gate_pending","decisionId":"a04b70f8-b18a-4f9a-a5ec-ddac7b4d7750","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.738Z","event":"p3_fixture_built","fixture_sha256":"558f7dd8eb56","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:11.635Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:11.637Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:11.638Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:11.665Z","event":"p3_fixture_decision","decisionId":"85fb4815-ec5f-4803-8c16-f837cfdd318e","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:11.716Z","event":"p3_fixture_confirm_gate_pending","decisionId":"9402e745-2da3-4549-aeab-e71e59bff663","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:11.783Z","event":"p3_fixture_built","fixture_sha256":"e728b99d6ccf","cursor":"confirm","replayed":4}
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:19.887Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:19.890Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:19.892Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:19.916Z","event":"p3_fixture_decision","decisionId":"6cc765c0-37e8-4262-8e47-2232e9e16c93","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:19.964Z","event":"p3_fixture_confirm_gate_pending","decisionId":"4b2c5c64-6b51-4c86-a0a0-5feaf8057c17","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.019Z","event":"p3_fixture_built","fixture_sha256":"80d7fcc7bb7d","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:11.958Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:11.960Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:11.961Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:12.000Z","event":"p3_fixture_decision","decisionId":"1e8e8de5-0cf6-40a7-bb00-c03bd6919690","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:12.034Z","event":"p3_fixture_confirm_gate_pending","decisionId":"5ad8cad6-9dd0-4b4b-bff0-b0c8c4b77d5f","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:12.063Z","event":"p3_fixture_built","fixture_sha256":"d4ae4cedfa5a","cursor":"confirm","replayed":4}
 PASS T1 (transport re-queue): fetch failed journaled + re-queued; consumed NO slot; campaign completed on attempt 2
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
@@ -120,12 +120,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:20.265Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:20.267Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:20.268Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:20.295Z","event":"p3_fixture_decision","decisionId":"49183b6b-6e98-42a1-9807-8742b39dfe6a","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.339Z","event":"p3_fixture_confirm_gate_pending","decisionId":"f070be73-8bf4-430e-bb17-b1f1ab5bcf13","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.371Z","event":"p3_fixture_built","fixture_sha256":"0b41010761f7","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:12.298Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:12.301Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:12.302Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:12.340Z","event":"p3_fixture_decision","decisionId":"454d5c49-e34e-4c39-9b89-cfc34dd177b0","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:12.395Z","event":"p3_fixture_confirm_gate_pending","decisionId":"b8848126-53e4-4989-8dfb-24e2c0c57e88","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:12.483Z","event":"p3_fixture_built","fixture_sha256":"9c1e813b6991","cursor":"confirm","replayed":4}
 PASS T2 (ambiguity not censored): non-transport error (HTTP 400) stays an evaluable MODEL-FAILURE
 PASS T3 (adjudicator matrix): qualifying transport shapes; 400/app/mixed/tampered/free-text-timeout ambiguous; budget exhaustion vetoes the re-queue; terminal-position rule enforced
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
@@ -134,48 +134,48 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:20.544Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:20.546Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:20.547Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:20.575Z","event":"p3_fixture_decision","decisionId":"a0b3b666-01ee-474d-8e4c-ede61783ef67","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.610Z","event":"p3_fixture_confirm_gate_pending","decisionId":"1c72575e-ec18-4a8a-aa81-9dd894e566f7","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.649Z","event":"p3_fixture_built","fixture_sha256":"35b8184d329a","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:12.651Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:12.653Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:12.654Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:12.688Z","event":"p3_fixture_decision","decisionId":"0a4a8aa0-78b5-4efd-97fd-7f98be4b2b11","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:12.754Z","event":"p3_fixture_confirm_gate_pending","decisionId":"482dface-e055-40a8-abac-377157ffae2b","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:12.822Z","event":"p3_fixture_built","fixture_sha256":"8dadb2460774","cursor":"confirm","replayed":4}
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:20.841Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:20.844Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:20.846Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:20.889Z","event":"p3_fixture_decision","decisionId":"9d28d4bd-7686-488d-a8eb-5c44c1c73bb3","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.945Z","event":"p3_fixture_confirm_gate_pending","decisionId":"f8deaf5a-140f-4476-b437-f2aa612c895d","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:20.973Z","event":"p3_fixture_built","fixture_sha256":"dc1121388266","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:12.973Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:12.976Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:12.977Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:13.002Z","event":"p3_fixture_decision","decisionId":"caacc551-a80c-4e04-aa8d-271e2d74a917","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.041Z","event":"p3_fixture_confirm_gate_pending","decisionId":"b8beb79e-7e20-400b-8fbe-19350b3bca2c","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.067Z","event":"p3_fixture_built","fixture_sha256":"ee72999966ae","cursor":"confirm","replayed":4}
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:21.095Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:21.097Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:21.097Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:21.117Z","event":"p3_fixture_decision","decisionId":"4e4f9342-57d4-4500-8521-83d279238a76","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:21.151Z","event":"p3_fixture_confirm_gate_pending","decisionId":"f605f0ad-7eb8-4125-9717-40fbe00568fd","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:21.186Z","event":"p3_fixture_built","fixture_sha256":"6b1f52add730","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:13.227Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:13.229Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:13.230Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:13.267Z","event":"p3_fixture_decision","decisionId":"d560da45-8093-4b80-81d1-499b8ed92ac2","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.306Z","event":"p3_fixture_confirm_gate_pending","decisionId":"ca8f2920-c654-455f-91dc-892cbfaa49d0","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.332Z","event":"p3_fixture_built","fixture_sha256":"2a5c389183ca","cursor":"confirm","replayed":4}
 fatal: pathspec 'docs/cycle-charter.md' did not match any files
 fatal: pathspec 'docs/requirements.md' did not match any files
 fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:21.332Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:21.334Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:21.335Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:21.357Z","event":"p3_fixture_decision","decisionId":"98ebd97a-ccd9-4789-b8a1-7997f7f56941","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:21.422Z","event":"p3_fixture_confirm_gate_pending","decisionId":"363745ff-d1fe-4cc5-92f6-0f8d0aa59261","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:21.461Z","event":"p3_fixture_built","fixture_sha256":"b8cfea317452","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:13.459Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:13.460Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:13.461Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:13.483Z","event":"p3_fixture_decision","decisionId":"25d2a8df-9048-4bc7-b73c-8392c2f95c08","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.525Z","event":"p3_fixture_confirm_gate_pending","decisionId":"965a1b49-0642-431f-985d-c738a0c1aec5","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.552Z","event":"p3_fixture_built","fixture_sha256":"c6b12a045eaf","cursor":"confirm","replayed":4}
 PASS T4 (re-queue cap): exactly 3 re-queues recorded; the 4th transport-censored event is not re-queued; REQUEUE-EXHAUSTED STOP back to the operator; nothing consumed
 PASS T5 (preflight adjudication): clean probe accepted; finish_reason error/absent/length, wrong stop_reason, empty text, multi-call, STOP all rejected
 PASS T6 (evidence durability): all attempt packages re-verify by hash after subsequent fixture rebuilds; ledger hashes match
@@ -187,12 +187,12 @@ fatal: pathspec 'docs/architecture.md' did not match any files
 fatal: pathspec 'docs/plan.md' did not match any files
 fatal: pathspec 'docs/test-plan.md' did not match any files
 fatal: pathspec 'apps/ai-server/tests/integration/test_worker_failure_payload_contract.py' did not match any files
-[p3] {"ts":"2026-10-10T09:04:21.801Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
-[p3] {"ts":"2026-10-10T09:04:21.803Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
-[p3] {"ts":"2026-10-10T09:04:21.804Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
-[p3] {"ts":"2026-10-10T09:04:21.831Z","event":"p3_fixture_decision","decisionId":"f192f8b4-2ead-4795-8dc3-fa83013d81a6","type":"checkpoint","cursor":"scoping.checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:21.865Z","event":"p3_fixture_confirm_gate_pending","decisionId":"71067772-ab1e-4482-942f-dbb49843aea7","type":"checkpoint"}
-[p3] {"ts":"2026-10-10T09:04:21.903Z","event":"p3_fixture_built","fixture_sha256":"9c7fb0970b3e","cursor":"confirm","replayed":4}
+[p3] {"ts":"2026-10-10T11:02:13.864Z","event":"p3_seeded","defineWi":"wi-define-108-a8"}
+[p3] {"ts":"2026-10-10T11:02:13.865Z","event":"p3_authority_instantiated","definition_sha256":"71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5"}
+[p3] {"ts":"2026-10-10T11:02:13.866Z","event":"p3_execution_wi_created","wiId":"wi-exec-108","workflowParameters":{"planning_depth":"minimal","max_iterations":5,"on_cap_hit":"halt","definitionSource":{"workItemId":"wi-define-108-a8"},"editPolicy":{"appliesToSteps":["build"],"allowedEditPaths":["apps/ai-server/rag-worker-service/main.py"],"requiredEditPaths":["apps/ai-server/rag-worker-service/main.py"]}}}
+[p3] {"ts":"2026-10-10T11:02:13.897Z","event":"p3_fixture_decision","decisionId":"469c5443-ea45-40df-9ebb-535fcdc251dd","type":"checkpoint","cursor":"scoping.checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.943Z","event":"p3_fixture_confirm_gate_pending","decisionId":"114c3a37-ff93-4b62-9916-4b09cdb6daf8","type":"checkpoint"}
+[p3] {"ts":"2026-10-10T11:02:13.972Z","event":"p3_fixture_built","fixture_sha256":"47926e1bdf84","cursor":"confirm","replayed":4}
 PASS T9 (G2 precedence): capture G2 + exception G1 -> G2 end-to-end; capture G1 + exception G2 -> G2 via the combination matrix (consistent with mapCaptureToStop)
 
 P3 RUNNER QUALIFICATION: ALL PASS (zero completion traffic)

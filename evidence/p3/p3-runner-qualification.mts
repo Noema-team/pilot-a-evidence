@@ -52,7 +52,7 @@ import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
 import { runP3Campaign, restoreTargetPristine, adjudicateTransportFailure, adjudicatePreflightCapture, combineStops, MAX_REQUEUES, type CampaignOptions } from './p3-live-runner.mts';
-import { composeBuildAttempt, composePreflight, P3_TARGET } from './p3-live-driver.mts';
+import { composeBuildAttempt, composePreflight, preflightContract, P3_TARGET } from './p3-live-driver.mts';
 import { ConfigGuardViolation, classifyGuardCapture, type StepContract } from './config-guard.mts';
 
 const ROOT = '/home/theo/Documents/coding/repos/student-platform';
@@ -287,7 +287,8 @@ const mkOpts = (over: Partial<CampaignOptions>): CampaignOptions =>
   assert.ok(probe.capturePath.includes('preflight-'), 'preflight capture namespace is separate');
   await (probe.provider as { completeMultiTurn: (p: unknown) => Promise<unknown> }).completeMultiTurn({
     model: probe.model, system: 'x', messages: [{ role: 'user', content: 'x' }],
-    max_tokens: 16, temperature: 0.7, reasoning_effort: 'low', tools: [],
+    // mirror the FROZEN probe contract (freeze-5: 512) — derived, never hardcoded
+    max_tokens: preflightContract(probe.model).max_tokens, temperature: 0.7, reasoning_effort: 'low', tools: [],
   });
   const pf = probe.classifyAttempt();
   assert.equal(pf.stop, null, 'the preflight probe archived cleanly');

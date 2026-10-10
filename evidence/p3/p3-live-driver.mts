@@ -67,11 +67,21 @@ export function buildContract(model: string = P3_MODEL_REGIME.model): StepContra
 // pre-launch capability probe contract (used at GO time only, ONE tiny
 // completion): model/effort/temperature as frozen, minimal budget, no tools.
 // Dialing it is NOT part of freeze preparation (no model traffic).
+//
+// freeze-5 AMENDMENT (authorized after the live terminal at a101363): the
+// original 16-token budget is structurally unreachable for a reasoning-mode
+// completion — the live wire observation proved the model spends its whole
+// budget on the reasoning channel first (reasoning_tokens: 16,
+// content_bytes: 0, finish_reason length), so a properly terminated
+// completion (end_turn, non-empty text) can never occur. 512 completion
+// tokens gives P99 low-effort reasoning headroom (~30-150 typical) so the
+// probe's success state is reachable BY CONSTRUCTION. BUILD contract budget
+// (32768) is untouched; the probe remains one call, once per campaign.
 export function preflightContract(model: string = P3_MODEL_REGIME.model): StepContract {
   return {
     stepId: 'preflight',
     model,
-    max_tokens: 16,
+    max_tokens: 512,
     reasoning_effort: P3_MODEL_REGIME.build.reasoning_effort,
     temperature: P3_MODEL_REGIME.build.temperature,
     tool_sets: [[]],

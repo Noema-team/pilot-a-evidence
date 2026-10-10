@@ -1,0 +1,68 @@
+{
+ "artifact": "P4 DRAFT PREREGISTRATION — NOT FROZEN, NOT AUTHORIZED. Design-draft companion to evidence/p4/p4-design-draft.md (DRAFT v1). This file exists so the architecture review can preregister-by-reference; every field below is provisional until the review returns and the qualification freezes it.",
+ "experiment": "P4",
+ "title": "Autonomous upstream reliability — can the real workflow + real LLM produce a valid BUILD-entry state without fixture replay?",
+ "research_question": "Can the real Stratum workflow, using a real LLM rather than scripted upstream fixture replay, consistently produce a valid BUILD-entry state?",
+ "relation_to_prior_experiments": {
+  "P2": "0/9 workflows reached BUILD; root cause: campaign-driver settings clobber (10/10 runs at degraded budgets) + upstream generative exhaustion; P4 prevents and measures both",
+  "P3": "3/3 BUILD publications from a replayed entry state (QUALIFIED SUPPORT) — P4 removes the replay",
+  "P4_is_not": "a BUILD reliability study (P3's closed result), a task-generalization study, or a downstream-correctness study"
+ },
+ "primary_endpoint": {
+  "definition": "BUILD-entry readiness at the confirm checkpoint, assessed BEFORE any BUILD execution; the confirm decision remains pending",
+  "readiness_checks": {
+   "R1_workflow_state": "execution WorkItem live; cursor at confirm; well-formed pending checkpoint decision",
+   "R2_authority": "definition artifact with recorded definition_sha256 produced by THIS run's model output; execution WI references it as definitionSource",
+   "R3_configuration": "settings.json sha 5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2 verified at every step transition; installed once at campaign start; no campaign code writes it afterward",
+   "R4_budget_on_wire": "every archived upstream request carries max_tokens from the frozen per-step map (workflow_max_tokens) and frozen effort keys",
+   "R5_edit_policy": "workflowParameters carry allowedEditPaths/requiredEditPaths over the worker file",
+   "R6_wire_integrity": "all upstream turns guard-archived with wire_observation; zero unarchived provider calls"
+  },
+  "assessment_record": "readiness-assessment.json per attempt: READY | NOT-READY + class + evidence pointers"
+ },
+ "not_ready_classes": [
+  "budget-exhaustion-upstream (genuine finish_reason length at the CORRECT frozen budget)",
+  "authority-invalid (definition artifact missing/inauthoritative)",
+  "workflow-abandoned (cap-hit halt, max-iterations)",
+  "malformed-state (confirm state malformed/missing)",
+  "provider-error-unresolved (non-transport, unresolved after repair)"
+ ],
+ "procedure_classes_consume_nothing": [
+  "CONFIG-DRIFT STOP (settings sha divergence — immediate campaign-terminal STOP with archived diff)",
+  "transport re-queue (bounded at 3, P3 discipline; ambiguity never censored)",
+  "guard evidence STOP (G1/G2 semantics inherited from P3)",
+  "crash recovery per charter v1.1 section 10 (retained/incomplete/resume)"
+ ],
+ "sampling": {
+  "task": "single pinned input evidence/p3/inputs/issue-108.json (dd40147291edb7412eb0ccf57c3cadbd3f19ac8d7299306c0bc880419eb124c5) — same task as P3, now WITHOUT replay",
+  "design_rationale": "fixed-task repetition measures delivery reliability without task-difficulty confounds; task generalization explicitly out of scope",
+  "n": 3,
+  "success_threshold": ">= 2/3 attempts READY",
+  "denominator_rule": "every launched workflow instance is evaluable (READY or NOT-READY+class); procedure classes consume nothing"
+ },
+ "model_regime": "identical frozen regime: openrouter, z-ai/glm-5.3-flash, settings 5634b2e8 (full file with workflow_max_tokens + workflow_reasoning_effort), upstream per-step budgets honored and WIRE-VERIFIED",
+ "config_integrity": {
+  "state_time_guard": "settings sha verified before each upstream step; drift -> CONFIG-DRIFT STOP (procedure class)",
+  "request_time_guard": "P3 config-guard composition wraps every upstream step; per-step contracts derived from the frozen settings",
+  "no_seed_rule": "no seed()/instantiate-reset in the campaign path; settings installed exactly once per campaign"
+ },
+ "crash_recovery": {
+  "charter": "v1.1 section 10, declared BEFORE launch",
+  "implementation": "ledger-driven resume in the P4 runner: attempt-counted = retained (never re-run/double-counted); mid-flight at crash = incomplete (archived under interrupted-*, discarded, consumes nothing); resume continues the original terminal condition",
+  "logs": "all orchestration output under the campaign evidence dir from process start"
+ },
+ "qualification_plan": {
+  "L1_offline": "scripted-provider end-to-end: READY path; each NOT-READY class induced+classified; clobber simulation -> CONFIG-DRIFT; drifted-budget request -> guard STOP; kill-and-resume (retained slot preserved); no-seed code-inspection gate",
+  "L2_real_provider": "one round, <= 6 calls, ops-qual namespace: define-shaped + design-shaped turns at frozen upstream budgets; 32768 reasoning-burn calibration (P2 hidden-burn anomaly); upstream tool-surface capture verification",
+  "L3": "N=3 campaign; first genuine upstream-to-BUILD-entry observation expected at attempt 1"
+ },
+ "reuse": "workflow engine, decision repos, config-guard capture, evidence packaging, ledger + adjudicators, restoration, qualification patterns; NEW thin code: upstream per-step contract derivation, R1-R6 readiness function (pure), ledger-resume in the runner",
+ "stop_rules": "immediate campaign-terminal STOP on CONFIG-DRIFT, out-of-policy disk writes during upstream, guard STOP, or evidence-archive failure — same shape as P3's frozen rules; on any STOP: archive, journal, return to operator",
+ "execution_status": "DRAFT — architecture review pending. No live experiments, no provider dialing, no GO.",
+ "open_questions_for_review": [
+  "R4 violation: STOP criterion (drafted) vs readiness-criterion-only?",
+  "upstream step set = the frozen workflow definition's own steps (drafted) — confirm",
+  "confirm decision left pending (drafted) vs composite endpoint through BUILD — rejected for scope control",
+  "N=3 fixed-task as a reliability probe — confirm or name a task-mix alternative"
+ ]
+}

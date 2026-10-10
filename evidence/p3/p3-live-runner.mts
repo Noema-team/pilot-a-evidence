@@ -23,7 +23,9 @@
 //        unambiguous transport failure -> TRANSPORT-REQUEUE: journaled,
 //            consumes NO attempt (frozen denominator_rule: "Transport
 //            failure mid-BUILD: journal + re-queue, consumes no attempt;
-//            ambiguity is NOT censored; the archived capture decides")
+//            ambiguity is NOT censored; the archived capture decides");
+//            an already-observed output-budget failure is NEVER censored
+//            by a later transport error (freeze-4)
 //   4. BEFORE the attempt is counted and BEFORE the next fixture reset
 //      destroys the runtime workspace: archive an immutable per-attempt
 //      evidence package (guard capture, submission/rejection + provenance +
@@ -31,9 +33,10 @@
 //      outcome, diagnostics) self-verified by hash, then write a durable
 //      campaign-ledger line (freeze-3 review P1-2)
 //   5. stop after exactly MAX_ATTEMPTS evaluable attempts, or immediately
-//      on a campaign STOP; transport re-queues are hard-capped at
-//      MAX_REQUEUES (exceeding the cap = REQUEUE-EXHAUSTED STOP, return to
-//      the operator — retries can never silently exceed the approved scope)
+//      on a campaign STOP; at most MAX_REQUEUES transport events are
+//      re-queued — a further transport-censored event is NOT re-queued and
+//      NOT recorded as one (REQUEUE-EXHAUSTED STOP, return to the operator:
+//      retries can never silently exceed the approved scope)
 //   6. restore the target PRISTINE: pinned HEAD + worker bytes PLUS a full
 //      `git status --porcelain` verification accounting explicitly for
 //      .sle/ — any tracked modification or unexpected untracked file fails
@@ -70,11 +73,14 @@ const sha256File = (p: string): string => createHash('sha256').update(readFileSy
 const sha256String = (s: string): string => createHash('sha256').update(s).digest('hex');
 
 export const MAX_ATTEMPTS = 3;
-// freeze-3 review P1-1 — the approved campaign scope is THREE evaluable
-// attempts. Transport re-queues consume no slot but are hard-capped: after
-// MAX_REQUEUES non-consuming re-queues the campaign STOPs (REQUEUE-EXHAUSTED)
-// and returns to the operator. The campaign can therefore never silently
-// exceed the approved scope (evaluable <= 3; total attempts <= 3 + 3).
+// freeze-3 review P1-1 (semantics finalized per freeze-4 review P2) — the
+// approved campaign scope is THREE evaluable attempts. MAX_REQUEUES is the
+// EXACT maximum of non-consuming re-queues: the first MAX_REQUEUES
+// transport-censored events are journaled + re-queued; a further one is NOT
+// re-queued and NOT recorded as a re-queue — the campaign STOPs
+// (REQUEUE-EXHAUSTED) and returns to the operator. The campaign can
+// therefore never silently exceed the approved scope (evaluable <= 3;
+// re-queue events <= 3).
 export const MAX_REQUEUES = 3;
 
 export type AttemptOutcome = 'PUBLISHED' | 'MODEL-FAILURE' | 'TRANSPORT-REQUEUE' | 'STOPPED';
@@ -91,15 +97,35 @@ export type CampaignStopReason = 'G1' | 'G2' | 'FIXTURE-RESTORE' | 'REQUEUE-EXHA
 // Unambiguous transport classes, grounded in the frozen stack (llm-provider
 // error shape `LLM API request failed: <status> <statusText>` and the undici
 // fetch wrapper — the ONLY fetch user in the attempt path is the LLM HTTP
-// transport; no model-attributable outcome can produce these records):
+// transport; no model-attributable outcome can produce these records).
+// freeze-4 review P1: deliberately NARROW — recognizable provider/network
+// error types and shapes only; free-text matches like "timeout" in an
+// application error are NOT transport evidence (network timeouts carry
+// explicit codes: ETIMEDOUT, UND_ERR_*_TIMEOUT, HTTP 408).
 const TRANSPORT_ERROR_PATTERNS: RegExp[] = [
   /\bfetch failed\b/,                                   // undici network-layer wrapper (TypeError: fetch failed)
   /\bLLM API request failed: (?:5\d\d|408|429)\b/,      // HTTP 5xx / request timeout / rate limit
   /\b(?:ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|EHOSTUNREACH|ENETUNREACH|ECONNABORTED)\b/,
   /\bUND_ERR_(?:CONNECT_TIMEOUT|HEADERS_TIMEOUT|BODY_TIMEOUT|SOCKET)\b/,
   /\bsocket hang up\b/i,
-  /\btimeout\b|\btimed out\b/i,
 ];
+
+// freeze-4 review P1 — output-budget exhaustion is an ALREADY-OBSERVED model
+// failure (inherited Addendum-2 discipline: output-budget-truncated BUILD
+// output is an evaluable failure). A later transport error must never
+// retroactively erase it: any archived response carrying a budget signal
+// vetoes the re-queue regardless of the error records' transport shape.
+const BUDGET_STOP_REASONS = new Set(['max_tokens', 'length']);
+function observedBudgetExhaustion(cls: CaptureClassification): string | null {
+  for (const r of cls.responses) {
+    const sr = typeof r.stop_reason === 'string' ? r.stop_reason : null;
+    const wire = (r.wire_observation ?? null) as { finish_reason?: unknown } | null;
+    const fr = wire && typeof wire === 'object' ? wire.finish_reason : undefined;
+    if (sr !== null && BUDGET_STOP_REASONS.has(sr)) return `stop_reason ${sr}`;
+    if (fr === 'length') return `finish_reason length (stop_reason ${String(sr)})`;
+  }
+  return null;
+}
 
 export interface TransportErrorRecord {
   error_name: string | null;
@@ -123,11 +149,14 @@ const isTransportErrorRecord = (r: TransportErrorRecord): boolean => {
 //   (a) >= 1 archived provider error record,
 //   (b) ZERO capture-integrity failures and ZERO guard STOPs (a tampered or
 //       stopped capture can never decide a re-queue),
-//   (c) EVERY archived error record matches an unambiguous transport class,
-//   (d) the LAST archived outcome record is the error itself — the attempt's
+//   (c) ZERO output-budget signals in the responses (an already-observed
+//       evaluable model failure is never retroactively censored — freeze-4),
+//   (d) EVERY archived error record matches an unambiguous transport class,
+//   (e) the LAST archived outcome record is the error itself — the attempt's
 //       proximate failure cause is the transport failure, not a later model
 //       turn.
-// Anything else is AMBIGUOUS (-> evaluable MODEL-FAILURE; never censored).
+// Anything else is AMBIGUOUS or NOT-TRANSPORT (-> evaluable MODEL-FAILURE;
+// never censored).
 export function adjudicateTransportFailure(cls: CaptureClassification, capturePath: string): TransportAdjudication {
   const records: TransportErrorRecord[] = cls.errors.map((e) => ({
     error_name: typeof e.error_name === 'string' ? e.error_name : null,
@@ -142,6 +171,12 @@ export function adjudicateTransportFailure(cls: CaptureClassification, capturePa
     return verdict('AMBIGUOUS', `capture integrity failures present (${cls.integrity_failures.slice(0, 2).join(' | ')}) — a compromised capture cannot decide a re-queue`);
   }
   if (cls.stops.length > 0) return verdict('AMBIGUOUS', 'guard STOPs present in the capture — procedure class, not adjudicable as transport');
+  // freeze-4 review P1 — an already-observed output-budget failure is
+  // EVALUABLE; a later transport error cannot retroactively censor it
+  const budget = observedBudgetExhaustion(cls);
+  if (budget !== null) {
+    return verdict('NOT-TRANSPORT', `output-budget exhaustion already observed (${budget}) — the attempt is an evaluable model failure; a later transport error does not erase it (addendum-2 discipline)`);
+  }
   const nonTransport = records.filter((r) => !isTransportErrorRecord(r));
   if (nonTransport.length > 0) {
     return verdict('AMBIGUOUS', `${nonTransport.length}/${records.length} archived error records are not unambiguous transport failures (first: ${nonTransport[0].error_name ?? '?'}: ${(nonTransport[0].error_message ?? '').slice(0, 100)}) — ambiguity is NOT censored (addendum-2)`);
@@ -521,6 +556,18 @@ async function archiveAttemptEvidence(opts: CampaignOptions, ctx: AttemptEvidenc
   return { dir, sha256: packageSha };
 }
 
+// freeze-4 review P2 — G2 takes precedence over G1 when the capture and
+// exception classifications overlap, consistently with the composed driver's
+// mapCaptureToStop(): an evidence-integrity failure must never be misreported
+// as a configuration violation (both halt; the forensic classification must
+// still be right). Exported pure so the full combination matrix is
+// regression-testable (the engine absorbs provider-call exceptions, so an
+// end-to-end G1-capture + G2-exception overlap is not drivable offline).
+export function combineStops(captureStop: CampaignStop, violationStop: CampaignStop): CampaignStop {
+  return captureStop === 'G2' || violationStop === 'G2' ? 'G2'
+    : captureStop === 'G1' || violationStop === 'G1' ? 'G1' : null;
+}
+
 // ─── one BUILD-entry attempt ─────────────────────────────────────────────────
 async function runAttempt(
   index: number,
@@ -567,11 +614,11 @@ async function runAttempt(
     attemptError = err; // engine-level failures are recorded, then classified
   }
 
-  // classify BEFORE counting — capture first, then exceptions
+  // classify BEFORE counting — capture first, then exceptions, combined with
+  // G2 precedence (freeze-4 review P2; see combineStops)
   const { cls, stop: captureStop } = attempt.classifyAttempt();
   const violationStop = attemptError ? classifyViolation(attemptError) : null;
-  const stop: CampaignStopReason = captureStop === 'G1' || violationStop === 'G1' ? 'G1'
-    : captureStop === 'G2' || violationStop === 'G2' ? 'G2' : null;
+  const stop: CampaignStopReason = combineStops(captureStop, violationStop);
 
   // publication evidence (provenance row + disk == provenance)
   let publicationHash: string | null = null;
@@ -751,22 +798,30 @@ export async function runP3Campaign(opts: CampaignOptions): Promise<CampaignResu
     });
 
     // transport re-queue: journaled (operator-visible), consumes NO slot,
-    // hard-capped so retries can never silently exceed the approved scope
+    // hard-capped so retries can never silently exceed the approved scope.
+    // freeze-4 review P2 — the declared cap is the exact maximum of
+    // non-consuming re-queues: once requeues === MAX_REQUEUES, a further
+    // transport-censored event is NOT re-queued and NOT recorded as one —
+    // the campaign ends REQUEUE-EXHAUSTED.
     if (rec.outcome === 'TRANSPORT-REQUEUE') {
+      if (requeues + 1 > MAX_REQUEUES) {
+        result.stop = 'REQUEUE-EXHAUSTED';
+        result.stopDetail = `transport-censored event #${requeues + 1} exceeds the stated maximum of ${MAX_REQUEUES} non-consuming re-queues — NOT re-queued; returning to the operator (${result.evaluable} evaluable so far)`;
+        result.complete = true;
+        result.targetRestoredPristine = await restoreTargetPristine();
+        appendLedger(opts.evidenceDir, {
+          event: 'campaign-terminal', stop: result.stop, stopDetail: result.stopDetail,
+          evaluable: result.evaluable, requeues,
+          note: `transport-censored event #${requeues + 1} not re-queued (cap ${MAX_REQUEUES} reached)`,
+        });
+        return result;
+      }
       requeues++;
       result.requeues = requeues;
       appendLedger(opts.evidenceDir, {
         event: 'transport-requeue', index: rec.index, attempt_id: rec.attemptId,
         requeues_used: requeues, requeues_cap: MAX_REQUEUES, detail: rec.stopDetail,
       });
-      if (requeues > MAX_REQUEUES) {
-        result.stop = 'REQUEUE-EXHAUSTED';
-        result.stopDetail = `${requeues} unambiguous transport re-queues exceed the cap of ${MAX_REQUEUES} — returning to the operator (no attempt consumed by re-queues; ${result.evaluable} evaluable so far)`;
-        result.complete = true;
-        result.targetRestoredPristine = await restoreTargetPristine();
-        appendLedger(opts.evidenceDir, { event: 'campaign-terminal', stop: result.stop, stopDetail: result.stopDetail, evaluable: result.evaluable, requeues });
-        return result;
-      }
       continue;
     }
 

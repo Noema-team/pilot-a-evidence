@@ -24,8 +24,8 @@
 //      evaluable MODEL-FAILURE
 //  T3  transport adjudicator matrix: qualifying/ambiguous/terminal-position
 //      rules decided from the archived capture alone
-//  T4  re-queue cap: retries can never silently exceed the approved scope
-//      (REQUEUE-EXHAUSTED STOP after MAX_REQUEUES)
+//  T4  re-queue cap: the 4th transport-censored event is NOT re-queued and
+//      NOT recorded as one (REQUEUE-EXHAUSTED after exactly MAX_REQUEUES)
 //  T5  preflight completion-status adjudication: the P2 class (finish_reason
 //      error / absent / length, or missing text) is rejected; a clean probe
 //      is accepted
@@ -36,6 +36,14 @@
 //  T8  full pristine restoration: untracked upstream artifacts removed via
 //      filesystem ops, complete porcelain verification accounting for .sle,
 //      fail closed on unexpected files
+// freeze-4 review T-gates (additive; R1-R7 + T1-T8 preserved):
+//  T3 additions: output-budget exhaustion vetoes the re-queue even when a
+//      later transport error ends the capture (addendum-2: an already-
+//      observed evaluable failure is never retroactively censored); an
+//      application error merely containing "timeout" is NOT transport
+//      evidence
+//  T9  G2-over-G1 precedence when capture and exception classifications
+//      overlap (consistently with mapCaptureToStop)
 
 import { readFileSync, writeFileSync, existsSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -43,7 +51,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
-import { runP3Campaign, restoreTargetPristine, adjudicateTransportFailure, adjudicatePreflightCapture, MAX_REQUEUES, type CampaignOptions } from './p3-live-runner.mts';
+import { runP3Campaign, restoreTargetPristine, adjudicateTransportFailure, adjudicatePreflightCapture, combineStops, MAX_REQUEUES, type CampaignOptions } from './p3-live-runner.mts';
 import { composeBuildAttempt, composePreflight, P3_TARGET } from './p3-live-driver.mts';
 import { ConfigGuardViolation, classifyGuardCapture, type StepContract } from './config-guard.mts';
 
@@ -437,7 +445,23 @@ const ERR = (name: string, msg: string): Record<string, unknown> => ({
   const tamperedPath = writeCapture([REQ(), ERR('TypeError', 'fetch failed')]);
   writeFileSync(tamperedPath, readFileSync(tamperedPath, 'utf-8') + 'not-json\n');
   assert.equal(adjudicateTransportFailure(classifyGuardCapture(tamperedPath), tamperedPath).verdict, 'AMBIGUOUS');
-  console.log('PASS T3 (adjudicator matrix): 6 qualifying transport classes; 400/app/mixed/tampered ambiguous; terminal-position rule enforced');
+  // (k) freeze-4: output-budget exhaustion ALREADY observed -> a later
+  // transport error must NOT retroactively censor the evaluable failure
+  const k = adjPath([REQ(), RESP({ wire_observation: { finish_reason: 'length' } }), REQ(), ERR('TypeError', 'fetch failed')]);
+  assert.equal(k.verdict, 'NOT-TRANSPORT', `budget veto: ${k.detail}`);
+  assert.ok(k.detail.includes('output-budget exhaustion'), `budget veto named: ${k.detail}`);
+  // (k2) budget signal via the normalized stop_reason side
+  const k2 = adjPath([REQ(), RESP({ stop_reason: 'max_tokens', wire_observation: { finish_reason: 'stop' } }), REQ(), ERR('TypeError', 'fetch failed')]);
+  assert.equal(k2.verdict, 'NOT-TRANSPORT', `stop_reason budget veto: ${k2.detail}`);
+  // (l) freeze-4: an application error merely CONTAINING "timeout" is NOT
+  // transport evidence — narrow classification to provider/network shapes
+  const l = adjPath([REQ(), ERR('Error', 'anchor validation timeout exceeded while staging the submission')]);
+  assert.equal(l.verdict, 'AMBIGUOUS', `free-text 'timeout' rejected as transport evidence: ${l.detail}`);
+  // (l2) genuine network timeouts still qualify — via explicit codes/shapes
+  assert.equal(adjPath([REQ(), ERR('Error', 'LLM API request failed: 408 Request Timeout — upstream')]).verdict, 'TRANSPORT-REQUEUE');
+  assert.equal(adjPath([REQ(), ERR('SystemError', 'connect ETIMEDOUT 10.0.0.1:443')]).verdict, 'TRANSPORT-REQUEUE');
+  assert.equal(adjPath([REQ(), ERR('Error', 'UND_ERR_CONNECT_TIMEOUT: connect timed out')]).verdict, 'TRANSPORT-REQUEUE');
+  console.log('PASS T3 (adjudicator matrix): qualifying transport shapes; 400/app/mixed/tampered/free-text-timeout ambiguous; budget exhaustion vetoes the re-queue; terminal-position rule enforced');
 }
 
 // ─── T4: re-queue cap — retries can never exceed the approved scope ──────────
@@ -452,17 +476,20 @@ const ERR = (name: string, msg: string): Record<string, unknown> => ({
     runPreflight: async () => ({ stop: null, detail: 'offline preflight' }),
   }));
   assert.equal(result.complete, true);
-  assert.equal(result.stop, 'REQUEUE-EXHAUSTED', 'the campaign STOPs once the re-queue cap is exceeded');
+  assert.equal(result.stop, 'REQUEUE-EXHAUSTED', 'the campaign STOPs once the re-queue cap is reached');
   assert.equal(result.evaluable, 0, 'no evaluable attempt consumed');
-  assert.equal(result.attempts.length, MAX_REQUEUES + 1, `exactly ${MAX_REQUEUES + 1} attempts ran (3 re-queues honored, the 4th transport failure STOPs)`);
+  assert.equal(result.attempts.length, MAX_REQUEUES + 1, `the ${MAX_REQUEUES + 1}th transport-censored attempt EXECUTES but is not re-queued`);
   assert.ok(result.attempts.every((a) => a.outcome === 'TRANSPORT-REQUEUE'));
-  assert.equal(result.requeues, MAX_REQUEUES + 1);
+  assert.equal(result.requeues, MAX_REQUEUES, `exactly MAX_REQUEUES (${MAX_REQUEUES}) re-queues recorded — no fourth`);
   const ledgerLines = readFileSync(result.ledgerPath, 'utf-8').trim().split('\n').map((l) => JSON.parse(l) as Record<string, unknown>);
-  assert.equal(ledgerLines.filter((l) => l.event === 'transport-requeue').length, MAX_REQUEUES + 1, 'every re-queue journaled');
+  assert.equal(ledgerLines.filter((l) => l.event === 'transport-requeue').length, MAX_REQUEUES, 'exactly MAX_REQUEUES re-queue events journaled');
+  const fourth = result.attempts[MAX_REQUEUES];
+  assert.ok(!ledgerLines.some((l) => l.event === 'transport-requeue' && l.attempt_id === fourth.attemptId), 'the cap-exceeding event is NOT journaled as a re-queue');
+  assert.ok((result.stopDetail ?? '').includes('NOT re-queued'), `terminal condition names the refusal: ${result.stopDetail}`);
   assert.ok(ledgerLines.some((l) => l.event === 'campaign-terminal' && l.stop === 'REQUEUE-EXHAUSTED'), 'terminal journaled');
   assert.ok(result.targetRestoredPristine);
   assertTargetPristine();
-  console.log('PASS T4 (re-queue cap): bounded retries; REQUEUE-EXHAUSTED STOP back to the operator; nothing consumed');
+  console.log('PASS T4 (re-queue cap): exactly 3 re-queues recorded; the 4th transport-censored event is not re-queued; REQUEUE-EXHAUSTED STOP back to the operator; nothing consumed');
 }
 
 // ─── T5: preflight completion-status adjudication (P2 class rejected) ────────
@@ -553,6 +580,50 @@ const ERR = (name: string, msg: string): Record<string, unknown> => ({
   rmSync(stray, { force: true });
   assert.equal(await restoreTargetPristine(), true, 'restoration passes again once the stray is cleared');
   console.log('PASS T8 (full restoration): untracked artifacts removed, tracked drift reverted, .sle accounted; unexpected files fail closed');
+}
+
+// ─── T9: G2-over-G1 precedence when capture and exception overlap (freeze-4) ─
+{
+  const silent = { async completeMultiTurn() { return { stop_reason: 'end_turn', text: 'x', tool_uses: [], tokens_used: 1 } as never; } };
+  const WRONG: () => StepContract = () => ({
+    stepId: 'build', model: 'z-ai/glm-5.3-flash', max_tokens: 999, reasoning_effort: 'low', temperature: 0.7,
+    tool_sets: [['read_file']], submit_result: null,
+  });
+
+  // (a) capture classification G2 (co-occurring integrity failure) + thrown
+  // config violation (G1) -> the runner must report G2, never G1
+  const evA = join(tmpdir(), 'p3t9a');
+  rmSync(evA, { recursive: true, force: true });
+  const resultA = await runP3Campaign(mkOpts({
+    evidenceDir: evA,
+    composeAttempt: (attemptId) => {
+      const composed = composeBuildAttempt(ROOT, attemptId, { innerProvider: silent, contract: WRONG });
+      return {
+        ...composed,
+        classifyAttempt: () => ({
+          cls: { ...composed.classifyAttempt().cls, g2: true, integrity_failures: ['synthetic co-occurring integrity failure (overlap precedence regression)'] },
+          stop: 'G2' as const,
+        }),
+      };
+    },
+    runPreflight: async () => ({ stop: null, detail: 'offline preflight' }),
+  }));
+  assert.equal(resultA.stop, 'G2', `G2 precedence over the co-occurring G1 exception (got ${resultA.stop})`);
+  assert.equal(resultA.attempts[0].stop, 'G2');
+  assert.equal(resultA.evaluable, 0);
+
+  // (b) the full combination matrix — the engine absorbs provider-call
+  // exceptions (attemptError stays null), so the G1-capture + G2-exception
+  // overlap is proven on the exported pure combination the runner uses
+  const cs = combineStops as (a: string | null, b: string | null) => string | null;
+  assert.equal(cs('G2', 'G1'), 'G2', 'capture G2 + exception G1 -> G2');
+  assert.equal(cs('G1', 'G2'), 'G2', 'capture G1 + exception G2 -> G2');
+  assert.equal(cs('G2', null), 'G2');
+  assert.equal(cs(null, 'G2'), 'G2');
+  assert.equal(cs('G1', null), 'G1', 'a lone G1 remains G1 (R3 behavior preserved)');
+  assert.equal(cs(null, 'G1'), 'G1');
+  assert.equal(cs(null, null), null);
+  console.log('PASS T9 (G2 precedence): capture G2 + exception G1 -> G2 end-to-end; capture G1 + exception G2 -> G2 via the combination matrix (consistent with mapCaptureToStop)');
 }
 
 rmSync(synthDir, { recursive: true, force: true });

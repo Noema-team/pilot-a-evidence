@@ -1,0 +1,116 @@
+{
+ "artifact": "P3 EFFECTIVE FREEZE BINDING v4 \u2014 ADDITIVE final transport-accounting corrections: output-budget veto + narrowed transport classification, exact re-queue cap accounting, G2-over-G1 precedence; freeze-1, freeze-2, and freeze-3 binding FILES byte-unchanged",
+ "generated_at_utc": "2026-10-10T09:45:00Z",
+ "review": {
+  "ruling": "P3 FREEZE-3 REVIEW: LIVE HOLD, NARROW FINAL CORRECTIONS \u2014 (1) transport censoring must never suppress an already-evaluable BUILD output-budget failure; reject broad application-error text matches as transport evidence; (2) enforce the stated maximum of three non-consuming re-queues without a fourth re-queue being recorded; (3) preserve G2-over-G1 precedence when capture and exception classifications overlap",
+  "reviewed_commit": "9dd202a9bfd9fda5d422a249baa156d0f3cbc5af",
+  "frozen_stratum": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "accepted": "freeze-3 accepted as the current evidence baseline; durable evidence lifecycle, preflight adjudication, and restoration corrections CLOSED; the scientific design NOT reopened"
+ },
+ "additivity": "v4 corrects ONLY the executable runner (p3-live-runner.mts) and its qualification. UNCHANGED since freeze-3 (byte-verified): p3-live-driver.mts (the pinned composition), config-guard.mts, p3-fixture-builder.mts, p3-preregistration.json. No change to Stratum, the model regime, the hypothesis, the fixture authority, or the publication boundary.",
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04"
+ },
+ "target": {
+  "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "pristine": true,
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988"
+ },
+ "corrections": {
+  "P1_budget_veto_and_narrow_transport": {
+   "budget_veto": "adjudicateTransportFailure() now vetoes the re-queue whenever ANY archived response carries an output-budget signal (stop_reason max_tokens|length, or wire_observation finish_reason length) \u2014 an already-observed evaluable model failure is never retroactively censored by a later transport error (inherited addendum-2 discipline); qualified in T3(k)/(k2)",
+   "narrow_classification": "the free-text /\\btimeout\\b|\\btimed out\\b/ pattern is REMOVED; transport evidence is restricted to recognizable provider/network error types and shapes: undici 'fetch failed', 'LLM API request failed: 5xx|408|429' (the frozen llm-provider error shape), explicit system/undici codes (ECONNRESET, ETIMEDOUT, UND_ERR_*), 'socket hang up'; qualified in T3(l) (application error merely containing 'timeout' -> AMBIGUOUS, stays evaluable) and T3(l2) (HTTP 408 / ETIMEDOUT / UND_ERR_CONNECT_TIMEOUT still qualify)"
+  },
+  "P2_exact_requeue_cap": {
+   "accounting": "MAX_REQUEUES is the EXACT maximum of non-consuming re-queues: the first MAX_REQUEUES transport-censored events are journaled + re-queued (requeues_used 1..3, all <= cap); a FURTHER transport-censored event executes but is NOT re-queued and NOT recorded as a re-queue \u2014 the campaign ends REQUEUE-EXHAUSTED with the terminal detail naming the refusal. Counter, journal, and terminal condition now agree: re-queue events <= 3, no fourth re-queue anywhere.",
+   "qualified": "T4: exactly 3 re-queue events journaled; the 4th transport-censored attempt has NO transport-requeue ledger line; result.requeues === 3; terminal detail contains 'NOT re-queued'"
+  },
+  "P2_g2_precedence": {
+   "mechanism": "the capture/exception combination is extracted to the exported pure helper combineStops(captureStop, violationStop) with G2 precedence, consistent with the composed driver's mapCaptureToStop(); runAttempt() uses it. Exported pure because the engine absorbs provider-call exceptions (attemptError stays null), so a G1-capture + G2-exception overlap is not drivable end-to-end offline \u2014 the helper's full matrix is regression-tested instead.",
+   "qualified": "T9: end-to-end capture G2 + exception G1 -> G2 through the real runner; full combination matrix incl. capture G1 + exception G2 -> G2; lone G1 unchanged (R3 preserved)"
+  }
+ },
+ "runner_qualification": {
+  "artifact": "evidence/p3/p3-runner-qualification-output.txt",
+  "verdict": "ALL PASS (R1-R7 preserved + T1-T9; 16/16), zero completion traffic",
+  "scenarios": {
+   "R1": "successful publication through the runner (full-porcelain restoration)",
+   "R2": "model-attributable failure consumes the denominator",
+   "R3": "G1 STOP (immediate abort, not counted, 0 model calls)",
+   "R4": "G2 STOP from a capture-write failure (fail-closed archive)",
+   "R5": "stop-at-three (exactly 3 evaluable attempts)",
+   "R6": "preflight separation (distinct path; STOP aborts before attempt 1)",
+   "R7": "fail-closed evidence (missing capture -> G2; violations classify from exceptions)",
+   "T1": "transport re-queue consumes NO denominator slot",
+   "T2": "ambiguity is NOT censored (HTTP 400 stays evaluable)",
+   "T3": "adjudicator matrix incl. budget-exhaustion veto and free-text-timeout rejection (freeze-4)",
+   "T4": "exact re-queue cap accounting: no fourth re-queue recorded (freeze-4)",
+   "T5": "preflight completion-status adjudication (P2 finish_reason=error class rejected)",
+   "T6": "evidence durability across fixture rebuilds",
+   "T7": "campaign ledger durability and event structure",
+   "T8": "full pristine restoration: success and failure paths",
+   "T9": "G2-over-G1 precedence end-to-end + combination matrix (freeze-4)"
+  }
+ },
+ "chain": [
+  {
+   "path": "evidence/p3/p3-live-runner.mts",
+   "sha256": "4679b399ba369c24875f044406d237b2c2a7b25fc115144090fbc1b793c505dd"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification.mts",
+   "sha256": "3bc9a08abec57f44093248e90fa863e202c5d0fe0e2d73e4e75df6fcf44d70b3"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification-output.txt",
+   "sha256": "ad80cb3db03095848edde09d51eabce6c34b44b54e503143012f9c5c72c4a6ad"
+  }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p3/p3-effective-freeze-4.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public); run sha256sum -c evidence/p3/p3-effective-freeze-4.sha256 (v4), sha256sum -c evidence/p3/p3-effective-freeze-2.sha256 (v2: the driver pin must still verify) and sha256sum -c evidence/p3/p3-effective-freeze-1.sha256 (freeze-1: 13/15, the two documented moves carried from v2)"
+ },
+ "execution_status": "BOUND v4 \u2014 awaiting the operator's final launch review. No live P3 executed (zero completion traffic).",
+ "supersedes": {
+  "v3_path": "evidence/p3/p3-effective-freeze-3.sha256",
+  "v3_sha256": "a40962e0b01ae566cf2e9ca032a38c59c421747600549394620020c2fc17bcf2",
+  "v3_binding_file_unchanged": true,
+  "v2_binding_file_unchanged": true,
+  "v1_binding_file_unchanged": true,
+  "pin_status": "freeze-3 chain: 0/3 pins byte-identical \u2014 all THREE moved pins are the runner, its qualification, and its output, i.e. exactly the artifacts the review's corrections touched; the pinned composition (p3-live-driver.mts) remains byte-identical to freeze-2/3 and is NOT re-pinned here.",
+  "moved_pins": [
+   {
+    "path": "evidence/p3/p3-live-runner.mts",
+    "freeze3_sha256": "2f0e3ab22197cdae18d07aa6e9c303f0829587de8eefbcc5caba08088de3eaee",
+    "current_sha256": "4679b399ba369c24875f044406d237b2c2a7b25fc115144090fbc1b793c505dd",
+    "reason": "the review's three narrow corrections: output-budget veto + narrowed transport classification (free-text timeout regex removed); exact MAX_REQUEUES accounting (the cap-exceeding event is not re-queued and not recorded); G2-over-G1 precedence via the exported combineStops helper. No other behavior changed; the durable-evidence, preflight, and restoration corrections of freeze-3 are carried unchanged."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification.mts",
+    "freeze3_sha256": "353ee67285f4c5c6bf4668918e4f1461a6bf3624f51c58fed1ea760bd6389355",
+    "current_sha256": "3bc9a08abec57f44093248e90fa863e202c5d0fe0e2d73e4e75df6fcf44d70b3",
+    "reason": "R1-R7 and T1-T3/T5-T8 bodies preserved; T4 asserts the corrected cap accounting; T3 gains the budget-veto and free-text-timeout cases; T9 added (G2 precedence)."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification-output.txt",
+    "freeze3_sha256": "84fcd95325fbcc57fbbee0e12c16cb8cea9ed7ee11f411474b47285943eb791e",
+    "current_sha256": "ad80cb3db03095848edde09d51eabce6c34b44b54e503143012f9c5c72c4a6ad",
+    "reason": "fresh full-suite run: 16/16 PASS, zero completion traffic."
+   }
+  ],
+  "carried_unchanged": {
+   "p3-live-driver.mts": "d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf (identical to freeze-2/3; mapCaptureToStop was already G2-first \u2014 the runner now matches it)",
+   "fixture_manifest_identity_fields": {
+    "note": "p3-build-entry-fixture-manifest.json is regenerated on every fixture instantiation by design; the deterministic identity fields remain the binding authority:",
+    "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+    "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+    "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+    "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+    "run_cursor": "confirm",
+    "issue_input_sha256": "dd40147291edb7412eb0ccf57c3cadbd3f19ac8d7299306c0bc880419eb124c5"
+   }
+  }
+ }
+}

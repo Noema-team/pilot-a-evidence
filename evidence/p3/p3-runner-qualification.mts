@@ -16,6 +16,26 @@
 //  R6  preflight separation: distinct path/namespace, never counted; a
 //      preflight STOP aborts BEFORE attempt 1 with 0 attempts
 //  R7  fail-closed evidence: a missing capture file classifies G2, not crash
+//
+// freeze-3 review T-gates (additive; R1-R7 preserved unchanged):
+//  T1  transport re-queue: an unambiguous transport failure (fetch failed)
+//      is JOURNALED and re-queued WITHOUT consuming a denominator slot
+//  T2  ambiguity is NOT censored: a non-transport provider error stays an
+//      evaluable MODEL-FAILURE
+//  T3  transport adjudicator matrix: qualifying/ambiguous/terminal-position
+//      rules decided from the archived capture alone
+//  T4  re-queue cap: retries can never silently exceed the approved scope
+//      (REQUEUE-EXHAUSTED STOP after MAX_REQUEUES)
+//  T5  preflight completion-status adjudication: the P2 class (finish_reason
+//      error / absent / length, or missing text) is rejected; a clean probe
+//      is accepted
+//  T6  evidence durability: the per-attempt package re-verifies by hash
+//      AFTER subsequent fixture rebuilds destroyed the runtime workspace
+//  T7  campaign ledger durability: preflight/attempt/requeue/terminal events
+//      recorded with evidence-package hashes before the next attempt
+//  T8  full pristine restoration: untracked upstream artifacts removed via
+//      filesystem ops, complete porcelain verification accounting for .sle,
+//      fail closed on unexpected files
 
 import { readFileSync, writeFileSync, existsSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -23,9 +43,9 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
-import { runP3Campaign, type CampaignOptions } from './p3-live-runner.mts';
+import { runP3Campaign, restoreTargetPristine, adjudicateTransportFailure, adjudicatePreflightCapture, MAX_REQUEUES, type CampaignOptions } from './p3-live-runner.mts';
 import { composeBuildAttempt, composePreflight, P3_TARGET } from './p3-live-driver.mts';
-import { ConfigGuardViolation, type StepContract } from './config-guard.mts';
+import { ConfigGuardViolation, classifyGuardCapture, type StepContract } from './config-guard.mts';
 
 const ROOT = '/home/theo/Documents/coding/repos/student-platform';
 const WORKER = P3_TARGET.worker_main_path;
@@ -283,5 +303,258 @@ const mkOpts = (over: Partial<CampaignOptions>): CampaignOptions =>
   assert.equal((classifyViolation as (e: unknown) => string | null)(new Error('ordinary')), null);
   console.log('PASS R7 (fail-closed evidence): missing capture -> G2; violations classify from the exception alone');
 }
+
+// ─── scripted transport-failure providers (freeze-3 review P1-1) ─────────────
+function transportThrower(err: Error) {
+  return {
+    async completeMultiTurn(): Promise<never> {
+      throw err;
+    },
+  };
+}
+
+// synthetic capture helpers for the adjudicator matrices (T3/T5) — the same
+// record shapes the guard writes
+const synthDir = join(tmpdir(), `p3r-synth-${Math.random().toString(36).slice(2)}`);
+function writeCapture(lines: Array<Record<string, unknown>>): string {
+  mkdirSync(synthDir, { recursive: true });
+  const p = join(synthDir, `cap-${Math.random().toString(36).slice(2)}.jsonl`);
+  writeFileSync(p, lines.map((l) => JSON.stringify(l)).join('\n') + '\n');
+  return p;
+}
+const REQ = (step = 'build'): Record<string, unknown> => ({
+  ts: 't', capture_version: 2, phase: 'synth', kind: 'request', wire: 'completeMultiTurn',
+  step, model: 'm', guard_verdict: 'PASS', violations: [],
+});
+const RESP = (over: Record<string, unknown> = {}): Record<string, unknown> => ({
+  ts: 't', kind: 'response', wire: 'completeMultiTurn', step: 'build',
+  stop_reason: 'end_turn', text: 'ok', tokens_used: 1, ...over,
+});
+const ERR = (name: string, msg: string): Record<string, unknown> => ({
+  ts: 't', kind: 'error', wire: 'completeMultiTurn', step: 'build', error_name: name, error_message: msg,
+});
+
+// ─── T1: transport re-queue consumes NO denominator slot ─────────────────────
+{
+  const evidence = join(tmpdir(), 'p3t1');
+  rmSync(evidence, { recursive: true, force: true });
+  let composeN = 0;
+  const result = await runP3Campaign(mkOpts({
+    maxAttempts: 1, // ONE evaluable slot: the transport failure must consume none of it
+    evidenceDir: evidence,
+    composeAttempt: (attemptId) => {
+      composeN++;
+      return composeBuildAttempt(ROOT, attemptId, {
+        innerProvider: composeN === 1 ? transportThrower(new TypeError('fetch failed')) : conformingBuilder(),
+      });
+    },
+    runPreflight: async () => ({ stop: null, detail: 'offline preflight' }),
+  }));
+  assert.equal(result.complete, true);
+  assert.equal(result.stop, null, 'a qualifying transport failure does not stop the campaign');
+  assert.equal(result.requeues, 1, 'one transport re-queue');
+  assert.equal(result.evaluable, 1, 'the re-queue consumed NO evaluable slot');
+  assert.equal(result.published, 1);
+  assert.equal(result.attempts.length, 2, 'exactly two attempts ran: the transport failure + the re-queued success');
+  const rq = result.attempts[0];
+  assert.equal(rq.outcome, 'TRANSPORT-REQUEUE');
+  assert.equal(rq.evaluable, false, 'not counted');
+  assert.equal(rq.slot, null, 'no denominator slot');
+  assert.equal(rq.adjudication?.verdict, 'TRANSPORT-REQUEUE');
+  assert.equal(rq.publicationHash, null);
+  const ok = result.attempts[1];
+  assert.equal(ok.outcome, 'PUBLISHED');
+  assert.equal(ok.slot, 1, 'the published attempt took SLOT 1 — the transport failure took none');
+  // durable ledger + package exist for the requeued attempt
+  assert.ok(existsSync(result.ledgerPath), 'campaign ledger written');
+  const ledgerLines = readFileSync(result.ledgerPath, 'utf-8').trim().split('\n').map((l) => JSON.parse(l) as Record<string, unknown>);
+  assert.ok(ledgerLines.some((l) => l.event === 'transport-requeue' && l.requeues_used === 1), 'the re-queue is operator-visibly journaled');
+  const rqLine = ledgerLines.find((l) => l.event === 'attempt' && l.attempt_id === rq.attemptId) as Record<string, unknown>;
+  assert.equal(rqLine.evidence_package_sha256, rq.evidencePackageSha256, 'ledger carries the package hash');
+  assert.ok(rq.evidencePackagePath && existsSync(rq.evidencePackagePath), 'requeued attempt evidence package exists');
+  assert.ok(!existsSync(rq.capturePath), 'attempt 1 runtime capture was destroyed by the attempt-2 fixture rebuild — the durable package is the surviving record');
+  assert.ok(result.targetRestoredPristine);
+  assertTargetPristine();
+  console.log('PASS T1 (transport re-queue): fetch failed journaled + re-queued; consumed NO slot; campaign completed on attempt 2');
+}
+
+// ─── T2: ambiguity is NOT censored — evaluable MODEL-FAILURE ─────────────────
+{
+  const evidence = join(tmpdir(), 'p3t2');
+  rmSync(evidence, { recursive: true, force: true });
+  const result = await runP3Campaign(mkOpts({
+    maxAttempts: 1,
+    evidenceDir: evidence,
+    composeAttempt: (attemptId) => composeBuildAttempt(ROOT, attemptId, {
+      innerProvider: transportThrower(new Error('LLM API request failed: 400 Bad Request — upstream rejected the request')),
+    }),
+    runPreflight: async () => ({ stop: null, detail: 'offline preflight' }),
+  }));
+  const rec = result.attempts[0];
+  assert.equal(rec.outcome, 'MODEL-FAILURE', 'a non-transport provider error stays model-attributable');
+  assert.equal(rec.evaluable, true, 'ambiguous cases remain evaluable (denominator consumed)');
+  assert.equal(rec.adjudication?.verdict, 'AMBIGUOUS');
+  assert.equal(result.modelFailures, 1);
+  assert.equal(result.requeues, 0);
+  assert.ok(result.targetRestoredPristine);
+  console.log('PASS T2 (ambiguity not censored): non-transport error (HTTP 400) stays an evaluable MODEL-FAILURE');
+}
+
+// ─── T3: transport adjudicator matrix (archived capture alone decides) ───────
+{
+  const adjPath = (lines: Array<Record<string, unknown>>) => {
+    const p = writeCapture(lines);
+    return adjudicateTransportFailure(classifyGuardCapture(p), p);
+  };
+  // (a) undici wrapper — qualifies
+  assert.equal(adjPath([REQ(), ERR('TypeError', 'fetch failed')]).verdict, 'TRANSPORT-REQUEUE');
+  // (b) HTTP 502 (frozen llm-provider error shape) — qualifies
+  assert.equal(adjPath([REQ(), ERR('Error', 'LLM API request failed: 502 Bad Gateway — upstream')]).verdict, 'TRANSPORT-REQUEUE');
+  // (c) HTTP 408/429 — qualify
+  assert.equal(adjPath([REQ(), ERR('Error', 'LLM API request failed: 408 Request Timeout — upstream')]).verdict, 'TRANSPORT-REQUEUE');
+  assert.equal(adjPath([REQ(), ERR('Error', 'LLM API request failed: 429 Too Many Requests — upstream')]).verdict, 'TRANSPORT-REQUEUE');
+  // (d) socket-level classes — qualify
+  assert.equal(adjPath([REQ(), ERR('SocketError', 'socket hang up')]).verdict, 'TRANSPORT-REQUEUE');
+  assert.equal(adjPath([REQ(), ERR('SystemError', 'connect ECONNRESET 127.0.0.1:443')]).verdict, 'TRANSPORT-REQUEUE');
+  // (e) non-transport HTTP class — ambiguous (stays evaluable upstream)
+  assert.equal(adjPath([REQ(), ERR('Error', 'LLM API request failed: 400 Bad Request — upstream')]).verdict, 'AMBIGUOUS');
+  // (f) ordinary application error — ambiguous
+  assert.equal(adjPath([REQ(), ERR('Error', 'anchor mint failed: no readable slice')]).verdict, 'AMBIGUOUS');
+  // (g) terminal-position rule: a well-formed capture whose LAST outcome is a
+  // response means the transport error is not the proximate failure cause —
+  // no re-queue (falls through to model-attributable adjudication)
+  const g = adjPath([REQ(), ERR('TypeError', 'fetch failed'), REQ(), RESP()]);
+  assert.equal(g.verdict, 'AMBIGUOUS');
+  assert.ok(g.detail.includes('last archived outcome is a response'), `terminal-position rule: ${g.detail}`);
+  // (g2) a malformed capture (unpaired response after the error) is tamper
+  // class — compromised captures can NEVER decide a re-queue
+  assert.equal(adjPath([REQ(), ERR('TypeError', 'fetch failed'), RESP()]).verdict, 'AMBIGUOUS');
+  // (h) mixed transport + non-transport errors — ambiguous
+  assert.equal(adjPath([REQ(), ERR('TypeError', 'fetch failed'), REQ(), ERR('Error', 'anchor mint failed')]).verdict, 'AMBIGUOUS');
+  // (i) no errors at all — not transport
+  assert.equal(adjPath([REQ(), RESP()]).verdict, 'NOT-TRANSPORT');
+  // (j) a tampered capture can never decide a re-queue
+  const tamperedPath = writeCapture([REQ(), ERR('TypeError', 'fetch failed')]);
+  writeFileSync(tamperedPath, readFileSync(tamperedPath, 'utf-8') + 'not-json\n');
+  assert.equal(adjudicateTransportFailure(classifyGuardCapture(tamperedPath), tamperedPath).verdict, 'AMBIGUOUS');
+  console.log('PASS T3 (adjudicator matrix): 6 qualifying transport classes; 400/app/mixed/tampered ambiguous; terminal-position rule enforced');
+}
+
+// ─── T4: re-queue cap — retries can never exceed the approved scope ──────────
+{
+  const evidence = join(tmpdir(), 'p3t4');
+  rmSync(evidence, { recursive: true, force: true });
+  const result = await runP3Campaign(mkOpts({
+    evidenceDir: evidence, // default maxAttempts = 3 (frozen)
+    composeAttempt: (attemptId) => composeBuildAttempt(ROOT, attemptId, {
+      innerProvider: transportThrower(new TypeError('fetch failed')),
+    }),
+    runPreflight: async () => ({ stop: null, detail: 'offline preflight' }),
+  }));
+  assert.equal(result.complete, true);
+  assert.equal(result.stop, 'REQUEUE-EXHAUSTED', 'the campaign STOPs once the re-queue cap is exceeded');
+  assert.equal(result.evaluable, 0, 'no evaluable attempt consumed');
+  assert.equal(result.attempts.length, MAX_REQUEUES + 1, `exactly ${MAX_REQUEUES + 1} attempts ran (3 re-queues honored, the 4th transport failure STOPs)`);
+  assert.ok(result.attempts.every((a) => a.outcome === 'TRANSPORT-REQUEUE'));
+  assert.equal(result.requeues, MAX_REQUEUES + 1);
+  const ledgerLines = readFileSync(result.ledgerPath, 'utf-8').trim().split('\n').map((l) => JSON.parse(l) as Record<string, unknown>);
+  assert.equal(ledgerLines.filter((l) => l.event === 'transport-requeue').length, MAX_REQUEUES + 1, 'every re-queue journaled');
+  assert.ok(ledgerLines.some((l) => l.event === 'campaign-terminal' && l.stop === 'REQUEUE-EXHAUSTED'), 'terminal journaled');
+  assert.ok(result.targetRestoredPristine);
+  assertTargetPristine();
+  console.log('PASS T4 (re-queue cap): bounded retries; REQUEUE-EXHAUSTED STOP back to the operator; nothing consumed');
+}
+
+// ─── T5: preflight completion-status adjudication (P2 class rejected) ────────
+{
+  const pf = (lines: Array<Record<string, unknown>>) => adjudicatePreflightCapture(writeCapture(lines));
+  // (a) clean probe — accepted
+  const good = pf([REQ('preflight'), RESP({ step: 'preflight', wire_observation: { finish_reason: 'stop' } })]);
+  assert.equal(good.accepted, true, 'a clean end_turn/stop probe is accepted');
+  assert.equal(good.stop, null);
+  // (b) the P2 transport-censoring class: end_turn + finish_reason error + partial text — REJECTED
+  const p2 = pf([REQ('preflight'), RESP({ step: 'preflight', text: 'par', wire_observation: { finish_reason: 'error' } })]);
+  assert.equal(p2.accepted, false);
+  assert.equal(p2.stop, 'G2');
+  assert.ok(p2.detail.includes('finish_reason'), `P2 class named: ${p2.detail}`);
+  // (c) missing wire_observation (no finish_reason evidence) — rejected
+  assert.equal(pf([REQ('preflight'), RESP({ step: 'preflight', wire_observation: null })]).accepted, false);
+  // (d) finish_reason length — rejected
+  assert.equal(pf([REQ('preflight'), RESP({ step: 'preflight', wire_observation: { finish_reason: 'length' } })]).accepted, false);
+  // (e) stop_reason not end_turn — rejected
+  assert.equal(pf([REQ('preflight'), RESP({ step: 'preflight', stop_reason: 'max_tokens', wire_observation: { finish_reason: 'stop' } })]).accepted, false);
+  // (f) empty text — rejected
+  assert.equal(pf([REQ('preflight'), RESP({ step: 'preflight', text: '', wire_observation: { finish_reason: 'stop' } })]).accepted, false);
+  // (g) more than one probe call — rejected (exactly-one rule)
+  assert.equal(pf([REQ('preflight'), RESP({ step: 'preflight', wire_observation: { finish_reason: 'stop' } }), RESP({ step: 'preflight', wire_observation: { finish_reason: 'stop' } })]).accepted, false);
+  // (h) guard STOP in the probe — rejected
+  assert.equal(pf([{ ...REQ('preflight'), guard_verdict: 'STOP', dimension: 'config', violations: ['max_tokens mismatch'] }]).accepted, false);
+  console.log('PASS T5 (preflight adjudication): clean probe accepted; finish_reason error/absent/length, wrong stop_reason, empty text, multi-call, STOP all rejected');
+}
+
+// ─── T6: evidence durability across fixture rebuilds (uses T1's campaign) ────
+{
+  const evidence = join(tmpdir(), 'p3t1');
+  const ledgerLines = readFileSync(join(evidence, 'campaign-ledger.jsonl'), 'utf-8').trim().split('\n').map((l) => JSON.parse(l) as Record<string, unknown>);
+  const attemptLines = ledgerLines.filter((l) => l.event === 'attempt') as Array<Record<string, string>>;
+  assert.ok(attemptLines.length >= 2);
+  for (const line of attemptLines) {
+    const manifest = JSON.parse(readFileSync(join(line.evidence_package, 'evidence-manifest.json'), 'utf-8')) as {
+      files: Record<string, string>; package_sha256: string;
+    };
+    // every file re-hashes to the manifest AFTER .sle was rebuilt by later attempts
+    for (const [f, h] of Object.entries(manifest.files)) {
+      assert.equal(sha256(join(line.evidence_package, f)), h, `package file ${f} intact after fixture rebuilds`);
+    }
+    assert.equal(line.evidence_package_sha256, manifest.package_sha256, `ledger hash matches manifest for attempt ${line.index}`);
+  }
+  // and the RUNTIME copies are gone — the package is the only surviving copy
+  console.log('PASS T6 (evidence durability): all attempt packages re-verify by hash after subsequent fixture rebuilds; ledger hashes match');
+}
+
+// ─── T7: campaign ledger event structure (uses T1's campaign) ────────────────
+{
+  const evidence = join(tmpdir(), 'p3t1');
+  const lines = readFileSync(join(evidence, 'campaign-ledger.jsonl'), 'utf-8').trim().split('\n').map((l) => JSON.parse(l) as Record<string, unknown>);
+  const events = lines.map((l) => l.event as string);
+  assert.equal(events[0], 'preflight', 'the ledger opens with the preflight verdict');
+  assert.deepEqual(
+    events.filter((e) => e === 'attempt-counted').length, 1, 'exactly one counted slot',
+  );
+  assert.ok(events.indexOf('transport-requeue') >= 0 && events.indexOf('transport-requeue') < events.indexOf('attempt-counted'), 'the re-queue precedes the slot assignment');
+  assert.equal(events[events.length - 1], 'campaign-terminal', 'the ledger closes with the terminal state');
+  for (const l of lines) {
+    assert.ok(typeof l.ts === 'string' && l.ts.length > 0, 'every ledger line is timestamped');
+  }
+  console.log('PASS T7 (ledger structure): preflight -> attempt -> re-queue -> counted -> terminal, all timestamped, package hashes carried');
+}
+
+// ─── T8: full pristine restoration — success and failure paths ───────────────
+{
+  // (a) success: untracked upstream artifacts + a tracked modification +
+  //     .sle present — all resolved; porcelain clean except .sle
+  writeFileSync(join(ROOT, 'docs/requirements.md'), '# stray upstream artifact (T8)\n');
+  writeFileSync(join(ROOT, 'docs/test-plan.md'), '# stray upstream artifact (T8)\n');
+  const mainPath = join(ROOT, 'apps/ai-server/rag-worker-service/main.py');
+  const mainBytes = readFileSync(mainPath);
+  writeFileSync(mainPath, mainBytes + '\n# T8 tracked drift\n');
+  assert.equal(await restoreTargetPristine(), true, 'restoration succeeds with untracked artifacts + tracked drift + .sle present');
+  assert.equal(sha256(mainPath), P3_TARGET.worker_main_sha256, 'worker bytes restored');
+  assert.ok(!existsSync(join(ROOT, 'docs/requirements.md')) && !existsSync(join(ROOT, 'docs/test-plan.md')), 'untracked upstream artifacts removed');
+  const porcelain = execFileSync('git', ['-C', ROOT, 'status', '--porcelain']).toString().trim().split('\n').filter((l) => l.length > 0);
+  assert.deepEqual(porcelain, ['?? .sle/'], `worktree clean except .sle: ${JSON.stringify(porcelain)}`);
+
+  // (b) failure: an unexpected untracked file fails closed and is left for
+  //     the operator
+  const stray = join(ROOT, 'p3-restore-probe-stray.txt');
+  writeFileSync(stray, 'unexpected\n');
+  assert.equal(await restoreTargetPristine(), false, 'an unexpected untracked file fails restoration (fail closed)');
+  assert.ok(existsSync(stray), 'the stray file is NOT silently deleted — left for the operator');
+  rmSync(stray, { force: true });
+  assert.equal(await restoreTargetPristine(), true, 'restoration passes again once the stray is cleared');
+  console.log('PASS T8 (full restoration): untracked artifacts removed, tracked drift reverted, .sle accounted; unexpected files fail closed');
+}
+
+rmSync(synthDir, { recursive: true, force: true });
 
 console.log('\nP3 RUNNER QUALIFICATION: ALL PASS (zero completion traffic)');

@@ -1,0 +1,119 @@
+{
+ "artifact": "P3 EFFECTIVE FREEZE BINDING v3 \u2014 ADDITIVE execution-integrity correction: transport adjudication + non-consuming re-queue, durable evidence lifecycle, full pristine restoration; freeze-1 and freeze-2 binding FILES byte-unchanged",
+ "generated_at_utc": "2026-10-10T09:00:00Z",
+ "review": {
+  "ruling": "P3 FREEZE-2 REVIEW: HOLD \u2014 three execution-integrity blockers (P1 transport censoring/denominator; P1 evidence lost between attempts; P1 restoration does not establish a pristine target)",
+  "reviewed_commit": "da9eb2663320c8e009722a6ebe00d7bfcfacc6d6",
+  "frozen_stratum": "9f298f219db927d5065876cf99cdec11e462aa04",
+  "accepted": "freeze-2 accepted as the current frozen evidence baseline; executable integration architecture accepted; R1-R7 accepted; the scientific design (hypothesis, denominator, model regime, BUILD protocol, fixture authority, frozen Stratum, 2/3 threshold) NOT reopened"
+ },
+ "additivity": "v3 corrects ONLY the executable runner (p3-live-runner.mts) and its qualification. UNCHANGED since freeze-2 (byte-verified): p3-live-driver.mts (the pinned composition), config-guard.mts, p3-fixture-builder.mts, p3-preregistration.json, the fixture identity fields. No change to Stratum, the model regime, the hypothesis, or the sampling threshold.",
+ "implementation": {
+  "repo": "Noema-team/stratum",
+  "branch": "p1-collision-guard",
+  "commit": "9f298f219db927d5065876cf99cdec11e462aa04"
+ },
+ "target": {
+  "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "pristine": true,
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+  "pristine_verification": "restoreTargetPristine() now verifies the COMPLETE worktree: pinned HEAD + worker bytes PLUS git status --porcelain empty except the explicitly accounted .sle/ runtime workspace; unexpected tracked modifications or untracked files fail closed and are left for the operator"
+ },
+ "corrections": {
+  "P1_transport_adjudication": {
+   "rule": "frozen denominator_rule implemented verbatim: 'Transport failure mid-BUILD: journal + re-queue, consumes no attempt (addendum-2 discipline: ambiguity is NOT censored; the archived capture decides)'",
+   "mechanism": "adjudicateTransportFailure() reads ONLY the archived capture: >=1 provider error record, ZERO integrity failures/STOPs, EVERY error record matching an unambiguous transport class (undici 'fetch failed'; 'LLM API request failed: 5xx/408/429' per the frozen llm-provider error shape; ECONNRESET/ETIMEDOUT/UND_ERR_*/socket-hang-up codes), AND the capture ENDING on the transport error (terminal-position rule). Verdict TRANSPORT-REQUEUE -> journaled re-queue, no slot consumed. AMBIGUOUS/NOT-TRANSPORT -> evaluable MODEL-FAILURE (never censored).",
+   "scope_guard": "MAX_REQUEUES = 3 hard cap: after MAX_REQUEUES non-consuming re-queues the campaign STOPs (REQUEUE-EXHAUSTED) and returns to the operator. Evaluable <= 3 and total attempts <= 6; retries can never silently exceed the approved scope.",
+   "qualified": "T1 (fetch failed re-queued, NO slot consumed, campaign completes on the re-queued attempt), T2 (HTTP 400 stays evaluable MODEL-FAILURE), T3 (adjudicator matrix: 6 qualifying classes incl. 502/408/429/ECONNRESET/socket-hang-up; 400/app-error/mixed/tampered ambiguous; terminal-position rule), T4 (REQUEUE-EXHAUSTED cap, nothing consumed)"
+  },
+  "P1_durable_evidence": {
+   "per_attempt_package": "archiveAttemptEvidence() runs BEFORE the attempt is counted and BEFORE the next buildFixture() destroys .sle; immutable package per attempt: guard-capture.jsonl, db-records.json (run row, artifacts incl. submissions/anchors/applied-edit provenance, decisions), run-artifacts.tgz (staging + composition evidence), attempt-outcome.json (publication outcome + diagnostics + adjudication), sealed by evidence-manifest.json (per-file sha256 + package_sha256) and SELF-VERIFIED; a publication without runtime artifacts fails closed; any packaging failure = G2 STOP",
+   "campaign_ledger": "campaign-ledger.jsonl (outside .sle) written BEFORE the next attempt: preflight verdict, per-attempt classification with package hash, transport-requeue events (operator-visible per the frozen rule), slot assignments, terminal state",
+   "preflight": "the GO-time probe capture is durably archived OUTSIDE .sle (preflight/preflight-guard.jsonl + preflight-record.json with sha256) and adjudicated by adjudicatePreflightCapture(): exactly one guarded request+response, zero STOPs/integrity failures, stop_reason end_turn AND finish_reason in {stop, end_turn} \u2014 the P2 transport-censoring class (finish_reason error/length/absent with partial content) is REJECTED",
+   "qualified": "T6 (packages re-verify by hash AFTER later fixture rebuilds destroyed the runtime workspace; ledger hashes match manifests), T7 (ledger event structure preflight -> attempt -> re-queue -> counted -> terminal), T5 (preflight adjudication: clean accepted; error/absent/length/wrong-stop_reason/empty-text/multi-call/STOP rejected)"
+  },
+  "P1_full_restoration": {
+   "mechanism": "untracked upstream artifacts removed via filesystem operations (git rm cannot see them \u2014 the swallowed 'pathspec did not match' failures are gone); tracked worker drift reverted by checkout; then FULL git status --porcelain verification with .sle/ explicitly accounted; unexpected entries fail closed (targetRestoredPristine=false -> G2) and the offending files are left for the operator",
+   "qualified": "T8 (success: untracked artifacts + tracked drift + .sle present -> restored, porcelain ['?? .sle/'] only; failure: unexpected untracked file -> false, file preserved), R1 + R2 (restoration verified through the new full check after publication AND model failure)"
+  }
+ },
+ "runner_qualification": {
+  "artifact": "evidence/p3/p3-runner-qualification-output.txt",
+  "verdict": "ALL PASS (R1-R7 preserved + T1-T8 added; 15/15), zero completion traffic",
+  "scenarios": {
+   "R1": "successful publication through the runner (1 evaluable PUBLISHED, boundary refusal, evidence archived, target restored \u2014 now via the FULL porcelain check)",
+   "R2": "model-attributable failure (clean capture, model reached, no publication; consumes the denominator; restoration verified after failure)",
+   "R3": "G1 STOP (immediate abort, attempt not counted, 0 model calls)",
+   "R4": "G2 STOP from a capture-write failure (exception-hardened classification; attempt not counted; archive failure itself fails closed G2)",
+   "R5": "stop-at-three (exactly 3 evaluable attempts, 3 publications, terminal)",
+   "R6": "preflight separation (preflight STOP aborts before attempt 1 counting nothing; probe path distinct)",
+   "R7": "fail-closed evidence (missing capture -> G2; violations classify from the exception alone)",
+   "T1": "transport re-queue: unambiguous transport failure journaled + re-queued, consumes NO denominator slot",
+   "T2": "ambiguity is NOT censored: non-transport provider error stays an evaluable MODEL-FAILURE",
+   "T3": "transport adjudicator matrix: qualifying classes, ambiguous classes, terminal-position rule, tampered-capture refusal",
+   "T4": "re-queue cap: REQUEUE-EXHAUSTED STOP after MAX_REQUEUES; retries can never silently exceed the approved scope",
+   "T5": "preflight completion-status adjudication incl. the P2 finish_reason=error class rejected",
+   "T6": "evidence durability: per-attempt packages re-verify by hash after subsequent fixture rebuilds",
+   "T7": "campaign ledger durability and event structure",
+   "T8": "full pristine restoration: success and failure paths, .sle accounting, fail-closed strays"
+  }
+ },
+ "chain": [
+  {
+   "path": "evidence/p3/p3-live-runner.mts",
+   "sha256": "2f0e3ab22197cdae18d07aa6e9c303f0829587de8eefbcc5caba08088de3eaee"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification.mts",
+   "sha256": "353ee67285f4c5c6bf4668918e4f1461a6bf3624f51c58fed1ea760bd6389355"
+  },
+  {
+   "path": "evidence/p3/p3-runner-qualification-output.txt",
+   "sha256": "84fcd95325fbcc57fbbee0e12c16cb8cea9ed7ee11f411474b47285943eb791e"
+  }
+ ],
+ "verification": {
+  "effective_checksum_file": "evidence/p3/p3-effective-freeze-3.sha256",
+  "how_to": "clone branch p2-freeze-evidence of Noema-team/pilot-a-evidence (public); run sha256sum -c evidence/p3/p3-effective-freeze-3.sha256 (v3), sha256sum -c evidence/p3/p3-effective-freeze-2.sha256 (v2: driver pin must still verify) and sha256sum -c evidence/p3/p3-effective-freeze-1.sha256 (freeze-1: 13/15, the two documented moves carried from v2)"
+ },
+ "execution_status": "BOUND v3 \u2014 awaiting the operator's final live-GO review. No live P3 executed (zero completion traffic).",
+ "supersedes": {
+  "v2_path": "evidence/p3/p3-effective-freeze-2.sha256",
+  "v2_sha256": "54312021c789a490c626db2c48b9aaf655c2035444a2921c83a8e1797130c337",
+  "v2_binding_file_unchanged": true,
+  "v1_binding_file_unchanged": true,
+  "pin_status": "freeze-2 chain: 1/4 pins byte-identical (p3-live-driver.mts \u2014 the pinned composition is UNCHANGED by this revision); THREE pins moved, all and only the files this correction touched:",
+  "moved_pins": [
+   {
+    "path": "evidence/p3/p3-live-runner.mts",
+    "freeze2_sha256": "a59f090e262b4f4bd15bbbb132ddfb06c9d324e23ec9cef733bd1aa688adb3b1",
+    "current_sha256": "2f0e3ab22197cdae18d07aa6e9c303f0829587de8eefbcc5caba08088de3eaee",
+    "reason": "the review's three required corrections: transport adjudication + capped non-consuming re-queue; durable per-attempt evidence packages + campaign ledger + preflight archival/completion-status adjudication; full porcelain pristine-target restoration. Lifecycle order, counting semantics (3 evaluable max), boundary, classification precedence, and all frozen interfaces are unchanged."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification.mts",
+    "freeze2_sha256": "4ff63768462855f59d7a469a1ccfa4588b189d6c86b1f2261185e0406f73e3b5",
+    "current_sha256": "353ee67285f4c5c6bf4668918e4f1461a6bf3624f51c58fed1ea760bd6389355",
+    "reason": "R1-R7 scenario bodies preserved unchanged; imports extended; additive T1-T8 regression gates for the three corrections."
+   },
+   {
+    "path": "evidence/p3/p3-runner-qualification-output.txt",
+    "freeze2_sha256": "9efd8757c156f778eca17f93a6b41955aded740d6da1924be96d4c56b0521df7",
+    "current_sha256": "84fcd95325fbcc57fbbee0e12c16cb8cea9ed7ee11f411474b47285943eb791e",
+    "reason": "fresh full-suite run: 15/15 PASS, zero completion traffic."
+   }
+  ],
+  "carried_unchanged": {
+   "p3-live-driver.mts": "d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf (identical to freeze-2; the composition, guard wiring, contracts, and boundary are untouched)",
+   "fixture_manifest_identity_fields": {
+    "note": "p3-build-entry-fixture-manifest.json is regenerated on every fixture instantiation by design (uuid/timestamp-bearing snapshot; re-run during qualification); its DETERMINISTIC identity fields remain the binding authority and are unchanged:",
+    "definition_sha256": "71f1c39c97ecea575b1195b63de510fa403dad4fecaa1df0c774d04fae89cac5",
+    "readiness_sha256": "b5a96b175f5b67fbe697d6fa32ed58081070d1cfa47089c7b812c60bf495d2b7",
+    "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+    "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+    "run_cursor": "confirm",
+    "issue_input_sha256": "dd40147291edb7412eb0ccf57c3cadbd3f19ac8d7299306c0bc880419eb124c5"
+   }
+  }
+ }
+}

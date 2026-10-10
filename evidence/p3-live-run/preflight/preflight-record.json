@@ -1,0 +1,12 @@
+{
+ "probe_id": "c3082d2f-6439-460c-9b2d-1d3dad84aa36",
+ "live_capture_path": "/home/theo/Documents/coding/repos/student-platform/.sle/p3-captures/preflight-c3082d2f-6439-460c-9b2d-1d3dad84aa36/preflight-guard.jsonl",
+ "archived_capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run/preflight/preflight-guard.jsonl",
+ "archived_capture_sha256": "4c757be471eb33b9417dc8e5d77370ce3259994f7b8cfc04812233dc22d83538",
+ "adjudication": {
+  "accepted": false,
+  "stop": "G2",
+  "detail": "preflight stop_reason max_tokens is not an acceptable completion status"
+ },
+ "archived_at_utc": "2026-10-10T09:39:16.230Z"
+}

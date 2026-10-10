@@ -1,0 +1,76 @@
+{
+ "report": "P3 LIVE CAMPAIGN — TERMINAL REPORT",
+ "generated_at_utc": "2026-10-10T09:52:00Z",
+ "endpoint_verdict": "UNEVALUABLE",
+ "outcome_summary": "The frozen P3 campaign terminated at the guarded GO-time preflight, BEFORE attempt 1, per the frozen STOP rules. The single preflight probe completion was correctly rejected by the frozen completion-status adjudication (stop_reason max_tokens / finish_reason length): the model consumed its entire 16-token probe budget on reasoning tokens and emitted zero visible content. A preflight STOP aborts the campaign before attempt 1 and is never counted.",
+ "accounting": {
+  "denominator_exercised": "0 / 3 (zero evaluable BUILD-entry attempts)",
+  "publications": 0,
+  "model_failures": 0,
+  "requeues": 0,
+  "stop_condition": "G2 — preflight adjudication rejected the probe completion status",
+  "stop_detail": "preflight: preflight stop_reason max_tokens is not an acceptable completion status",
+  "campaign_complete": true,
+  "target_restored_pristine": true
+ },
+ "model_traffic": {
+  "completion_requests": 1,
+  "notes": "exactly ONE preflight probe request; NO BUILD attempts were dialed; zero completion traffic beyond the probe",
+  "probe": {
+   "model": "z-ai/glm-5.3-flash",
+   "provider_on_wire": "Inceptron (via OpenRouter)",
+   "stream_id": "gen-1791625154-xUcPuLH5MhfdMht6VihL",
+   "request": { "max_tokens": 16, "reasoning_effort": "low", "temperature": 0.7, "tools": 0, "guard_verdict": "PASS" },
+   "wire_result": {
+    "stop_reason": "max_tokens",
+    "finish_reason": "length",
+    "completion_tokens": 16,
+    "reasoning_tokens": 16,
+    "content_bytes": 0,
+    "text": "",
+    "prompt_tokens": 34,
+    "total_tokens": 50,
+    "duration_ms": 1313
+   },
+   "adjudication": { "accepted": false, "stop": "G2", "detail": "preflight stop_reason max_tokens is not an acceptable completion status" }
+  }
+ },
+ "root_cause": {
+  "finding": "The frozen preflight probe contract allocates max_tokens: 16 with reasoning_effort: 'low'. In this model regime the reasoning channel consumed the entire budget (reasoning_tokens: 16, content_bytes: 0), so the completion necessarily terminated with finish_reason 'length' — a status the frozen adjudication (qualified in T5) must reject. The wire DID accept the frozen contract (guard PASS; response streamed with reasoning fields present; model/provider echoed), so endpoint connectivity and contract acceptance were proven — but a properly terminated completion could not be produced within the frozen budget.",
+  "frozen_parameter_involved": "preflightContract().max_tokens = 16 in evidence/p3/p3-live-driver.mts (pinned d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf, byte-identical across freeze-1..4 and at execution)",
+  "why_not_remediated": "max_tokens is a FROZEN parameter; the GO directive forbids modifying frozen parameters and continuing after a STOP. Re-launching after the preflight STOP would violate the frozen rule that a STOP ends the campaign. Remediation (e.g., raising the probe budget, or a probe contract with reasoning disabled) is a frozen-artifact amendment that requires independent review authorization."
+ },
+ "invocation_record": {
+  "authorization": "Operator LIVE GO: freeze-4 at 48cf22c APPROVED FOR LIVE EXECUTION",
+  "entry": "/tmp/opencode/p3-live-launch.mts (external scratch entry; imports the frozen modules by absolute path; passes ONLY evidenceDir — no offline overrides, default 3-evaluable-attempt limit)",
+  "first_launch_attempt": "node --experimental-strip-types failed at IMPORT (strip-only mode cannot parse the frozen guard's TypeScript parameter property, config-guard.mts:87) — no dialing occurred, no state created; invocation switched to tsx, the exact runtime under which every qualification gate (Q1-Q7, R1-R7, T1-T9) was proven; frozen modules untouched (shas re-verified at terminal)",
+  "campaign_invocation": "runP3Campaign({ evidenceDir: 'evidence/p3-live-run' }) — guarded GO-time preflight executed inside the campaign before attempt 1, exactly as bound"
+ },
+ "pre_dial_gates": {
+  "pilot_a_commit": "48cf22c32fbc291ed0c24ab3da120c7f149dc375 (clean)",
+  "frozen_stratum": "9f298f219db927d5065876cf99cdec11e462aa04 (clean at launch AND terminal)",
+  "target": { "head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e", "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988", "porcelain_at_terminal": "?? .sle/ only" },
+  "bindings": { "freeze_4": "3/3", "freeze_2_driver_pin": "1/1", "freeze_1": "13/15 (2 documented moves)", "p2_freeze_5": "18/18" },
+  "evidence_dir_fresh": true
+ },
+ "terminal_verification": {
+  "target_pristine": true,
+  "target_head": "86ec0871d64ecca8732434c11d015fd8e08ddc7e",
+  "worker_main_sha256": "7d7718bcbeb2e219dab14e285a66e62ea5883c209981a0be91cc29b490569988",
+  "frozen_modules_byte_identical_at_terminal": {
+   "p3-live-driver.mts": "d15db98346defa5b44f5de4410b8e4b60ae703e73833d959be60604cdb86edcf",
+   "p3-live-runner.mts": "4679b399ba369c24875f044406d237b2c2a7b25fc115144090fbc1b793c505dd",
+   "config-guard.mts": "64214721f3618ce7 (unchanged from the freeze-1 pin)"
+  }
+ },
+ "evidence": {
+  "ledger": { "path": "evidence/p3-live-run/campaign-ledger.jsonl", "sha256": "b9c3c2264366fa9a91ffb6f9b3c2eb0c94d4f04a873c2fcce75ff509c06cedde", "events": ["preflight rejected -> G2", "campaign-terminal G2, evaluable 0, requeues 0"] },
+  "preflight_package": {
+   "record": { "path": "evidence/p3-live-run/preflight/preflight-record.json", "sha256": "38d72ed457f9f289f627a75b080157d1721c787c42afe32fa94717d5a09b21b8" },
+   "guard_capture": { "path": "evidence/p3-live-run/preflight/preflight-guard.jsonl", "sha256": "4c757be471eb33b9417dc8e5d77370ce3259994f7b8cfc04812233dc22d83538" },
+   "console": { "path": "evidence/p3-live-run/launch-console.log", "sha256": "9a9185c7e47981416ea48b67ff99ef431bf6b2033d4d5344d0bfc83840cad92b" }
+  },
+  "hypothesis_status": "H-build-entry-publication UNEVALUABLE — the BUILD entry endpoint was never exercised (preflight abort, zero attempts)"
+ },
+ "next_step": "RETURN FOR INDEPENDENT RESULTS REVIEW. No re-launch, no frozen-parameter amendment, no successor experiment without new authorization."
+}

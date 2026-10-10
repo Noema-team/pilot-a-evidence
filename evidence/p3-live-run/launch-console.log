@@ -1,0 +1,13 @@
+=== P3 LIVE CAMPAIGN RESULT ===
+{
+  "attempts": [],
+  "published": 0,
+  "modelFailures": 0,
+  "evaluable": 0,
+  "requeues": 0,
+  "stop": "G2",
+  "stopDetail": "preflight: preflight: preflight stop_reason max_tokens is not an acceptable completion status",
+  "complete": true,
+  "targetRestoredPristine": true,
+  "ledgerPath": "/home/theo/Documents/coding/repos/pilot-a/evidence/p3-live-run/campaign-ledger.jsonl"
+}

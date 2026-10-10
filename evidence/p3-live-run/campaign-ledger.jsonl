@@ -1,0 +1,2 @@
+{"ts":"2026-10-10T09:39:16.230Z","event":"preflight","accepted":false,"stop":"G2","detail":"preflight: preflight stop_reason max_tokens is not an acceptable completion status"}
+{"ts":"2026-10-10T09:39:16.247Z","event":"campaign-terminal","stop":"G2","stopDetail":"preflight: preflight: preflight stop_reason max_tokens is not an acceptable completion status","evaluable":0,"requeues":0}

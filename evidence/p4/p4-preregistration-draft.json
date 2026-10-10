@@ -1,34 +1,51 @@
 {
- "artifact": "P4 DRAFT PREREGISTRATION — NOT FROZEN, NOT AUTHORIZED. Design-draft companion to evidence/p4/p4-design-draft.md (DRAFT v1). This file exists so the architecture review can preregister-by-reference; every field below is provisional until the review returns and the qualification freezes it.",
+ "artifact": "P4 DRAFT PREREGISTRATION v2 — NOT FROZEN, NOT AUTHORIZED. Revised per P4 architecture review of 8962ab5 (approved in principle; four corrections applied). Companion to evidence/p4/p4-design-draft.md (DRAFT v2). Provisional until final review returns and qualification freezes it.",
  "experiment": "P4",
- "title": "Autonomous upstream reliability — can the real workflow + real LLM produce a valid BUILD-entry state without fixture replay?",
+ "title": "Autonomous upstream reliability — can the real Stratum workflows + real LLM produce a valid BUILD-entry state without fixture replay?",
  "research_question": "Can the real Stratum workflow, using a real LLM rather than scripted upstream fixture replay, consistently produce a valid BUILD-entry state?",
  "relation_to_prior_experiments": {
   "P2": "0/9 workflows reached BUILD; root cause: campaign-driver settings clobber (10/10 runs at degraded budgets) + upstream generative exhaustion; P4 prevents and measures both",
   "P3": "3/3 BUILD publications from a replayed entry state (QUALIFIED SUPPORT) — P4 removes the replay",
   "P4_is_not": "a BUILD reliability study (P3's closed result), a task-generalization study, or a downstream-correctness study"
  },
+ "lifecycle": {
+  "workflows": "Stratum native define-work + full-build ONLY (registry builtins at stratum 9f298f2); no custom upstream pipeline",
+  "attempt_structure": [
+   "1. clean per-attempt initialization (state/artifacts only; settings untouched)",
+   "2. define-work with real model (produce + engine single-turn review)",
+   "3. handoff: execution WorkItem created with definitionSource {workItemId: <define-work WI id>}; validated by existing resolveDefinitionSource (strict ref shape, fail-closed, integrity-pinned sha256, max 131072 bytes)",
+   "4. full-build with real model: scoping.gather -> scoping.produce -> scoping.checkpoint -> design -> critique (single-turn) -> plan -> test -> sharding_approval -> confirm; HALT at confirm",
+   "5. readiness assessment (R1-R6); BUILD never executed; confirm decision left pending"
+  ],
+  "checkpoint_and_decision_handling": {
+   "scoping.checkpoint + sharding_approval": "adjudicated by the determinate preregistered policy: approve iff the pending decision object is well-formed and all state guards pass; otherwise NOT-READY malformed-state; the campaign never authors or edits decision content",
+   "confirm": "NEVER adjudicated; left pending — the pending halted state is the endpoint",
+   "engine_review_steps": "define-work review and full-build critique are single-turn engine executions per the frozen definitions (on_fail loops), not human decisions; they pass through the same guard and capture"
+  }
+ },
  "primary_endpoint": {
-  "definition": "BUILD-entry readiness at the confirm checkpoint, assessed BEFORE any BUILD execution; the confirm decision remains pending",
+  "definition": "BUILD-entry readiness at the halted-at-confirm state, assessed BEFORE any BUILD execution; the confirm decision remains pending",
   "readiness_checks": {
-   "R1_workflow_state": "execution WorkItem live; cursor at confirm; well-formed pending checkpoint decision",
-   "R2_authority": "definition artifact with recorded definition_sha256 produced by THIS run's model output; execution WI references it as definitionSource",
-   "R3_configuration": "settings.json sha 5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2 verified at every step transition; installed once at campaign start; no campaign code writes it afterward",
-   "R4_budget_on_wire": "every archived upstream request carries max_tokens from the frozen per-step map (workflow_max_tokens) and frozen effort keys",
-   "R5_edit_policy": "workflowParameters carry allowedEditPaths/requiredEditPaths over the worker file",
-   "R6_wire_integrity": "all upstream turns guard-archived with wire_observation; zero unarchived provider calls"
+   "R1_halted_state": "engine actually halted at step confirm (kind checkpoint) with a well-formed pending decision, no subsequent step executed; upstream checkpoints resolved under the preregistered policy",
+   "R2_artifact_provenance_readability_admissibility": "definition artifact from THIS run's define-work WI: exists and is bound to that WI in storage; readable and parses via the existing definition-artifact parser; resolves through resolveDefinitionSource as the execution WI's authoritative definition (integrity-pinned sha256 recorded, <=131072 bytes, fail-closed) — i.e. admissible to BUILD context assembly by the existing machinery; NO byte-identity comparison with P3's fixture; NO subjective content grading",
+   "R3_configuration": "settings.json sha 5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2 verified at every step transition and resolved per-request parameters archived per call; installed exactly once per campaign",
+   "R4_budget_on_wire": "every archived upstream request carries max_tokens from the frozen per-step map (workflow_max_tokens) and frozen effort keys; WIRE MISMATCH = campaign-terminal procedure STOP (budget-wire-mismatch), NEVER a model-attributed NOT-READY (review ruling); genuine exhaustion at the correct budget remains a NOT-READY",
+   "R5_edit_policy_parameters": "workflowParameters carry allowedEditPaths/requiredEditPaths over the worker file — verified as parameters only; BUILD editPolicy is never enforced on upstream steps (review correction 3)",
+   "R6_wire_integrity": "all upstream turns incl. single-turn review executions guard-archived with wire_observation; zero unarchived provider calls"
   },
   "assessment_record": "readiness-assessment.json per attempt: READY | NOT-READY + class + evidence pointers"
  },
  "not_ready_classes": [
   "budget-exhaustion-upstream (genuine finish_reason length at the CORRECT frozen budget)",
-  "authority-invalid (definition artifact missing/inauthoritative)",
+  "authority-invalid (resolveDefinitionSource failure codes)",
   "workflow-abandoned (cap-hit halt, max-iterations)",
-  "malformed-state (confirm state malformed/missing)",
+  "malformed-state (halted state or pending decision malformed; checkpoint-policy refusal)",
   "provider-error-unresolved (non-transport, unresolved after repair)"
  ],
  "procedure_classes_consume_nothing": [
-  "CONFIG-DRIFT STOP (settings sha divergence — immediate campaign-terminal STOP with archived diff)",
+  "CONFIG-DRIFT STOP (settings sha divergence at any step transition)",
+  "budget-wire-mismatch STOP (transmitted budget != frozen per-step budget)",
+  "AUTHORITY-BYPASS STOP (any disk write outside the union of the current step's authorized tool surface and the attempt namespace — per-step scoping; BUILD editPolicy is NOT applied upstream)",
   "transport re-queue (bounded at 3, P3 discipline; ambiguity never censored)",
   "guard evidence STOP (G1/G2 semantics inherited from P3)",
   "crash recovery per charter v1.1 section 10 (retained/incomplete/resume)"
@@ -38,13 +55,15 @@
   "design_rationale": "fixed-task repetition measures delivery reliability without task-difficulty confounds; task generalization explicitly out of scope",
   "n": 3,
   "success_threshold": ">= 2/3 attempts READY",
-  "denominator_rule": "every launched workflow instance is evaluable (READY or NOT-READY+class); procedure classes consume nothing"
+  "threshold_status": "ACCEPTED BY REVIEW as an engineering qualification only, not a scientific estimate",
+  "denominator_rule": "every launched attempt is evaluable (READY or NOT-READY+class); procedure classes consume nothing"
  },
  "model_regime": "identical frozen regime: openrouter, z-ai/glm-5.3-flash, settings 5634b2e8 (full file with workflow_max_tokens + workflow_reasoning_effort), upstream per-step budgets honored and WIRE-VERIFIED",
  "config_integrity": {
-  "state_time_guard": "settings sha verified before each upstream step; drift -> CONFIG-DRIFT STOP (procedure class)",
-  "request_time_guard": "P3 config-guard composition wraps every upstream step; per-step contracts derived from the frozen settings",
-  "no_seed_rule": "no seed()/instantiate-reset in the campaign path; settings installed exactly once per campaign"
+  "clean_initialization": "settings installed exactly once at campaign start; the per-attempt reset initializes a clean attempt namespace (fresh run dir, fresh workflow state, no generated artifacts) and writes nothing else — it must not touch .sle/settings.json or any path outside the attempt namespace; no-clobber enforced by L1 code-inspection gate + state-time guard (the P2 seed() behavior is structurally excluded)",
+  "no_inheritance": "each attempt runs in its own state namespace; a per-attempt pre-flight state check verifies the namespace is empty before the first request — attempts cannot inherit prior attempts' artifacts or workflow state",
+  "state_time_guard": "settings sha verified before each step; drift -> CONFIG-DRIFT STOP (procedure class)",
+  "request_time_guard": "P3 config-guard composition wraps every provider call of both native workflows — produce/gather steps, checkpoint adjudication reads, and single-turn review executions — with per-step contracts derived from the frozen settings (per-step budget map + effort + the step's own declared tool surface in flat {name, description, input_schema} format and step-specific submit_result schema); single-turn reviews use the same transport path and identical capture (request+response pairing, wire_observation)"
  },
  "crash_recovery": {
   "charter": "v1.1 section 10, declared BEFORE launch",
@@ -52,17 +71,17 @@
   "logs": "all orchestration output under the campaign evidence dir from process start"
  },
  "qualification_plan": {
-  "L1_offline": "scripted-provider end-to-end: READY path; each NOT-READY class induced+classified; clobber simulation -> CONFIG-DRIFT; drifted-budget request -> guard STOP; kill-and-resume (retained slot preserved); no-seed code-inspection gate",
-  "L2_real_provider": "one round, <= 6 calls, ops-qual namespace: define-shaped + design-shaped turns at frozen upstream budgets; 32768 reasoning-burn calibration (P2 hidden-burn anomaly); upstream tool-surface capture verification",
-  "L3": "N=3 campaign; first genuine upstream-to-BUILD-entry observation expected at attempt 1"
+  "L1_offline": "scripted-provider full lifecycle: READY path through both native workflows halting at confirm; each NOT-READY class induced+classified (incl. resolveDefinitionSource failure codes -> authority-invalid); clean-init regression (reset touches neither settings nor foreign paths; namespace isolation from prior attempts); drifted-budget request -> budget-wire-mismatch STOP; settings-clobber simulation -> CONFIG-DRIFT STOP; kill-and-resume (retained slot preserved, incomplete discarded); code-inspection gates (no settings write / no seed() in the campaign path; checkpoint adjudication = the determinate policy only)",
+  "L2_real_provider": "one round, <= 6 calls, ops-qual namespace: define-work-shaped + full-build-upstream-shaped turns at frozen per-step budgets; 32768 reasoning-burn calibration (P2 hidden-burn anomaly); upstream tool-surface capture verification incl. a single-turn review-shaped call",
+  "L3": "N=3 campaign under the frozen preregistration; first genuine upstream-to-BUILD-entry observation expected at attempt 1"
  },
- "reuse": "workflow engine, decision repos, config-guard capture, evidence packaging, ledger + adjudicators, restoration, qualification patterns; NEW thin code: upstream per-step contract derivation, R1-R6 readiness function (pure), ledger-resume in the runner",
- "stop_rules": "immediate campaign-terminal STOP on CONFIG-DRIFT, out-of-policy disk writes during upstream, guard STOP, or evidence-archive failure — same shape as P3's frozen rules; on any STOP: archive, journal, return to operator",
- "execution_status": "DRAFT — architecture review pending. No live experiments, no provider dialing, no GO.",
- "open_questions_for_review": [
-  "R4 violation: STOP criterion (drafted) vs readiness-criterion-only?",
-  "upstream step set = the frozen workflow definition's own steps (drafted) — confirm",
-  "confirm decision left pending (drafted) vs composite endpoint through BUILD — rejected for scope control",
-  "N=3 fixed-task as a reliability probe — confirm or name a task-mix alternative"
+ "reuse": "native workflow registry entries (define-work, full-build), engine + decision repos, resolveDefinitionSource + definition-artifact parser, config-guard capture, evidence packaging, ledger + adjudicators, restoration, qualification patterns; NEW thin code: campaign lifecycle driver (launch both workflows, create execution WI with definitionSource ref, adjudicate checkpoints per the fixed policy), R1-R6 readiness function (pure), clean-init/reset + ledger-resume in the runner; NO changes to stratum 9f298f2 or frozen P3 artifacts",
+ "stop_rules": "immediate campaign-terminal STOP on CONFIG-DRIFT, budget-wire-mismatch, AUTHORITY-BYPASS (per-step scoping per correction 3), guard STOP, or evidence-archive failure — P3 STOP shape; on any STOP: archive, journal, return to operator",
+ "execution_status": "DRAFT v2 — final architecture review pending. No implementation, no live traffic, no freeze.",
+ "review_rulings_applied": [
+  "R4 wire mismatch -> campaign-terminal procedure STOP, never model-attributed NOT-READY",
+  "native define-work + full-build workflows, not a custom upstream pipeline",
+  "stop at confirm with the decision pending; BUILD never executed",
+  "N=3 fixed issue-108, >=2/3 READY accepted as engineering qualification only"
  ]
 }

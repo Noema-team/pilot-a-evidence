@@ -1,0 +1,97 @@
+{
+  "report": "L2 OPERATIONAL QUALIFICATION ROUND",
+  "round_id": "l2-round-2026-10-10T12-21-57",
+  "charter_basis": "PROCESS-CHARTER.md §3 (L2), §4 (standing engineering-traffic class), §5 (calibration)",
+  "purpose": "validate empirically: wire acceptance of the frozen probe contract; probe-budget reachability; BUILD-shaped tool-call acceptance; reasoning-cost calibration. Engineering evidence only — NEVER counted toward any L3 denominator.",
+  "model": "z-ai/glm-5.3-flash",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "verdicts": {
+    "QA-connectivity": "PASS",
+    "QB-probe-viability": "3/3 acceptable PASS",
+    "QC-build-tool-smoke": "PASS (wire accepted; stop_reason=tool_use; tool_calls=1)"
+  },
+  "calibration": {
+    "probe_reasoning_tokens_observed": [
+      6,
+      6,
+      0
+    ],
+    "max_reasoning_tokens_any_call": 13,
+    "rule": "recommended = max observed probe reasoning x 4 (rounded to 64)",
+    "recommended_probe_budget": 64,
+    "current_probe_budget": 512,
+    "sufficient": true
+  },
+  "totals": {
+    "calls": 5,
+    "completion_tokens": 50,
+    "wall_ms": 8757
+  },
+  "calls": [
+    {
+      "label": "qa-connectivity",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-21-57/qa-connectivity-capture.jsonl",
+      "capture_sha256": "d7596286efcc7a591b595634732d05dfd9abea447b9748a130f03f20d99ae9ec",
+      "ms": 2632,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 5,
+      "reasoning_tokens": 13,
+      "completion_tokens": 16,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qb-probe-viability-1",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-21-57/qb-probe-viability-1-capture.jsonl",
+      "capture_sha256": "96bc1c9b14151f795c57adef086371ef12e568e2ef05204e34b0fcf4091e4c70",
+      "ms": 1602,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 5,
+      "reasoning_tokens": 6,
+      "completion_tokens": 9,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qb-probe-viability-2",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-21-57/qb-probe-viability-2-capture.jsonl",
+      "capture_sha256": "7bd2149b9649575acabe8ec50db2e0f48fc0810417f41cc5eaa9f2b902db7418",
+      "ms": 2085,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 6,
+      "reasoning_tokens": 6,
+      "completion_tokens": 9,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qb-probe-viability-3",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-21-57/qb-probe-viability-3-capture.jsonl",
+      "capture_sha256": "4ec32f4bb59ab3a8afd915b8d62b6655e23c01d342468765257dc6cf75820f4f",
+      "ms": 1362,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 6,
+      "reasoning_tokens": 0,
+      "completion_tokens": 3,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qc-build-tool-smoke",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-21-57/qc-build-tool-smoke-capture.jsonl",
+      "capture_sha256": "309aaa14ff53a6a869b24f116ad02c0739676dd843beabf709c34f9f45940221",
+      "ms": 1076,
+      "stop_reason": "tool_use",
+      "finish_reason": "tool_calls",
+      "text_len": 0,
+      "reasoning_tokens": 0,
+      "completion_tokens": 13,
+      "tool_calls": 1,
+      "acceptable": false
+    }
+  ]
+}

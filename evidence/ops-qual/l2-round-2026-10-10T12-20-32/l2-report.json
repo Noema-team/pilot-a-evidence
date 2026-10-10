@@ -1,0 +1,98 @@
+{
+  "report": "L2 OPERATIONAL QUALIFICATION ROUND",
+  "round_id": "l2-round-2026-10-10T12-20-32",
+  "charter_basis": "PROCESS-CHARTER.md §3 (L2), §4 (standing engineering-traffic class), §5 (calibration)",
+  "purpose": "validate empirically: wire acceptance of the frozen probe contract; probe-budget reachability; BUILD-shaped tool-call acceptance; reasoning-cost calibration. Engineering evidence only — NEVER counted toward any L3 denominator.",
+  "model": "z-ai/glm-5.3-flash",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "verdicts": {
+    "QA-connectivity": "PASS",
+    "QB-probe-viability": "3/3 acceptable PASS",
+    "QC-build-tool-smoke": "PASS (wire accepted; stop_reason=null; tool_calls=0)"
+  },
+  "calibration": {
+    "probe_reasoning_tokens_observed": [
+      6,
+      10,
+      6
+    ],
+    "max_reasoning_tokens_any_call": 14,
+    "rule": "recommended = max observed probe reasoning x 4 (rounded to 64)",
+    "recommended_probe_budget": 64,
+    "current_probe_budget": 512,
+    "sufficient": true
+  },
+  "totals": {
+    "calls": 5,
+    "completion_tokens": 46,
+    "wall_ms": 5224
+  },
+  "calls": [
+    {
+      "label": "qa-connectivity",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-20-32/qa-connectivity-capture.jsonl",
+      "capture_sha256": "ba35ba4654ac5ad03f6dc199b0a9db6f7e15ff810b7ceda9fc625820baac2a07",
+      "ms": 2225,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 5,
+      "reasoning_tokens": 14,
+      "completion_tokens": 16,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qb-probe-viability-1",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-20-32/qb-probe-viability-1-capture.jsonl",
+      "capture_sha256": "fa3b45fdbd1079fdfcb0f251d2801edd0a0a2eabc2677e29d928f87614d8df1f",
+      "ms": 907,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 5,
+      "reasoning_tokens": 6,
+      "completion_tokens": 8,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qb-probe-viability-2",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-20-32/qb-probe-viability-2-capture.jsonl",
+      "capture_sha256": "7a52776f9d1fafa3236182fa1cb8e3f929372178f26a38a20a303b426cc5c0a4",
+      "ms": 1209,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 5,
+      "reasoning_tokens": 10,
+      "completion_tokens": 13,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qb-probe-viability-3",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-20-32/qb-probe-viability-3-capture.jsonl",
+      "capture_sha256": "5a499b2489a6279d91ad7ca20359f1c8789b32cf62722f85ed5249505ddf68ba",
+      "ms": 883,
+      "stop_reason": "end_turn",
+      "finish_reason": "stop",
+      "text_len": 5,
+      "reasoning_tokens": 6,
+      "completion_tokens": 9,
+      "tool_calls": 0,
+      "acceptable": true
+    },
+    {
+      "label": "qc-build-tool-smoke",
+      "capture": "/home/theo/Documents/coding/repos/pilot-a/evidence/ops-qual/l2-round-2026-10-10T12-20-32/qc-build-tool-smoke-capture.jsonl",
+      "capture_sha256": "205dc6b1ec5a3a346411f28b987b5413f67323c12db6cbb7ef4b1f7293ac4d69",
+      "ms": 0,
+      "stop_reason": null,
+      "finish_reason": null,
+      "text_len": 0,
+      "reasoning_tokens": null,
+      "completion_tokens": null,
+      "tool_calls": 0,
+      "acceptable": false,
+      "error": "config-guard: STOP — l2-toolsmoke: tool set [,] matches none of the frozen shapes [read_file,submit_result] — the model call was NOT made"
+    }
+  ]
+}

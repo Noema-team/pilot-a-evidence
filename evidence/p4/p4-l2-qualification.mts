@@ -26,8 +26,16 @@
 // mid-investigation in scoping.produce — the honest cap-stop endpoint.
 //
 // Usage: npx tsx evidence/p4/p4-l2-qualification.mts  (from the stratum repo)
+//
+// OPERATIONAL HISTORY (corrected per the freeze review): TWO invocations
+// occurred — invocation 1 was INADVERTENT (this module self-executed on
+// import during a syntax check) and its evidence directory was destroyed by
+// invocation 2's then-destructive startup; invocation 2 is the surviving
+// evidence. The module is now IMPORT-SAFE (executes only when invoked
+// directly) and its startup is NON-DESTRUCTIVE: every invocation writes to a
+// unique, immutable run directory — prior evidence is never overwritten.
 
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { CaptureRecord } from '../p3/config-guard.mts';
 import {
@@ -134,10 +142,24 @@ function pairTraffic(cap: CaptureRecord[]): Array<{ req: CaptureRecord; resp: Ca
   return out.sort((a, b) => String(a.req.ts ?? '').localeCompare(String(b.req.ts ?? '')));
 }
 
+// every real-round package ever produced under the L2 namespace, across the
+// legacy flat layout and the per-invocation immutable run directories
+function allRealRoundPackages(): string[] {
+  const out: string[] = [];
+  const consider = (dir: string): void => {
+    try {
+      for (const d of readdirSync(dir)) if (d.startsWith('attempt-1-') && existsSync(join(dir, d, 'manifest.json'))) out.push(join(dir, d));
+    } catch { /* unreadable subtree contributes nothing */ }
+  };
+  consider(L2_DIR);
+  for (const d of readdirSync(L2_DIR)) if (d.startsWith('invocation-')) consider(join(L2_DIR, d));
+  return out.sort();
+}
+
 async function regenerateReport(): Promise<void> {
-  const pkgDirs = (await import('node:fs')).readdirSync(L2_DIR).filter((d) => d.startsWith('attempt-1-'));
-  if (pkgDirs.length !== 1) throw new Error(`report-only: expected exactly one real-round package, found ${pkgDirs.length}`);
-  const pkg = join(L2_DIR, pkgDirs[0]);
+  const pkgs = allRealRoundPackages();
+  if (pkgs.length !== 1) throw new Error(`report-only: expected exactly one surviving real-round package, found ${pkgs.length}: ${pkgs.join(', ')}`);
+  const pkg = pkgs[0];
   const manifest = JSON.parse(readFileSync(join(pkg, 'manifest.json'), 'utf-8')) as { outcome: string; failureClass: string | null; package_sha256: string };
   const cap: CaptureRecord[] = readFileSync(join(pkg, 'guard-capture.jsonl'), 'utf-8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l) as CaptureRecord);
   const pairs = pairTraffic(cap);
@@ -158,12 +180,16 @@ async function regenerateReport(): Promise<void> {
   };
   const allGuardPass = cap.filter((r) => r.kind === 'request').every((r) => r.guard_verdict === 'PASS');
   const pv = verifyEvidencePackage(pkg);
-  const preflight = (await import('node:fs')).readdirSync(L2_DIR).filter((d) => d.startsWith('attempt-0-'))[0] ?? null;
+  const preflightDirs: string[] = [];
+  const considerP = (dir: string): void => { try { for (const d of readdirSync(dir)) if (d.startsWith('attempt-0-') && existsSync(join(dir, d, 'manifest.json'))) preflightDirs.push(join(dir, d)); } catch { /* ignore */ } };
+  considerP(L2_DIR);
+  for (const d of readdirSync(L2_DIR)) if (d.startsWith('invocation-')) considerP(join(L2_DIR, d));
+  preflightDirs.sort();
   const report = {
     round: 'p4-l2-operational-qualification',
-    go: 'operator L2 GO (L3 HOLD) — one bounded real-provider round, maximum 6 calls',
+    go: 'operator L2 GO (L3 HOLD) — one bounded real-provider round, maximum 6 calls. HISTORY: two invocations occurred (one inadvertent); the surviving complete evidence is invocation 2; see operational_history',
     finished_at_utc: new Date().toISOString(),
-    regenerated_offline: 'report regenerated from the archived capture (--report-only; zero traffic)',
+    regenerated_offline: 'report regenerated from the archived capture (--report-only; zero traffic; the capture and evidence packages are read-only to this path)',
     provider_identity: {
       provider: 'openrouter', base_url: 'https://openrouter.ai/api/v1',
       model: 'z-ai/glm-5.3-flash', api_key_env: 'OPENROUTER_API_KEY',
@@ -172,9 +198,23 @@ async function regenerateReport(): Promise<void> {
     },
     pre_dial: {
       offline_verification: 'PASS (attempt-0: scripted provider through the real engine, READY, R1–R6 all pass)',
-      offline_attempt_package: preflight,
+      offline_attempt_package: preflightDirs[0] ?? null,
       real_calls_before_round: 0,
     },
+    operational_history: {
+      authorized: 'ONE bounded real-provider round (maximum 6 real calls)',
+      actual_history: 'TWO invocations occurred. Invocation 1 was INADVERTENT — the module self-executed on import during a syntax check — and ran as a full round. Invocation 2 was the intended invocation. Invocation 1\'s evidence directory was destroyed by invocation 2\'s then-destructive startup (rmSync at start — since removed); no invocation-1 artifact survives.',
+      surviving_evidence: 'invocation 2: the attempt-0 preflight package, the attempt-1 real-round package (guard capture inside), and this report',
+      call_reconciliation: {
+        invocation_2_dials: realCalls,
+        invocation_2_exact: true,
+        invocation_2_cap_refusal_pre_dial: capHit,
+        invocation_1_dials: 'NOT INDEPENDENTLY RECOVERABLE — bounded 1..6 by the per-invocation cap enforcement (the capped transport throws on the 7th count). The incident record shows invocation 1 ran to completion, so a cap-stop at 6 dials is the expected value, but this is NOT independently verifiable.',
+        total_dials_both_invocations: `bounded ${1 + realCalls}..${6 + realCalls}; a point estimate of ${6 + realCalls} assumes invocation 1 also reached its cap-stop, which cannot be verified. The previously published estimate (~12-14) was looser than the evidence supports and is superseded by these bounds. Uncertainty is PRESERVED, not resolved.`,
+        reconciliation_sources_checked: 'local evidence directories and execution logs (no invocation-1 artifact survives anywhere local); provider-side usage records were deliberately NOT queried (no additional provider traffic is permitted)',
+      },
+    },
+    execution_incident: 'DISCLOSED: the module self-executed on import during a syntax check, inadvertently running invocation 1 as a full round; invocation 2\'s then-destructive startup (rmSync — since removed) destroyed invocation 1\'s evidence directory. The surviving complete evidence is invocation 2. The module is now import-safe and non-destructive (unique immutable run directories). Total real-provider dials across both invocations: bounded [7..12]; see operational_history.call_reconciliation — the exact invocation-1 count is unrecoverable and the uncertainty is preserved.',
     traffic: {
       cap: MAX_REAL_CALLS, observed_dials: realCalls, cap_enforced: true, cap_hit: capHit,
       per_call: perCall,
@@ -184,11 +224,10 @@ async function regenerateReport(): Promise<void> {
       attempt_outcome: manifest.outcome, failureClass: manifest.failureClass,
       assessment_note: 'the cap refusal is a PREREGISTERED PROCEDURE endpoint — the attempt-level class (provider-error-unresolved) reflects the engine-recorded step error, not a provider outage',
     },
-    execution_incident: 'DISCLOSED: the module self-executes on import; an import-based syntax check inadvertently ran a first full round before the intended invocation. The first round\'s evidence directory was overwritten by the second (rmSync at start); the surviving complete evidence is from the second invocation. Total real-provider dials across both invocations exceeded the single-round intent (~12-14 calls, all within the per-round 6-call cap and all captured by the guard at the time); no third round was run. The surviving evidence is treated as THE one L2 round.',
     observations: [
       'define-work produce wire: REAL traffic exercised — the model returned tool_use turns with real usage (tokens observed per call), every request guard-validated against the frozen contract (model/budget/temperature/tool surface).',
       'the real model spent its turns on repository investigation (read tools) and did NOT submit the definition within the 6-call cap — the round ended at the preregistered traffic cap mid-define; the structured-review and upstream-producer wires were therefore NOT reached in this round.',
-      'no treatment adaptation: no retries, no prompt changes, single round; the cap was enforced pre-dial (the 7th request was captured and refused before reaching the provider).',
+      'no treatment adaptation: no retries, no prompt changes; the cap was enforced pre-dial (the 7th request was captured and refused before reaching the provider).',
     ],
     safety_evidence: {
       all_requests_guard_PASS: allGuardPass,
@@ -218,12 +257,20 @@ async function main(): Promise<void> {
   if (!keyPresent) throw new Error(`${keyEnv} not present — L2 refuses to dial`);
   const shapes = loadPinnedShapes(SHAPES_PATH);
 
-  rmSync(L2_DIR, { recursive: true, force: true });
+  // NON-DESTRUCTIVE startup: never wipe prior evidence — every invocation
+  // writes into its own unique, immutable run directory under the namespace
   mkdirSync(L2_DIR, { recursive: true });
+  const invocationDir = join(L2_DIR, `invocation-${new Date().toISOString().replace(/[:.]/g, '-')}`);
+  mkdirSync(invocationDir, { recursive: true });
+  writeFileSync(join(invocationDir, 'invocation.json'), JSON.stringify({
+    started_at_utc: new Date().toISOString(),
+    purpose: REPORT_ONLY ? 'report-regeneration' : 'l2-qualification-round',
+    note: 'immutable invocation directory — prior evidence is never overwritten',
+  }, null, 2));
 
   // ── phase 0: OFFLINE pre-dial verification (zero real traffic) ─────────────
   const pre = offlineProvider();
-  const preRec = await runP4Attempt(0, pre.provider, L2_DIR, shapes, { onActive: pre.bind, launchId: 'p4-l2-preflight' });
+  const preRec = await runP4Attempt(0, pre.provider, invocationDir, shapes, { onActive: pre.bind, launchId: 'p4-l2-preflight' });
   const preOk = preRec.outcome === 'READY' && preRec.assessment !== null
     && Object.values(preRec.assessment.checks).every((c) => c.pass)
     && preRec.evidencePackagePath !== null && verifyEvidencePackage(preRec.evidencePackagePath).ok;
@@ -241,7 +288,7 @@ async function main(): Promise<void> {
   const started = new Date().toISOString();
   let rec: AttemptRecord;
   try {
-    rec = await runP4Attempt(1, cappedProvider(realProvider as object, counter), L2_DIR, shapes, {
+    rec = await runP4Attempt(1, cappedProvider(realProvider as object, counter), invocationDir, shapes, {
       captureToolSchemas: true, launchId: 'p4-l2-round',
     });
   } finally {
@@ -325,4 +372,10 @@ async function main(): Promise<void> {
   console.log(perCallLines.join('\n'));
 }
 
-main().catch((e) => { console.error('L2 fatal:', e); process.exit(1); });
+// IMPORT-SAFE: executes ONLY when invoked directly as the entry script.
+// Importing this module (e.g. for a syntax/type check) is a NO-OP — the L2
+// execution incident (a module that dialed real providers on import) cannot
+// recur.
+const INVOKED_DIRECTLY = typeof process.argv[1] === 'string'
+  && import.meta.url === new URL(`file://${process.argv[1]}`).href;
+if (INVOKED_DIRECTLY) main().catch((e) => { console.error('L2 fatal:', e); process.exit(1); });

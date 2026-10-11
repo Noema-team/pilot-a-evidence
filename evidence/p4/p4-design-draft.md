@@ -1,6 +1,6 @@
 # P4 DESIGN DRAFT — Autonomous Upstream Reliability
 
-**Status:** DRAFT v3.2 — L2 operational round EXECUTED (OPERATIONAL-CAP-STOP, honestly reported); all three pre-freeze corrections implemented + proven (L1-r3 24/24). STOPPED for independent scientific-freeze review. §13 v3 as-built · §14 r2 corrections · §15 L2 round + r3 pre-freeze corrections.
+**Status:** DRAFT v3.3 — freeze review (narrow hold) implemented: L2 module import-safe + non-destructive + history reconciled; L2-supplement DESIGN ONLY (not authorized); minimal L3 production entrypoint; reconstruction requires non-null matching package identities (L1-r3b 24/24). STOPPED for FINAL freeze review. §13 v3 as-built · §14 r2 · §15 L2 + r3 · §16 freeze-review implementation.
 **Directive:** operator conditional implementation GO (final architecture review): implement + L1 offline qualification only; STOP before L2 provider traffic, freeze, or L3.
 **Predecessor evidence:** P2 forensics, P3 closeout, charter v1.1. Review rulings + four binding corrections applied and BUILT (§13).
 
@@ -201,3 +201,29 @@ Evidence namespace: `evidence/p4/l2-qualification/` (separate; NO P4 trial count
 `evidence/p4/l1-qualification-output-r3.txt`; packages in `l1-qualification-r3/`; prior evidence (r1 14/14, r2 20/20) preserved untouched.
 
 stratum 9f298f2 and all P3 artifacts remain byte-unchanged; the target worktree is pristine.
+
+---
+
+## 16. FREEZE-REVIEW IMPLEMENTATION (v3.3 addition)
+
+The narrow-hold review of `606a5dd` accepted the offline qualifications and the six real L2 investigation-wire calls; it did NOT accept complete L2 wire qualification, and it required the actual operational history to be stated plainly. All five directives are implemented; **the OPERATIONAL-CAP-STOP endpoint is preserved unchanged** — a preregistered procedure endpoint, not a provider failure and not a P4 scientific result.
+
+### 16.1 L2 module: import-safe, non-destructive, history reconciled
+
+- **Import-safety**: the module executes only when invoked directly as the entry script; importing it is proven a no-op (no execution, no directories).
+- **Non-destructive**: the startup `rmSync` is removed; every invocation writes into a unique immutable `invocation-<ts>/` directory under `evidence/p4/l2-qualification/` — prior evidence can never be overwritten again.
+- **Corrected report**: `l2-report.json` regenerated OFFLINE from the byte-identical capture (`--report-only`; capture hash verified before/after; no directories touched). The corrected `operational_history`: TWO invocations occurred (one inadvertent, evidence destroyed by the then-destructive startup); the surviving complete evidence is invocation 2. **Call reconciliation**: invocation 2 = exactly 6 recorded dials (capture); invocation 1 = NOT independently recoverable, bounded 1..6 by the per-invocation cap; total bounded **[7..12]** — the previously published ~12–14 is superseded as looser than the evidence supports; provider-side usage was deliberately NOT queried (no additional provider traffic). Uncertainty is preserved, not resolved.
+
+### 16.2 L2-supplement: DESIGN ONLY (not authorized)
+
+`evidence/p4/l2-supplement-design.md` prepares — and does not execute — the qualification of exactly the two missing wire families: W1 structured-review (`completeStructured` on the readiness-review contracts) and W2 full-build producer wires. Hard constraints: requests derived from the actual native execution path (frozen engine builtins through `runP4Attempt`, published pins as the only shape source, no hand-authored prompts), pinned guarded provider composition, bounded caps enforced pre-dial (W1 ≤4, W2 ≤6, global ≤10), separate immutable namespace, no P4 trial counted, no treatment adaptation, cap-stop a valid endpoint. **No executable dialing code is shipped with the design** (deliberate, post-incident); execution requires a new explicit operator GO.
+
+### 16.3 L3 production entrypoint
+
+`evidence/p4/p4-l3-entrypoint.mts` is the only L3 launch surface, with zero treatment parameters: frozen settings sha-checked, task campaign-owned, published step-shape pins (missing file refuses), **N=3, threshold ≥2/3**, and exactly the stop rules `runP4Campaign` implements (guard-stop, authority-bypass, ledger-conflict, target-not-pristine, budget exhaustion as NOT-READY, sticky STOP, launch cap; resume-from-ledger on re-invocation). No scripted providers, calibration shapes, attempt overrides, hooks, or env knobs exist on this surface. Import proven a no-op.
+
+### 16.4 Reconstruction: non-null matching identities
+
+`reconstructCountedSlots` now treats a **null/absent `evidencePackageSha256` as itself a fail-closed conflict** — every reconstructed counted slot requires a non-null identity that matches the retained manifest and fully verifies. Gate G2 extended (case c) and proven. **L1-r3b: 24/24** (`p4-l1-qualification-output-r3b.txt`; r3 evidence preserved untouched; the rerun was authorized because the reconstruction change affects gates G/G2).
+
+stratum `9f298f2` and all P3 artifacts remain byte-unchanged; the target worktree is pristine; no provider traffic since the L2 round.

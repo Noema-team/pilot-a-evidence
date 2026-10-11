@@ -43,7 +43,7 @@ import {
 import { DEFAULT_SHAPES, calibrationShapes, loadFrozenSettings, type PinnedShapes } from './p4-step-contracts.mts';
 
 const EVIDENCE = '/home/theo/Documents/coding/repos/pilot-a/evidence';
-const L1_DIR = `${EVIDENCE}/p4/l1-qualification-r3`;
+const L1_DIR = `${EVIDENCE}/p4/l1-qualification-r3b`;
 const SHAPES_PATH = `${EVIDENCE}/p4/p4-step-shapes.json`;
 
 const results: Array<{ gate: string; pass: boolean; detail: string }> = [];
@@ -821,8 +821,16 @@ async function gateG2(): Promise<void> {
   appendFileSync(join(fixture, 'campaign-ledger.jsonl'), `${JSON.stringify({ ts: new Date().toISOString(), event: 'attempt-counted', attemptId: 'duplicate-slot-entry', index: retained.index, outcome: 'READY', evaluable: true, evidencePackageSha256: retained.evidencePackageSha256 })}\n`);
   const duplicated = reconstructCountedSlots(fixture);
   const duplicateRejected = duplicated.conflicts.some((c) => c.includes('counted twice'));
-  report('G2.ledger-conflict-rejection', baselineClean && tamperRejected && duplicateRejected,
-    `baselineConflicts=${baseline.conflicts.length} tamperRejected=${tamperRejected} duplicateRejected=${duplicateRejected} — retained package identities verified, conflicting counts fail closed`);
+  // (c) a counted slot whose ledger entry carries NO package identity —
+  // reconstruction requires a non-null, matching evidencePackageSha256
+  // (a retained manifest exists, so the slot WOULD otherwise reconstruct)
+  appendFileSync(join(fixture, 'campaign-ledger.jsonl'), `${JSON.stringify({ ts: new Date().toISOString(), event: 'attempt-counted', attemptId: 'sha-less-slot', index: 9, outcome: 'READY', evaluable: true, evidencePackageSha256: null })}\n`);
+  mkdirSync(join(fixture, 'attempt-9-sha-less-slot'), { recursive: true });
+  writeFileSync(join(fixture, 'attempt-9-sha-less-slot', 'manifest.json'), JSON.stringify({ package_sha256: 'deadbeefdeadbeef' }));
+  const shaless = reconstructCountedSlots(fixture);
+  const shalessRejected = shaless.conflicts.some((c) => c.includes('no evidencePackageSha256'));
+  report('G2.ledger-conflict-rejection', baselineClean && tamperRejected && duplicateRejected && shalessRejected,
+    `baselineConflicts=${baseline.conflicts.length} tamperRejected=${tamperRejected} duplicateRejected=${duplicateRejected} shalessRejected=${shalessRejected} — every reconstructed counted slot requires a non-null, verifiable package identity; conflicting counts fail closed`);
 }
 
 function gateH(): void {
@@ -837,7 +845,7 @@ function gateH(): void {
 // ─── main ────────────────────────────────────────────────────────────────────
 async function main(): Promise<void> {
   if (!targetPristine()) throw new Error('target not pristine — L1 refuses to run');
-  console.log('=== P4 L1 qualification r3 (offline; zero network traffic) ===');
+  console.log('=== P4 L1 qualification r3b (offline; zero network traffic) ===');
   gateH();
   const shapes = await gateA();
   if (results.find((r) => r.gate === 'A.ready-path')?.pass) {
@@ -860,8 +868,8 @@ async function main(): Promise<void> {
     console.log('Gate A failed — remaining gates skipped (fix the READY path first).');
   }
   const passed = results.filter((r) => r.pass).length;
-  console.log(`=== L1 r3: ${passed}/${results.length} gates passed ===`);
-  writeFileSync(`${EVIDENCE}/p4/p4-l1-qualification-output-r3.txt`, JSON.stringify({ finished_at_utc: new Date().toISOString(), results }, null, 2));
+  console.log(`=== L1 r3b: ${passed}/${results.length} gates passed ===`);
+  writeFileSync(`${EVIDENCE}/p4/p4-l1-qualification-output-r3b.txt`, JSON.stringify({ finished_at_utc: new Date().toISOString(), results }, null, 2));
   if (passed !== results.length) process.exitCode = 1;
 }
 

@@ -1,0 +1,13 @@
+{"ts":"2026-10-11T18:16:04.142Z","event":"attempt-incomplete","launchId":"8902d99b-8cbf-4b3c-a478-f93b627b40ea","detail":"interrupted runtime archived to /home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/gate-g-campaign/interrupted-runtime-2026-10-11T18-16-04-140Z"}
+{"ts":"2026-10-11T18:16:04.175Z","event":"campaign-start","launchId":"8902d99b-8cbf-4b3c-a478-f93b627b40ea","detail":"resuming with 0 reconstructed counted slot(s)"}
+{"ts":"2026-10-11T18:16:04.175Z","event":"attempt-start","index":1,"launchId":"8902d99b-8cbf-4b3c-a478-f93b627b40ea"}
+{"ts":"2026-10-11T18:16:04.902Z","event":"attempt-counted","attemptId":"667ba42c-2ec7-48fc-9e91-6c08f163f944","index":1,"launchId":"8902d99b-8cbf-4b3c-a478-f93b627b40ea","outcome":"READY","failureClass":null,"evaluable":true,"detail":null,"evidencePackageSha256":"465c9623e1185349bfcb259b799ea55f6793ad5050c10f83805e3639cf0b7ef2"}
+{"ts":"2026-10-11T18:16:04.902Z","event":"attempt-start","index":2,"launchId":"8902d99b-8cbf-4b3c-a478-f93b627b40ea"}
+{"ts":"2026-10-11T18:16:06.851Z","event":"attempt-incomplete","index":2,"launchId":"8902d99b-8cbf-4b3c-a478-f93b627b40ea","detail":"declared incomplete by resume: launch had no terminal event (process death)"}
+{"ts":"2026-10-11T18:16:06.862Z","event":"attempt-incomplete","launchId":"990c993f-48c8-4c66-9698-e35b40fa6e4e","detail":"interrupted runtime archived to /home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/gate-g-campaign/interrupted-runtime-2026-10-11T18-16-06-860Z"}
+{"ts":"2026-10-11T18:16:06.897Z","event":"campaign-start","launchId":"990c993f-48c8-4c66-9698-e35b40fa6e4e","detail":"resuming with 1 reconstructed counted slot(s)"}
+{"ts":"2026-10-11T18:16:06.897Z","event":"attempt-start","index":3,"launchId":"990c993f-48c8-4c66-9698-e35b40fa6e4e"}
+{"ts":"2026-10-11T18:16:11.596Z","event":"attempt-counted","attemptId":"c429d2ec-44f4-4b47-b22a-b9a8c4b5022f","index":3,"launchId":"990c993f-48c8-4c66-9698-e35b40fa6e4e","outcome":"READY","failureClass":null,"evaluable":true,"detail":null,"evidencePackageSha256":"9a5446da22cfdf4686fe74eb814451fa04803f4d3f1b71c85bd831bd1667ec4b"}
+{"ts":"2026-10-11T18:16:11.596Z","event":"campaign-terminal","launchId":"990c993f-48c8-4c66-9698-e35b40fa6e4e","detail":"ready=2 evaluable=2 supported=true"}
+{"ts":"2026-10-11T18:16:11.665Z","event":"attempt-counted","attemptId":"duplicate-slot-entry","index":1,"outcome":"READY","evaluable":true,"evidencePackageSha256":"465c9623e1185349bfcb259b799ea55f6793ad5050c10f83805e3639cf0b7ef2"}
+{"ts":"2026-10-11T18:16:11.669Z","event":"attempt-counted","attemptId":"sha-less-slot","index":9,"outcome":"READY","evaluable":true,"evidencePackageSha256":null}

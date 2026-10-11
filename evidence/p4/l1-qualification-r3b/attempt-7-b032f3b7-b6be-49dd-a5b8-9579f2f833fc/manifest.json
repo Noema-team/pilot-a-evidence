@@ -1,0 +1,40 @@
+{
+  "attemptId": "b032f3b7-b6be-49dd-a5b8-9579f2f833fc",
+  "index": 7,
+  "launchId": null,
+  "outcome": "NOT-READY",
+  "failureClass": "budget-exhaustion-upstream",
+  "stopDetail": "{\"kind\":\"FAILED\",\"detail\":\"run halted without a pending decision at design\"}",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T18:16:01.585Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "6efee4f02f7e21d77a74b75059677e82ba229c84be40796a4cc77a8dfbd90335",
+  "db_records_sha256": "e4d649e02e8940a481645adf6ca1b9f66d2995c05d2ad7d80381b892dc0070d6",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 20,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/attempt-7-b032f3b7-b6be-49dd-a5b8-9579f2f833fc/files.sha256.json",
+  "package_sha256": "923160504d1e7c40dbfd6ea813a9f4924e0b89135244ecc02e90116a3473155c"
+}

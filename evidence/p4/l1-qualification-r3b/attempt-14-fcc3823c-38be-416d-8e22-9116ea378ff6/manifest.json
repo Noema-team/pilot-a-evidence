@@ -1,0 +1,45 @@
+{
+  "attemptId": "fcc3823c-38be-416d-8e22-9116ea378ff6",
+  "index": 14,
+  "launchId": null,
+  "outcome": "STOPPED",
+  "failureClass": "authority-bypass",
+  "stopDetail": "AUTHORITY-BYPASS: docs/rogue-exc.md (unauthorized write: not in design's authorized outputs [docs/requirements.md, docs/architecture.md])",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T18:16:03.532Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "75598cee2faf692c407b535bbd82022cbd9c7e20978bb417c9330fe40797c145",
+  "db_records_sha256": "213327becf3160e983b895201f8503f2b86f6c4f29f382b1fcc4d1bac9aabe26",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    }
+  ],
+  "authority_violations": [
+    {
+      "path": "docs/rogue-exc.md",
+      "reason": "unauthorized write: not in design's authorized outputs [docs/requirements.md, docs/architecture.md]"
+    }
+  ],
+  "package_file_count": 22,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/attempt-14-fcc3823c-38be-416d-8e22-9116ea378ff6/files.sha256.json",
+  "package_sha256": "f0d3e75ea55a92034b42791dc198127b21dabcfdfa6f7a726db600e89a593803"
+}

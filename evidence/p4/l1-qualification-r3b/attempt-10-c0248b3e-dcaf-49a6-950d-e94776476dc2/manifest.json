@@ -1,0 +1,40 @@
+{
+  "attemptId": "c0248b3e-dcaf-49a6-950d-e94776476dc2",
+  "index": 10,
+  "launchId": null,
+  "outcome": "NOT-READY",
+  "failureClass": "build-inputs-incomplete",
+  "stopDetail": "{\"kind\":\"STALLED\",\"detail\":\"no dispatches; run active@design\"}",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T18:16:02.288Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "c77f8d3b9819267bc4eeb84110c4cbccdc7aae6d1f45112acbe4101897d060b9",
+  "db_records_sha256": "dfd5c105bb096b5f7114e12beb8f775dcd4e2a463f2039b294e346ae6390308e",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "baf21b0471c07aea1ed54870a77714a6f934326b6a064d5d8db4eecd421af487",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 18,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/attempt-10-c0248b3e-dcaf-49a6-950d-e94776476dc2/files.sha256.json",
+  "package_sha256": "0bb5b949b450c0ce08d922f755cb8b57c26e0507dea37247199a68b67e235473"
+}

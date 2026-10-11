@@ -1,0 +1,23 @@
+[
+  {
+    "path": ".sle/work/wi-define-108/definition.md",
+    "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+    "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+    "row_type": "definition",
+    "ref": "definition:obj-108"
+  },
+  {
+    "path": ".sle/work/wi-define-108/readiness.md",
+    "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+    "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+    "row_type": "definition-readiness",
+    "ref": "definition-readiness:obj-108"
+  },
+  {
+    "path": "docs/cycle-charter.md",
+    "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+    "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+    "row_type": "cycle-charter",
+    "ref": "doc:cycle-charter"
+  }
+]

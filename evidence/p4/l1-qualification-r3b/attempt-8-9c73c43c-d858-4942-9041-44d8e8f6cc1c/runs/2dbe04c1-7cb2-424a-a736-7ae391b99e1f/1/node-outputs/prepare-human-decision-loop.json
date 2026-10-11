@@ -1,0 +1,9 @@
+{
+  "node_id": "prepare-human-decision",
+  "result_transport": "submit-result",
+  "turns_taken": 1,
+  "tool_calls": [],
+  "wire_observation": {
+    "finish_reason": "tool_calls"
+  }
+}

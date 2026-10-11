@@ -1,5 +1,5 @@
 {
- "artifact": "P4 DRAFT PREREGISTRATION v3.2 — NOT FROZEN. L2 operational round EXECUTED (OPERATIONAL-CAP-STOP, honestly reported incl. one disclosed execution incident) and all three pre-freeze corrections implemented + proven offline (L1-r3 24/24 gates). READY FOR INDEPENDENT SCIENTIFIC-FREEZE REVIEW — no freeze applied, no L3.",
+ "artifact": "P4 DRAFT PREREGISTRATION v3.3 — NOT FROZEN. Implements the five freeze-review directives: (1) L2 module import-safe + non-destructive + report reconciled with preserved uncertainty; (2) L2-supplement DESIGN ONLY (not authorized, no dialing code shipped); (3) minimal L3 production entrypoint with a fixed launch surface; (4) reconstruction requires a non-null, matching evidencePackageSha256 per counted slot; (5) preregistration describes the actual operational history. L1-r3b 24/24. READY FOR FINAL FREEZE REVIEW — no freeze applied, no L3, no additional provider traffic.",
  "experiment": "P4",
  "title": "Autonomous upstream reliability — can the real Stratum workflows + real LLM produce a valid BUILD-entry state without fixture replay?",
  "research_question": "Can the real Stratum workflow, using a real LLM rather than scripted upstream fixture replay, consistently produce a valid BUILD-entry state?",
@@ -77,7 +77,7 @@
  },
  "reuse": "native workflow registry entries (define-work, full-build), engine + decision repos, resolveDefinitionSource + definition-artifact parser, config-guard capture, evidence packaging, ledger + adjudicators, restoration, qualification patterns; NEW thin code: campaign lifecycle driver (launch both workflows, create execution WI with definitionSource ref, adjudicate checkpoints per the fixed policy), R1-R6 readiness function (pure), clean-init/reset + ledger-resume in the runner; NO changes to stratum 9f298f2 or frozen P3 artifacts",
  "stop_rules": "immediate campaign-terminal STOP on CONFIG-DRIFT, budget-wire-mismatch, AUTHORITY-BYPASS (per-step scoping per correction 3), guard STOP, or evidence-archive failure — P3 STOP shape; on any STOP: archive, journal, return to operator",
- "execution_status": "L2 EXECUTED (OPERATIONAL-CAP-STOP) + pre-freeze corrections r3 COMPLETE — STOPPED for independent scientific-freeze review. No freeze applied, no L3.",
+ "execution_status": "STOPPED for FINAL freeze review. No freeze applied, no L3 execution, no additional provider traffic since the L2 round.",
  "review_rulings_applied": [
   "R4 wire mismatch -> campaign-terminal procedure STOP, never model-attributed NOT-READY",
   "native define-work + full-build workflows, not a custom upstream pipeline",
@@ -175,5 +175,31 @@
    "evidence/p4/l1-qualification/ (14/14)",
    "evidence/p4/l1-qualification-r2/ (20/20)"
   ]
- }
+ },
+ "l2_operational_history": {
+  "authorized": "ONE bounded real-provider round (max 6 calls)",
+  "actual": "TWO invocations occurred. Invocation 1 was INADVERTENT (module self-executed on import during a syntax check) and ran as a full round; invocation 2's then-destructive startup destroyed its evidence directory. Invocation 2 is the surviving complete evidence.",
+  "call_reconciliation": {
+   "invocation_2_dials": 6,
+   "invocation_2_exact": true,
+   "invocation_1_dials": "NOT INDEPENDENTLY RECOVERABLE — bounded 1..6 by the per-invocation cap enforcement; 6 (cap-stop) is the expected value given identical code and model, but is NOT independently verifiable",
+   "total_dials_both_invocations": "bounded [7..12]; a point estimate of 12 assumes invocation 1 also reached cap-stop; the previously published ~12-14 estimate is superseded as looser than the evidence supports; uncertainty PRESERVED",
+   "sources_checked": "local evidence dirs + execution logs (no invocation-1 artifact survives); provider-side usage deliberately NOT queried (no additional provider traffic permitted)"
+  },
+  "endpoint_preserved": "OPERATIONAL-CAP-STOP — a preregistered procedure endpoint, not a provider failure and not a P4 scientific result; define-produce wire exercised with real traffic; structured-review and upstream-producer wires NOT reached",
+  "corrective_state": "the L2 module is now IMPORT-SAFE (executes only when invoked directly; import proven a no-op) and NON-DESTRUCTIVE (unique immutable invocation-<ts> directories; prior evidence never overwritten); the report was regenerated offline from the byte-identical capture with the corrected history and reconciliation"
+ },
+ "l2_supplement_design": {
+  "document": "evidence/p4/l2-supplement-design.md",
+  "status": "DESIGN ONLY — NOT AUTHORIZED; requires a new explicit operator GO naming the document; NO executable dialing code is shipped with the design (deliberate, post-incident)",
+  "scope": "exactly the two missing wire families: W1 structured-review (completeStructured on definition-readiness-review, real traffic) and W2 full-build producer wires (scoping.produce/design/plan/test multi-turn + SLE-ARTIFACT materialization)",
+  "constraints": "requests derived from the actual native execution path (frozen engine builtins via runP4Attempt, published pins as the only shape source, no hand-authored prompts); pinned guarded provider composition; bounded (W1<=4, W2<=6, global <=10 real calls, caps enforced pre-dial); separate immutable namespace evidence/p4/l2-supplement/; no P4 trial counted; same pre-dial offline verification + packaging + offline report regeneration; no treatment adaptation — cap-stop is a valid endpoint"
+ },
+ "l3_entrypoint": {
+  "module": "evidence/p4/p4-l3-entrypoint.mts",
+  "surface": "the ONLY L3 launch surface; zero treatment parameters (no scripted providers, no calibration shapes, no attempt/launch overrides, no hooks, no env knobs)",
+  "fixed": "provider/model/settings from the frozen settings file sha-checked against the published constant; task = the frozen target repo + frozen workflow (campaign-owned); step shapes = published pins (missing file refuses launch); N=3; threshold >=2/3; stop rules = runP4Campaign's implemented set (guard-stop, authority-bypass, ledger-conflict, target-not-pristine, budget exhaustion as NOT-READY, sticky STOP, launch cap); resume-from-ledger on re-invocation",
+  "import_safety": "import proven a no-op (same discipline as the corrected L2 module)"
+ },
+ "reconstruction_hardening": "every reconstructed counted slot requires a NON-NULL, matching evidencePackageSha256: a null/absent identity is itself a fail-closed LEDGER-CONFLICT even when a manifest exists; gate G2 extended (case c) and proven — L1-r3b 24/24 (evidence/p4/p4-l1-qualification-output-r3b.txt; r3 evidence preserved untouched; the rerun was authorized because the reconstruction change affects gates G/G2)"
 }

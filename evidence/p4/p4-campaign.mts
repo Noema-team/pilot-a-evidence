@@ -1102,8 +1102,10 @@ export function reconcileLedgerOnResume(evidenceDir: string): void {
 // slots FROM THE LEDGER (never re-executing, never double-counting) — and
 // VERIFIES each retained slot's evidence package identity. A conflicting
 // ledger (duplicate counted indexes) or a retained package whose identity
-// does not verify (missing, tampered, or ledger/package sha disagreement) is
-// a fail-closed conflict: the campaign refuses to launch.
+// does not verify (missing, tampered, ledger/package sha disagreement, or a
+// null/absent evidencePackageSha256 — every reconstructed slot requires a
+// non-null matching identity) is a fail-closed conflict: the campaign refuses
+// to launch.
 export interface ReconstructedCount {
   attempts: AttemptRecord[];
   readyCount: number;
@@ -1138,7 +1140,11 @@ export function reconstructCountedSlots(evidenceDir: string): ReconstructedCount
     let identityDetail = 'package absent';
     if (existsSync(join(pkgDir, 'manifest.json'))) {
       const manifest = JSON.parse(readFileSync(join(pkgDir, 'manifest.json'), 'utf-8')) as { package_sha256: string };
-      if (e.evidencePackageSha256 != null && manifest.package_sha256 !== e.evidencePackageSha256) {
+      if (e.evidencePackageSha256 == null || String(e.evidencePackageSha256).length === 0) {
+        // a counted slot WITHOUT a package identity cannot be reconstructed:
+        // there would be nothing to verify the retained evidence against
+        identityDetail = 'ledger entry has no evidencePackageSha256 — a counted slot is reconstructed only with a non-null, verifiable package identity';
+      } else if (manifest.package_sha256 !== e.evidencePackageSha256) {
         identityDetail = `package identity ${manifest.package_sha256.slice(0, 12)} != ledger ${String(e.evidencePackageSha256).slice(0, 12)}`;
       } else {
         const verdict = verifyEvidencePackage(pkgDir);
@@ -1156,7 +1162,7 @@ export function reconstructCountedSlots(evidenceDir: string): ReconstructedCount
     attempts.push({
       attemptId: e.attemptId, index: e.index, outcome, failureClass: e.failureClass ?? null,
       stopDetail: e.detail ?? null, evaluable: e.evaluable !== false, capturePath: '',
-      evidencePackagePath: pkgDir, evidencePackageSha256: e.evidencePackageSha256 ?? null,
+      evidencePackagePath: pkgDir, evidencePackageSha256: String(e.evidencePackageSha256),
       assessment: null, reconstructed: true,
     });
   }

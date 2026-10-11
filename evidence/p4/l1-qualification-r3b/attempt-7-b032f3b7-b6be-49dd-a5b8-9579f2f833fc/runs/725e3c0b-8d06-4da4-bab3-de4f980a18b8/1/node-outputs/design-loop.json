@@ -1,0 +1,12 @@
+{
+  "node_id": "design",
+  "failed": true,
+  "result_transport": "textual-sle-output",
+  "turns_taken": 2,
+  "tool_calls": [],
+  "stop_reason": "length",
+  "text_length": 7,
+  "wire_observation": {
+    "finish_reason": "length"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "db-records.json": "dfd5c105bb096b5f7114e12beb8f775dcd4e2a463f2039b294e346ae6390308e",
+  "definition.md": "baf21b0471c07aea1ed54870a77714a6f934326b6a064d5d8db4eecd421af487",
+  "guard-capture.jsonl": "c77f8d3b9819267bc4eeb84110c4cbccdc7aae6d1f45112acbe4101897d060b9",
+  "readiness-assessment.json": "b7a5330574e1e896de1faca8c1e66244e02d74726866a5e34a7702a4908c80d0",
+  "readiness.md": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+  "runs/22019159-cdc4-4a08-bc08-86fd9a5d30cc/1/manifest.json": "b142a878e5deb9009bb3d93fc461a9736f76a38e3380f25449937117417193e1",
+  "runs/22019159-cdc4-4a08-bc08-86fd9a5d30cc/1/node-outputs/scoping.produce-loop.json": "d7de5860dd27c8f40ca6a121e05c2533d86a2624bf0d8e028c29b9ec33789aef",
+  "runs/22019159-cdc4-4a08-bc08-86fd9a5d30cc/1/node-outputs/scoping.produce.md": "c7d7ef94d7c32ff6c285f343e60f21b906af6ab1ac8ec1ceb987c3b796271695",
+  "runs/f4b743e4-1aa8-4e7e-a5a2-fa10c1eab759/1/manifest.json": "fc4569c926fc7272a91a769e4ce3ce1f09faeee60d2f4322c6b0bdafac5d1af2",
+  "runs/f4b743e4-1aa8-4e7e-a5a2-fa10c1eab759/1/node-outputs/definition-readiness-review.md": "947a8df2d7d7b38427daa0265f162e976d372ca1067d33e2f9df12c453aadb78",
+  "runs/f4b743e4-1aa8-4e7e-a5a2-fa10c1eab759/1/node-outputs/synthesize-definition-loop.json": "328d19c03f306fe58db91ad510c5f5463c4ae571ff91b68ad0e275f13c36040d",
+  "runs/f4b743e4-1aa8-4e7e-a5a2-fa10c1eab759/1/node-outputs/synthesize-definition.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sle-work/wi-define-108/definition.md": "baf21b0471c07aea1ed54870a77714a6f934326b6a064d5d8db4eecd421af487",
+  "sle-work/wi-define-108/readiness.md": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+  "upstream-files/.sle/work/wi-define-108/definition.md": "baf21b0471c07aea1ed54870a77714a6f934326b6a064d5d8db4eecd421af487",
+  "upstream-files/.sle/work/wi-define-108/readiness.md": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+  "upstream-files/docs/cycle-charter.md": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+  "upstream-files-index.json": "89819292836a8734b238190c7a50aec660f8b83306c85a4b2924abbb2b9e3c62"
+}

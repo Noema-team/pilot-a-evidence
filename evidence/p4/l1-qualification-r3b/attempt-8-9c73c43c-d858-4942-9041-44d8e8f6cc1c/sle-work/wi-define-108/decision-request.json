@@ -1,0 +1,18 @@
+{
+  "type": "definition-scope",
+  "targetFactId": "f3",
+  "title": "Settle the failure-payload schema field set",
+  "summary": "The readiness review classified the payload-schema field set as a choice only a human can authorize; decide include vs exclude.",
+  "options": [
+    {
+      "id": "include",
+      "label": "Include",
+      "description": "Treat the full payload field set as in scope for this increment."
+    },
+    {
+      "id": "exclude",
+      "label": "Exclude",
+      "description": "Ship the minimal class field; defer the remaining fields."
+    }
+  ]
+}

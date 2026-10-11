@@ -1,0 +1,18 @@
+{
+  "attemptId": "404399b7-ac5e-4637-840e-0540b1917b68",
+  "index": 3,
+  "launchId": null,
+  "outcome": "STOPPED",
+  "failureClass": "guard-stop",
+  "stopDetail": "G2 capture-integrity failure during define: [\"record 1: PASS request has no paired response/error record\"]",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T18:16:00.392Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "80e0dd330102cd3f61ffffa08a7e38b7b0427c2264f7aaa7898815a5318f9071",
+  "db_records_sha256": "640fdb09aee8279694862d5f10ae1c3812c5ebdd0f06692397644276ba3550b1",
+  "upstream_files": [],
+  "authority_violations": [],
+  "package_file_count": 7,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/attempt-3-404399b7-ac5e-4637-840e-0540b1917b68/files.sha256.json",
+  "package_sha256": "bda3b5222c456f636a969f64a5d3bcc789e0dc763cedf3bb789717e9bdbfeae0"
+}

@@ -1,0 +1,22 @@
+{
+  "db-records.json": "e4d649e02e8940a481645adf6ca1b9f66d2995c05d2ad7d80381b892dc0070d6",
+  "definition.md": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+  "guard-capture.jsonl": "6efee4f02f7e21d77a74b75059677e82ba229c84be40796a4cc77a8dfbd90335",
+  "readiness-assessment.json": "0b35a0a913ea27c88309dcf7dc14428d0357c2ce56430b557b41cbd4fe63412b",
+  "readiness.md": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+  "runs/725e3c0b-8d06-4da4-bab3-de4f980a18b8/1/manifest.json": "8f74f5c106c6681a2b2aa3540a582cc04c0e8308b0bca5408add476ef2346f64",
+  "runs/725e3c0b-8d06-4da4-bab3-de4f980a18b8/1/node-outputs/design-loop.json": "5f4813295883fdc931445a15a773c70fdc4d8d4bfb76c61534c5ac1bdb57be03",
+  "runs/725e3c0b-8d06-4da4-bab3-de4f980a18b8/1/node-outputs/design.md": "deda802790bc0061b3735f71e7182a67494f9c00b74d728b44ffd9a9431557d2",
+  "runs/725e3c0b-8d06-4da4-bab3-de4f980a18b8/1/node-outputs/scoping.produce-loop.json": "d7de5860dd27c8f40ca6a121e05c2533d86a2624bf0d8e028c29b9ec33789aef",
+  "runs/725e3c0b-8d06-4da4-bab3-de4f980a18b8/1/node-outputs/scoping.produce.md": "c7d7ef94d7c32ff6c285f343e60f21b906af6ab1ac8ec1ceb987c3b796271695",
+  "runs/74ec7435-df42-4ee8-8890-20d5da214bcd/1/manifest.json": "23d5db7aa68a1afa105b802fcfc24c17f804f79ca47f0d2e9602a2ebd1ddf7d9",
+  "runs/74ec7435-df42-4ee8-8890-20d5da214bcd/1/node-outputs/definition-readiness-review.md": "947a8df2d7d7b38427daa0265f162e976d372ca1067d33e2f9df12c453aadb78",
+  "runs/74ec7435-df42-4ee8-8890-20d5da214bcd/1/node-outputs/synthesize-definition-loop.json": "328d19c03f306fe58db91ad510c5f5463c4ae571ff91b68ad0e275f13c36040d",
+  "runs/74ec7435-df42-4ee8-8890-20d5da214bcd/1/node-outputs/synthesize-definition.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sle-work/wi-define-108/definition.md": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+  "sle-work/wi-define-108/readiness.md": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+  "upstream-files/.sle/work/wi-define-108/definition.md": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+  "upstream-files/.sle/work/wi-define-108/readiness.md": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+  "upstream-files/docs/cycle-charter.md": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+  "upstream-files-index.json": "c70f0c88541fe4444a928a4e6bb8a46d1969671a0ea5706ba856c9367b3358c2"
+}

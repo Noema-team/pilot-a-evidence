@@ -1,8 +1,8 @@
 {
   "round": "p4-l2-operational-qualification",
-  "go": "operator L2 GO (L3 HOLD) — one bounded real-provider round, maximum 6 calls",
-  "finished_at_utc": "2026-10-11T17:26:32.403Z",
-  "regenerated_offline": "report regenerated from the archived capture (--report-only; zero traffic)",
+  "go": "operator L2 GO (L3 HOLD) — one bounded real-provider round, maximum 6 calls. HISTORY: two invocations occurred (one inadvertent); the surviving complete evidence is invocation 2; see operational_history",
+  "finished_at_utc": "2026-10-11T18:14:01.740Z",
+  "regenerated_offline": "report regenerated from the archived capture (--report-only; zero traffic; the capture and evidence packages are read-only to this path)",
   "provider_identity": {
     "provider": "openrouter",
     "base_url": "https://openrouter.ai/api/v1",
@@ -13,9 +13,23 @@
   },
   "pre_dial": {
     "offline_verification": "PASS (attempt-0: scripted provider through the real engine, READY, R1–R6 all pass)",
-    "offline_attempt_package": "attempt-0-b6b8162e-5708-41fb-ac5d-8b9fefde855d",
+    "offline_attempt_package": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l2-qualification/attempt-0-b6b8162e-5708-41fb-ac5d-8b9fefde855d",
     "real_calls_before_round": 0
   },
+  "operational_history": {
+    "authorized": "ONE bounded real-provider round (maximum 6 real calls)",
+    "actual_history": "TWO invocations occurred. Invocation 1 was INADVERTENT — the module self-executed on import during a syntax check — and ran as a full round. Invocation 2 was the intended invocation. Invocation 1's evidence directory was destroyed by invocation 2's then-destructive startup (rmSync at start — since removed); no invocation-1 artifact survives.",
+    "surviving_evidence": "invocation 2: the attempt-0 preflight package, the attempt-1 real-round package (guard capture inside), and this report",
+    "call_reconciliation": {
+      "invocation_2_dials": 6,
+      "invocation_2_exact": true,
+      "invocation_2_cap_refusal_pre_dial": true,
+      "invocation_1_dials": "NOT INDEPENDENTLY RECOVERABLE — bounded 1..6 by the per-invocation cap enforcement (the capped transport throws on the 7th count). The incident record shows invocation 1 ran to completion, so a cap-stop at 6 dials is the expected value, but this is NOT independently verifiable.",
+      "total_dials_both_invocations": "bounded 7..12; a point estimate of 12 assumes invocation 1 also reached its cap-stop, which cannot be verified. The previously published estimate (~12-14) was looser than the evidence supports and is superseded by these bounds. Uncertainty is PRESERVED, not resolved.",
+      "reconciliation_sources_checked": "local evidence directories and execution logs (no invocation-1 artifact survives anywhere local); provider-side usage records were deliberately NOT queried (no additional provider traffic is permitted)"
+    }
+  },
+  "execution_incident": "DISCLOSED: the module self-executed on import during a syntax check, inadvertently running invocation 1 as a full round; invocation 2's then-destructive startup (rmSync — since removed) destroyed invocation 1's evidence directory. The surviving complete evidence is invocation 2. The module is now import-safe and non-destructive (unique immutable run directories). Total real-provider dials across both invocations: bounded [7..12]; see operational_history.call_reconciliation — the exact invocation-1 count is unrecoverable and the uncertainty is preserved.",
   "traffic": {
     "cap": 6,
     "observed_dials": 6,
@@ -111,11 +125,10 @@
     "failureClass": "provider-error-unresolved",
     "assessment_note": "the cap refusal is a PREREGISTERED PROCEDURE endpoint — the attempt-level class (provider-error-unresolved) reflects the engine-recorded step error, not a provider outage"
   },
-  "execution_incident": "DISCLOSED: the module self-executes on import; an import-based syntax check inadvertently ran a first full round before the intended invocation. The first round's evidence directory was overwritten by the second (rmSync at start); the surviving complete evidence is from the second invocation. Total real-provider dials across both invocations exceeded the single-round intent (~12-14 calls, all within the per-round 6-call cap and all captured by the guard at the time); no third round was run. The surviving evidence is treated as THE one L2 round.",
   "observations": [
     "define-work produce wire: REAL traffic exercised — the model returned tool_use turns with real usage (tokens observed per call), every request guard-validated against the frozen contract (model/budget/temperature/tool surface).",
     "the real model spent its turns on repository investigation (read tools) and did NOT submit the definition within the 6-call cap — the round ended at the preregistered traffic cap mid-define; the structured-review and upstream-producer wires were therefore NOT reached in this round.",
-    "no treatment adaptation: no retries, no prompt changes, single round; the cap was enforced pre-dial (the 7th request was captured and refused before reaching the provider)."
+    "no treatment adaptation: no retries, no prompt changes; the cap was enforced pre-dial (the 7th request was captured and refused before reaching the provider)."
   ],
   "safety_evidence": {
     "all_requests_guard_PASS": true,

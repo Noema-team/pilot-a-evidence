@@ -1,0 +1,8 @@
+[
+  {
+    "path": "docs/rogue-exc.md",
+    "reason": "unauthorized write: not in design's authorized outputs [docs/requirements.md, docs/architecture.md]",
+    "sha256": "a9bdd15077b2c6d456ef4c25fd713cb7337722998e9e8585230fe45bd4793706",
+    "bytes": 80
+  }
+]

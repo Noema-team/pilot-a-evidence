@@ -1,0 +1,8 @@
+[
+  {
+    "path": "docs/cycle-charter.md",
+    "reason": "unauthorized rewrite of already-dirty path (before/after content identity mismatch): not in design's authorized outputs [docs/requirements.md, docs/architecture.md]",
+    "sha256": "62ef72cda46f4431bf3a5bd6d1416afc0bb07d8d1e9ae71bcc9c5ed1f1d409be",
+    "bytes": 9679
+  }
+]

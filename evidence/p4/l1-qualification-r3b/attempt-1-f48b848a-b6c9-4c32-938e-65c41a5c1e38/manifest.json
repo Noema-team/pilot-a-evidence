@@ -1,0 +1,33 @@
+{
+  "attemptId": "f48b848a-b6c9-4c32-938e-65c41a5c1e38",
+  "index": 1,
+  "launchId": null,
+  "outcome": "NOT-READY",
+  "failureClass": "definition-human-decision-required",
+  "stopDetail": "{\"kind\":\"HUMAN_DECISION\"}",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T18:15:58.871Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "6375197e19202cd0f94ca1c6727c19c52348bef8a2efffc9ce16019c4ef87a6c",
+  "db_records_sha256": "37dcc34d2fe022dd680c4ddffe7fa7a6c1828842bd14cf2771c779ac7fc5c9dd",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+      "storage_hash": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 17,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3b/attempt-1-f48b848a-b6c9-4c32-938e-65c41a5c1e38/files.sha256.json",
+  "package_sha256": "25c97151188f7ca29150287d791f767a47f4c5e16e1f608cf039320f0c512c4c"
+}

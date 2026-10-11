@@ -1,0 +1,9 @@
+{
+  "attemptId": "d72361ae-0114-4923-b8fd-cfd4de28c9fe",
+  "index": 7,
+  "outcome": "NOT-READY",
+  "failureClass": "definition-human-decision-required",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T13:51:52.111Z",
+  "capture_sha256": "099edcbb43716c33b87fab6d4090552e307b34f289b245de6d9328ca4491f733"
+}

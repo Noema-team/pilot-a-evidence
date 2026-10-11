@@ -1,0 +1,9 @@
+{
+  "attemptId": "976d116d-6cdd-40dd-8fc0-96f3a9b0e6c9",
+  "index": 6,
+  "outcome": "NOT-READY",
+  "failureClass": "budget-exhaustion-upstream",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T13:51:51.938Z",
+  "capture_sha256": "abdd5c4821ce81f8511390f70a998656dbab8cd0f9d450673b4ff04a55b25d40"
+}

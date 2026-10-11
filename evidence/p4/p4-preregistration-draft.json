@@ -1,5 +1,5 @@
 {
- "artifact": "P4 DRAFT PREREGISTRATION v2 — NOT FROZEN, NOT AUTHORIZED. Revised per P4 architecture review of 8962ab5 (approved in principle; four corrections applied). Companion to evidence/p4/p4-design-draft.md (DRAFT v2). Provisional until final review returns and qualification freezes it.",
+ "artifact": "P4 DRAFT PREREGISTRATION v3 — NOT FROZEN. L1 offline qualification COMPLETE (14/14 gates, 2026-10-11T13:51:55Z). Companion to p4-design-draft.md v3 (§13 as-built). Awaiting review before L2 provider traffic; no scientific freeze; no L3 authorization.",
  "experiment": "P4",
  "title": "Autonomous upstream reliability — can the real Stratum workflows + real LLM produce a valid BUILD-entry state without fixture replay?",
  "research_question": "Can the real Stratum workflow, using a real LLM rather than scripted upstream fixture replay, consistently produce a valid BUILD-entry state?",
@@ -77,11 +77,42 @@
  },
  "reuse": "native workflow registry entries (define-work, full-build), engine + decision repos, resolveDefinitionSource + definition-artifact parser, config-guard capture, evidence packaging, ledger + adjudicators, restoration, qualification patterns; NEW thin code: campaign lifecycle driver (launch both workflows, create execution WI with definitionSource ref, adjudicate checkpoints per the fixed policy), R1-R6 readiness function (pure), clean-init/reset + ledger-resume in the runner; NO changes to stratum 9f298f2 or frozen P3 artifacts",
  "stop_rules": "immediate campaign-terminal STOP on CONFIG-DRIFT, budget-wire-mismatch, AUTHORITY-BYPASS (per-step scoping per correction 3), guard STOP, or evidence-archive failure — P3 STOP shape; on any STOP: archive, journal, return to operator",
- "execution_status": "DRAFT v2 — final architecture review pending. No implementation, no live traffic, no freeze.",
+ "execution_status": "L1 COMPLETE — STOPPED before L2 provider traffic, scientific freeze, and L3. No live GO.",
  "review_rulings_applied": [
   "R4 wire mismatch -> campaign-terminal procedure STOP, never model-attributed NOT-READY",
   "native define-work + full-build workflows, not a custom upstream pipeline",
   "stop at confirm with the decision pending; BUILD never executed",
   "N=3 fixed issue-108, >=2/3 READY accepted as engineering qualification only"
- ]
+ ],
+ "implementation_status": {
+  "modules": [
+   "evidence/p4/p4-transport-guard.mts (three-wire guarded capture; per-call settings re-verification; fail-closed archival)",
+   "evidence/p4/p4-step-contracts.mts (fail-closed frozen-settings derivation; pinned observed shapes)",
+   "evidence/p4/p4-readiness.mts (pure R1-R6 assessor incl. final readiness outcome + provenance + disk integrity + BUILD-context admissibility)",
+   "evidence/p4/p4-campaign.mts (lifecycle driver; gated WorkService handoff; capture-derived G1/G2 STOPs; §10 ledger resume; evidence packaging)",
+   "evidence/p4/p4-l1-qualifier.mts + p4-l1-resume-child.mts (offline gates)"
+  ],
+  "l1_result": {
+   "gates_passed": 14,
+   "gates_total": 14,
+   "output": "evidence/p4/p4-l1-qualification-output.txt",
+   "pinned_shapes": "evidence/p4/p4-step-shapes.json (8 steps, observed on the production path)",
+   "key_proofs": [
+    "READY path end-to-end through native define-work + full-build to the confirm boundary, R1-R6 all pass, wires completeMultiTurn + completeStructured",
+    "P2 seed()-shaped settings drift mid-attempt -> campaign-terminal STOP (per-call settings sha re-verification; fail-closed evidence)",
+    "P2-shaped budget on the wire (16384 vs frozen 32768) refused pre-call",
+    "genuine length terminus at the CORRECT budget -> evaluable NOT-READY budget-exhaustion-upstream (never censored)",
+    "HUMAN_DECISION route halts with the decision PENDING; never synthetically approved",
+    "EXPLORE_AS_WORK route does NOT qualify (final readiness outcome verified, not just parse+resolve)",
+    "disk-corrupted definition fails provenance/admissibility closed",
+    "REAL SIGKILL mid-attempt -> resume declares incomplete from the ledger, archives interrupted runtime, restores worktree, completes terminal condition (ready=2/2)"
+   ]
+  },
+  "as_built_decisions": [
+   "handoff: campaign completes the define WI via the existing WorkService.complete transition, gated mechanically on final readiness PASS + no HUMAN_DECISION/EXPLORE artifacts + no pending decisions",
+   "guard STOPs surfaced inside engine step-catch are derived from the CAPTURE (G1 records / G2 integrity), wherever they surfaced",
+   "pinned per-step shapes are L1-OBSERVED production shapes (charter §5 calibration-over-constants), loaded from the committed p4-step-shapes.json at L2/L3"
+  ],
+  "frozen_untouched": "stratum 9f298f2 and all P3 artifacts byte-unchanged; target worktree pristine after qualification"
+ }
 }

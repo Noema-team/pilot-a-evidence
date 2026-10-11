@@ -1,0 +1,79 @@
+{
+  "work_items": [
+    {
+      "id": "wi-define-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "define-work",
+      "state": "failed",
+      "priority": 0,
+      "acceptance_criteria_json": "[\"Failure payload keys match across worker and rag-api (aligning the worker to `error_message`/`stage` matches rag-api's persisted fields and avoids a migration).\",\"A failed job persists the worker's actual error message and failing stage.\",\"`retryable` is either sent by the worker or derived deliberately — not defaulted silently.\",\"Contract test covering worker failure → rag-api persistence path.\"]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T13:51:51.687Z",
+      "updated_at": "2026-10-11T13:51:51.728Z",
+      "workflow_parameters_json": null
+    }
+  ],
+  "workflow_runs": [
+    {
+      "run_id": "aa3aa021-0949-41c7-bf33-55de302cf2fb",
+      "workflow_id": "define-work",
+      "work_item_id": "wi-define-108",
+      "status": "halted",
+      "current_step_id": "synthesize-definition",
+      "iteration": 1,
+      "revision": 0,
+      "awaiting_checkpoint": null,
+      "started_at": "2026-10-11T13:51:51.710Z",
+      "updated_at": "2026-10-11T13:51:51.727Z",
+      "resolved_parameters_json": "{}"
+    }
+  ],
+  "decisions": [],
+  "artifacts": [],
+  "step_executions": [
+    {
+      "id": "79d91b8c-7151-443a-8502-603febb56791",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "aa3aa021-0949-41c7-bf33-55de302cf2fb",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "failed",
+      "attempt": 1,
+      "started_at": "2026-10-11T13:51:51.710Z",
+      "completed_at": "2026-10-11T13:51:51.727Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": "{\"code\":\"workflow_error\",\"message\":\"LLM call failed: config-guard: STOP — synthesize-definition: tool set [read_file,read_source_slice,list_directory,submit_result] matches none of the frozen shapes [nonexistent_tool]; submit_result offered on a step whose frozen shape declares none — the model call was NOT made\"}"
+    }
+  ],
+  "events": [
+    {
+      "id": "b305ccef-1c53-46e4-ba35-ebcbc79c9178",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T13:51:51.710Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "58c6e68e-7e93-4eca-a791-bfeb1f33ce21",
+      "schema_version": 1,
+      "type": "work.state_changed",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T13:51:51.728Z",
+      "payload_json": "{\"from\":\"failed\",\"to\":\"failed\",\"reason\":\"LLM call failed: config-guard: STOP — synthesize-definition: tool set [read_file,read_source_slice,list_directory,submit_result] matches none of the frozen shapes [nonexistent_tool]; submit_result offered on a step whose frozen shape declares none — the model call was NOT made\"}"
+    }
+  ]
+}

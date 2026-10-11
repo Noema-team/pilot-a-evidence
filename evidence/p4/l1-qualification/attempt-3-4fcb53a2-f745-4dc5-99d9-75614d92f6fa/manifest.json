@@ -1,0 +1,9 @@
+{
+  "attemptId": "4fcb53a2-f745-4dc5-99d9-75614d92f6fa",
+  "index": 3,
+  "outcome": "STOPPED",
+  "failureClass": "guard-stop",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T13:51:51.602Z",
+  "capture_sha256": "a5756baaa5b4cce0bc14de2502a19abb6e21ae4b0162709162058b570bb9be91"
+}

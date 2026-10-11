@@ -1,0 +1,32 @@
+{
+  "ready": true,
+  "checks": {
+    "R1_halted_state": {
+      "pass": true,
+      "detail": "cursor=confirm status=halted pendingConfirm=true boundaryRefusals=0 buildRequests=0 intermediate=scoping.checkpoint:approve-policy"
+    },
+    "R2_definition_chain": {
+      "pass": true,
+      "detail": "parse=true finalReadinessPass=true (gaps=0) humanDecisionArtifact=false explorationArtifact=false defineDone=true sourceResolved=true artifactsIntegrity=true"
+    },
+    "R3_settings_pinned": {
+      "pass": true,
+      "detail": "6 requests, all carry settings_sha256 == frozen: true"
+    },
+    "R4_budget_on_wire": {
+      "pass": true,
+      "detail": "all 6 requests match the frozen budget/effort/model map"
+    },
+    "R5_edit_policy_parameters": {
+      "pass": true,
+      "detail": "editPolicy={\"appliesToSteps\":[\"build\"],\"allowedEditPaths\":[\"apps/ai-server/rag-worker-service/main.py\"],\"requiredEditPaths\":[\"apps/ai-server/rag-worker-service/main.py\"]}"
+    },
+    "R6_wire_integrity": {
+      "pass": true,
+      "detail": "g1=false g2=false parseFailures=0 foreignWire=false requests=6 responses=6 errors=0"
+    }
+  },
+  "failureClass": null,
+  "budgetExhaustedSteps": [],
+  "providerErrorCount": 0
+}

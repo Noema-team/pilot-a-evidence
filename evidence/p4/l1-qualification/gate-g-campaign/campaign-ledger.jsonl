@@ -1,0 +1,11 @@
+{"ts":"2026-10-11T13:51:53.014Z","event":"attempt-incomplete","detail":"interrupted runtime archived to /home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification/gate-g-campaign/interrupted-runtime-2026-10-11T13-51-53-011Z"}
+{"ts":"2026-10-11T13:51:53.058Z","event":"campaign-start"}
+{"ts":"2026-10-11T13:51:53.058Z","event":"attempt-start","index":1}
+{"ts":"2026-10-11T13:51:54.093Z","event":"attempt-incomplete","index":1,"detail":"declared incomplete by resume: launch had no terminal event (process death)"}
+{"ts":"2026-10-11T13:51:54.096Z","event":"attempt-incomplete","detail":"interrupted runtime archived to /home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification/gate-g-campaign/interrupted-runtime-2026-10-11T13-51-54-094Z"}
+{"ts":"2026-10-11T13:51:54.136Z","event":"campaign-start"}
+{"ts":"2026-10-11T13:51:54.136Z","event":"attempt-start","index":1}
+{"ts":"2026-10-11T13:51:54.750Z","event":"attempt-counted","attemptId":"afc8d19c-d612-4d61-bc3a-988a5549a1fc","index":1,"outcome":"READY","failureClass":null,"detail":null,"evidencePackageSha256":"822e6d33e61c2a2d27b6607b62f140430076c9290c8e4acaa54bd537df08df62"}
+{"ts":"2026-10-11T13:51:54.750Z","event":"attempt-start","index":2}
+{"ts":"2026-10-11T13:51:54.978Z","event":"attempt-counted","attemptId":"2b25ae8d-216b-47b3-9240-c3b3f0acd727","index":2,"outcome":"READY","failureClass":null,"detail":null,"evidencePackageSha256":"555252969fbdd8f791be752967387c9f62bb26a2549ebda768f1d70c5cda2e90"}
+{"ts":"2026-10-11T13:51:54.979Z","event":"campaign-terminal","detail":"ready=2 evaluable=2 supported=true"}

@@ -1,0 +1,131 @@
+{
+  "define-work/synthesize-definition": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice",
+        "submit_result"
+      ]
+    ],
+    "submit_result": {
+      "schema_top_level_properties": [
+        "acceptance",
+        "bodyMarkdown",
+        "constraints",
+        "facts",
+        "goal",
+        "nonGoals",
+        "requirements"
+      ],
+      "schema_required": [
+        "goal",
+        "facts",
+        "bodyMarkdown"
+      ],
+      "has_creates_property": false
+    }
+  },
+  "full-build/scoping.produce": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice"
+      ]
+    ],
+    "submit_result": null
+  },
+  "full-build/design": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice"
+      ]
+    ],
+    "submit_result": null
+  },
+  "full-build/plan": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice"
+      ]
+    ],
+    "submit_result": null
+  },
+  "full-build/test": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice"
+      ]
+    ],
+    "submit_result": null
+  },
+  "define-work/definition-readiness-review": {
+    "tool_sets": [
+      []
+    ],
+    "submit_result": null,
+    "structured_schema_name": "definition-readiness"
+  },
+  "define-work/prepare-human-decision": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice",
+        "submit_result"
+      ]
+    ],
+    "submit_result": {
+      "schema_top_level_properties": [
+        "options",
+        "summary",
+        "targetFactId",
+        "title",
+        "type"
+      ],
+      "schema_required": [
+        "type",
+        "targetFactId",
+        "title",
+        "summary",
+        "options"
+      ],
+      "has_creates_property": false
+    }
+  },
+  "define-work/record-exploration-need": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice",
+        "submit_result"
+      ]
+    ],
+    "submit_result": {
+      "schema_top_level_properties": [
+        "bodyMarkdown",
+        "completionEvidence",
+        "question",
+        "requiredWork",
+        "targetFactId",
+        "whyNotResolvableByReading"
+      ],
+      "schema_required": [
+        "targetFactId",
+        "question",
+        "whyNotResolvableByReading",
+        "requiredWork",
+        "completionEvidence"
+      ],
+      "has_creates_property": false
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "attemptId": "a6fde506-4cf5-4ba0-9517-2859ddb61bda",
+  "index": 1,
+  "outcome": "NOT-READY",
+  "failureClass": "definition-exploration-required",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T13:51:50.923Z",
+  "capture_sha256": "7aa710e9c6ccd000621174a36b3b154b0a28929dbe557fdec05206cacff37ba2"
+}

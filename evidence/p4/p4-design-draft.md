@@ -1,9 +1,8 @@
 # P4 DESIGN DRAFT — Autonomous Upstream Reliability
 
-**Status:** DRAFT v2 — revised per P4 architecture review of `8962ab5` (approved in principle; four narrow corrections applied). For final architecture review. Not frozen, not preregistered, no GO.
-**Directive:** operator authorization 2026-10-10 — "P4 design only"; STOP before implementation.
-**Predecessor evidence:** P2 forensics (`evidence/p2/forensics/p2-upstream-forensics.md`), P3 closeout (`evidence/p3/p3-closeout.json`), charter v1.1.
-**Review rulings applied:** R4 wire mismatch = campaign-terminal procedure STOP (never model-attributed NOT-READY) · native `define-work` + `full-build` workflows (no custom pipeline) · stop at confirm, decision pending, BUILD never executed · N=3 fixed issue-108, ≥2/3 READY accepted as engineering qualification only.
+**Status:** DRAFT v3 — implementation COMPLETE at L1 (offline qualification 14/14 gates). For review before L2. Not frozen, no L2/L3 authorization.
+**Directive:** operator conditional implementation GO (final architecture review): implement + L1 offline qualification only; STOP before L2 provider traffic, freeze, or L3.
+**Predecessor evidence:** P2 forensics, P3 closeout, charter v1.1. Review rulings + four binding corrections applied and BUILT (§13).
 
 ---
 
@@ -115,3 +114,38 @@ L1 gates → one L2 round → L3 attempt 1 (first genuine upstream-to-BUILD-entr
 3. ~~Open question: confirm pending vs composite endpoint~~ → **RESOLVED**: stop at confirm, decision pending, BUILD never executed (§3).
 4. ~~Open question: N=3 fixed-task~~ → **RESOLVED**: accepted as engineering qualification only (§6).
 5. Correction 3 applied: per-step output-path authority separated from BUILD-only editPolicy; the incorrect upstream-editPolicy STOP removed (§5).
+
+---
+
+## 13. AS-BUILT IMPLEMENTATION + L1 QUALIFICATION EVIDENCE (v3 addition)
+
+Implementation modules (evidence/p4/, campaign tooling only; stratum 9f298f2 and all P3 artifacts byte-unchanged):
+
+| Module | Role |
+|---|---|
+| `p4-transport-guard.mts` | correction 1 — guarded capture on ALL THREE native wires (`completeMultiTurn`, `complete`, `completeStructured`); per-call settings sha re-verification (R3 at request granularity); response/error provenance per wire's ACTUAL result shape (no fabricated streaming metadata on the single-turn wires — `wire_observation: null` recorded as fact); fail-closed archival-before-verdict; capture v3 records are `classifyGuardCapture`-compatible (P3 classifier + G1/G2 reused unchanged) |
+| `p4-step-contracts.mts` | fail-closed frozen-settings derivation (budget/effort per `workflowId/stepId`, STRICTER than the engine: the campaign refuses to run under an unparsable frozen map); pinned per-step request-shape table (`p4-step-shapes.json`) observed on the production path (charter §5 calibration-over-constants); unknown steps fail closed |
+| `p4-readiness.mts` | corrections 2+3 — the PURE R1–R6 assessor: halted-at-confirm state, definition chain (provenance sha, disk bytes, final readiness verdict PASS, no HUMAN_DECISION/EXPLORE_AS_WORK artifacts, `resolveDefinitionSource` admissibility), settings/budget re-verification FROM THE CAPTURE, edit policy as parameters only, wire integrity |
+| `p4-campaign.mts` | the lifecycle driver: clean per-attempt init (fresh `.sle`, frozen settings installed exactly once — the module's ONLY settings write), real define-work → WorkService-complete handoff gated on the final readiness verdict (never synthetic approval of unresolved human questions) → execution WI with `definitionSource` → full-build to the confirm boundary; determinate checkpoint policy; capture-derived G1/G2 campaign-terminal STOPs; §10 ledger + resume (orphaned launches declared incomplete by the resuming process; interrupted runtime archived; worktree restored); evidence packages (capture + db export incl. step failures/events + readiness assessment + artifacts + self-verifying manifest) |
+| `p4-l1-qualifier.mts` + `p4-l1-resume-child.mts` | the 14 offline gates below — scripted providers through the REAL engine, zero network traffic |
+
+### L1 qualification — 14/14 PASS (`p4-l1-qualification-output.txt`, 2026-10-11T13:51:55Z)
+
+- **A.calibration (+human/explore route legs)** — observed production request shapes for 8 steps pinned from real engine runs (`p4-step-shapes.json`); frozen model/budget/effort enforced even in calibration mode.
+- **A.ready-path** — READY at the confirm boundary under PINNED shapes; R1–R6 all pass; wires exercised: `completeMultiTurn` + `completeStructured` (the review wire).
+- **B.isolation** — correction 4: second attempt sees a fresh DB (only its own 2 work-item rows), pristine worktree before/after, frozen settings constant.
+- **C.config-drift-stop** — the EXACT P2 `seed()` output written mid-attempt → per-call settings re-verification fails closed (response unarchivable → G2) → campaign-terminal STOP with the settings violation in the step failure evidence.
+- **C2.budget-wire-stop** — a P2-shaped request (16384 vs frozen 32768 for full-build/design) refused BEFORE the model call.
+- **D.unpinned-shape-stop** — wrong pinned tool surface → guard STOP, zero model calls reached.
+- **F1** — genuine length terminus at the CORRECT budget → evaluable NOT-READY `budget-exhaustion-upstream` (never censored, never a STOP).
+- **F2** — HUMAN_DECISION route: the run halts at `human-decision-checkpoint`, the decision row stays PENDING, attempt = NOT-READY `definition-human-decision-required`. NO synthetic approval.
+- **F3** — EXPLORE_AS_WORK route: the committed definition via the explore route does NOT qualify — handoff gate refuses, NOT-READY `definition-exploration-required` (the final readiness outcome is verified, not merely parse+resolve).
+- **F4** — disk-corrupted definition after commit → provenance/disk-integrity/admissibility fail closed (`authority-invalid`, R2 false).
+- **G.kill-and-resume** — a REAL `SIGKILL` mid-attempt (child process) → the resume declares the orphaned launch INCOMPLETE from the ledger, archives the interrupted runtime, restores the worktree, and completes the terminal condition (ready=2/2, retained slots preserved).
+- **H.code-inspection** — exactly ONE settings write in the campaign path (init); BUILD is never dispatched.
+
+### As-built decisions recorded for review
+
+1. **Handoff completion act**: the engine leaves the define WI `in_review`; the campaign completes it via the existing `WorkService.complete` transition (the production control-plane act) — gated mechanically on the final readiness verdict PASS + no HUMAN_DECISION/EXPLORE artifacts + no pending decisions. `resolveDefinitionSource` then enforces `source_work_item_not_completed` fail-closure against any attempt to skip the gate.
+2. **Guard STOPs surface inside engine step-catch**: a mid-step guard violation becomes a step failure (engine behavior, unchanged). The campaign therefore derives campaign-terminal STOPs from the CAPTURE (any G1 STOP record or G2 integrity failure), wherever they surfaced — never from the exception path alone.
+3. **Pinned shapes** are L1-observed production shapes, not assumptions; the L2/L3 contracts load the committed `p4-step-shapes.json`.

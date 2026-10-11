@@ -1,0 +1,75 @@
+{
+  "finished_at_utc": "2026-10-11T13:51:55.029Z",
+  "results": [
+    {
+      "gate": "H.code-inspection",
+      "pass": true,
+      "detail": "settings writes=1 (init-only inside installFrozenSettings) present=true build never dispatched=true"
+    },
+    {
+      "gate": "A.calibration",
+      "pass": true,
+      "detail": "observed+attempt1=READY; pinned 6 step shapes [define-work/synthesize-definition, full-build/scoping.produce, full-build/design, full-build/plan, full-build/test, define-work/definition-readiness-review] → /home/theo/Documents/coding/repos/pilot-a/evidence/p4/p4-step-shapes.json"
+    },
+    {
+      "gate": "A.calibration.human-route",
+      "pass": true,
+      "detail": "leg outcome=NOT-READY class=definition-human-decision-required; pinned +1 route step shapes (total 7)"
+    },
+    {
+      "gate": "A.calibration.explore-route",
+      "pass": true,
+      "detail": "leg outcome=NOT-READY class=definition-exploration-required; pinned +1 route step shapes (total 8)"
+    },
+    {
+      "gate": "A.ready-path",
+      "pass": true,
+      "detail": "READY under PINNED shapes; R1–R6 all pass; scripted calls=6 wires=[completeMultiTurn,completeStructured]"
+    },
+    {
+      "gate": "B.isolation",
+      "pass": true,
+      "detail": "attempt2=READY workItems=[wi-define-108,wi-exec-108] (fresh DB: ONLY this attempt's rows) pristine before=true after=true settings=5634b2e8"
+    },
+    {
+      "gate": "C.config-drift-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=guard-stop stepFailureSaysSettings=true — mid-attempt drift (the exact P2 seed() output) STOPs the campaign (fail-closed evidence + settings violation)"
+    },
+    {
+      "gate": "C2.budget-wire-stop",
+      "pass": true,
+      "detail": "P2-shaped request (16384 vs frozen 32768 for full-build/design) refused pre-call; inner provider reached=false"
+    },
+    {
+      "gate": "D.unpinned-shape-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=guard-stop scripted calls for the step=0 (fail-closed request validation BEFORE any model call)"
+    },
+    {
+      "gate": "F1.budget-exhaustion-not-ready",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=budget-exhaustion-upstream evaluable=true — genuine length terminus at the CORRECT budget = model-attributable NOT-READY, never a STOP"
+    },
+    {
+      "gate": "F2.human-decision-pending",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=definition-human-decision-required pendingDecisions=1 — the semantic human question is NEVER synthetically approved"
+    },
+    {
+      "gate": "F3.explore-not-ready",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=definition-exploration-required — a committed definition reached via the explore route does NOT qualify (final readiness outcome verified, not just parse+resolve)"
+    },
+    {
+      "gate": "F4.authority-invalid",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=authority-invalid R2=false (parse=false finalReadinessPass=true (gaps=0) humanDecisionArtifact=false explorationArtifact=false defineDone=true sourceResolved=false (def) — provenance/disk-integrity/admissibility fails closed"
+    },
+    {
+      "gate": "G.kill-and-resume",
+      "pass": true,
+      "detail": "killed=true resumeTerminal=\"child terminal: complete: ready=2/2 (threshold 2)\" ledger incomplete=3 counted=2 allReady=true — a real process death consumed nothing; the resume declared it incomplete and completed the terminal condition"
+    }
+  ]
+}

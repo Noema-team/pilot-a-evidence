@@ -1,6 +1,6 @@
 # P4 DESIGN DRAFT — Autonomous Upstream Reliability
 
-**Status:** DRAFT v3 — implementation COMPLETE at L1 (offline qualification 14/14 gates). For review before L2. Not frozen, no L2/L3 authorization.
+**Status:** DRAFT v3.1 — implementation reviewed; L1-r2 offline qualification 20/20 gates. For review before L2. Not frozen, no L2/L3 authorization. §13 records the v3 as-built; §14 records the r2 corrections.
 **Directive:** operator conditional implementation GO (final architecture review): implement + L1 offline qualification only; STOP before L2 provider traffic, freeze, or L3.
 **Predecessor evidence:** P2 forensics, P3 closeout, charter v1.1. Review rulings + four binding corrections applied and BUILT (§13).
 
@@ -149,3 +149,28 @@ Implementation modules (evidence/p4/, campaign tooling only; stratum 9f298f2 and
 1. **Handoff completion act**: the engine leaves the define WI `in_review`; the campaign completes it via the existing `WorkService.complete` transition (the production control-plane act) — gated mechanically on the final readiness verdict PASS + no HUMAN_DECISION/EXPLORE artifacts + no pending decisions. `resolveDefinitionSource` then enforces `source_work_item_not_completed` fail-closure against any attempt to skip the gate.
 2. **Guard STOPs surface inside engine step-catch**: a mid-step guard violation becomes a step failure (engine behavior, unchanged). The campaign therefore derives campaign-terminal STOPs from the CAPTURE (any G1 STOP record or G2 integrity failure), wherever they surfaced — never from the exception path alone.
 3. **Pinned shapes** are L1-observed production shapes, not assumptions; the L2/L3 contracts load the committed `p4-step-shapes.json`.
+
+---
+
+## 14. R2 — IMPLEMENTATION-REVIEW CORRECTIONS (v3.1 addition)
+
+The implementation review held L1 for four targeted corrections; all are now BUILT and the full L1 suite re-run (additive: `l1-qualification/` from the first run is preserved untouched; r2 evidence in `l1-qualification-r2/`, output `p4-l1-qualification-output-r2.txt`).
+
+### P1 corrections, as built
+
+1. **Readiness — required native BUILD inputs.** `assembleReadinessInput` no longer guesses artifact types: the REQUIRED set is derived from the frozen full-build definition — the `cycle-charter` row (exact ref `doc:cycle-charter`), `produced-file` rows for `docs/requirements.md` + `docs/architecture.md` (design), `docs/plan.md` + `docs/test-plan.md` (plan), and ≥1 `produced-file:test:` row under `apps/ai-server/tests/`. Each is verified against its EXACT storage row (type+ref), row hash == disk sha256, non-empty file; a required output with no row can never pass silently. Missing AND corrupted artifacts fail closed as `build-inputs-incomplete`, naming the path (gates `E2.missing-artifact`, `E2.corrupted-artifact`).
+2. **Recovery — durable count reconstruction.** `runP4Campaign` now reconstructs counted slots FROM THE LEDGER (`reconstructCountedSlots`) with unique per-launch `launchId`s; the terminal condition is evaluated over the durable count BEFORE any new launch (a satisfied campaign never executes beyond N); procedure-class STOPPED is sticky across resumes. Gate `G` proves the exact demanded scenario: REAL SIGKILL after slot 1 counted, crash during slot 2 → resume reconstructs slot 1 (counted exactly once, package byte-identical), declares slot 2 incomplete, completes `ready=2/2` with counted indexes `[1,3]`.
+3. **Evidence — full-package hash binding.** ArchiveAttempt now packages and hash-binds EVERYTHING: DB records, readiness assessment, upstream files (derived from storage rows, including test outputs), runtime artifacts (`.sle/runs`), authority-violation bytes, capture, definition/readiness. `files.sha256.json` binds each file; `manifest.package_sha256` = sha256 over the canonical sorted file-hash map IS the package identity; the archive self-verifies at birth and `verifyEvidencePackage` independently re-verifies. Gate `T` flips one byte in a COPY and the verifier names the file.
+4. **Authority — AUTHORITY-BYPASS STOP.** Per-step worktree write authorization is derived from the frozen workflow definitions (define-work: `.sle/` only; full-build steps: declared `outputArtifact`/`authorizedOutputs`, prefix entries for directories), enforced at the stepRunner seam via before/after `git status --porcelain -uall` deltas. An out-of-policy write STOPs the campaign (`authority-bypass`), and the violating bytes are archived INSIDE the package BEFORE worktree cleanup (gate `AUTH`: `docs/rogue.md` authored inside design → STOPPED, `authority-violations/docs/rogue.md` in the package, worktree pristine afterwards).
+
+### Secondary corrections
+
+- **Route-shape coverage without wire weakening:** the refine-definition route (a full READY attempt through a second native route) and the human-resolution chain (`apply-human-decision` + `post-human-readiness-review`, driven by a SCRIPTED HUMAN OPERATOR resolving through the real ResumeService — a role the campaign itself never takes; the handoff gate still refuses on the decision-request artifact) are now calibrated; 10 shapes pinned, every call in every leg guard-validated.
+- **R1 asserts the actual state:** exec run `status=halted`, cursor `confirm`, `awaiting_checkpoint=confirm`, exactly ONE pending decision whose `subjectRef.stepId === 'confirm'`, zero boundary refusals, zero BUILD requests, intermediates policy-conform.
+- **Settings installation reconciled (prereg v3.1):** per attempt `.sle` is wiped and the frozen settings bytes are installed exactly once at init; the guard verifies the sha at construction and at EVERY captured request; never rewritten mid-attempt.
+
+### L1-r2 result — 20/20 gates PASS (2026-10-11T16:36:13Z)
+
+H · A.calibration (+refine-route, human-route, explore-route, human-resolution legs) · A.ready-path · B.isolation · C.config-drift-stop · C2.budget-wire-stop · D.unpinned-shape-stop · E2.missing-artifact · E2.corrupted-artifact · F1 · F2 · F3 · F4 · T.post-archive-tamper · AUTH.authority-bypass-stop · G.kill-and-resume.
+
+stratum 9f298f2 and all P3 artifacts remain byte-unchanged; the target worktree is pristine after qualification.

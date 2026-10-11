@@ -1,0 +1,103 @@
+{
+  "cycle_id": "7d09cbca-dd7f-4f6c-852d-e2c8a6ea0615",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-10-11T16:36:04.467Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "scoping.gather",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-10-11T16:36:04.468Z",
+      "completed_at": "2026-10-11T16:36:04.469Z"
+    },
+    {
+      "id": "scoping.produce",
+      "status": "complete",
+      "artifacts_written": [
+        "docs/cycle-charter.md"
+      ],
+      "started_at": "2026-10-11T16:36:04.470Z",
+      "turns_taken": 1,
+      "tool_calls": 0,
+      "completed_at": "2026-10-11T16:36:04.523Z"
+    },
+    {
+      "id": "scoping.checkpoint",
+      "status": "complete",
+      "artifacts_written": [],
+      "started_at": "2026-10-11T16:36:04.530Z",
+      "completed_at": "2026-10-11T16:36:04.558Z"
+    },
+    {
+      "id": "design",
+      "status": "running",
+      "artifacts_written": [],
+      "started_at": "2026-10-11T16:36:04.564Z",
+      "turns_taken": 1,
+      "tool_calls": 0
+    },
+    {
+      "id": "critique",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "plan",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "test",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "sharding_approval",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "confirm",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "build",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "exec",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "validation_gate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "debug",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "evaluate",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "summarise",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "snapshot",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

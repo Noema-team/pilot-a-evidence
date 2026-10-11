@@ -1,0 +1,13 @@
+{
+  "node_id": "synthesize-definition",
+  "failed": true,
+  "result_transport": "submit-result",
+  "turns_taken": 1,
+  "tool_calls": [],
+  "stop_reason": "provider_error",
+  "text_length": 0,
+  "transport_failure": {
+    "duration_ms": 0,
+    "error_name": "ConfigGuardViolation"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "db-records.json": "8f04ca34a72f3a2f1d7c22c72da3140fbf0a5d3a0026765ca7192b963aa7cb20",
+  "definition.md": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+  "guard-capture.jsonl": "1dc151234caab4dfb0daf6e6a7a65be7fcd1d9ff32508717bae4052b6f4f37f8",
+  "readiness-assessment.json": "17d15a4cbf3ebe4b5bd9cd4991117a7100af3cc3217cbba594eb2c704f707c45",
+  "readiness.md": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/manifest.json": "dd155cc97c2a062b49057513ccacf7d0462744e0ec2a7742b233c7c5f64bf36c",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/apply-human-decision-loop.json": "7484a786f85e57533454126d45f90086740204c387710cb780ab9d5a98b236db",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/apply-human-decision-rejected-result.json": "a81099fc524a54180fe5a499d7dac755a7d9437fe54495a890194c23bf79feff",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/apply-human-decision.md": "92425bcd9178e351929e6791c38193f4419df0c9b3aa71ae91e2936e305fe7e2",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/definition-readiness-review.md": "7194d1078a77d7f234a49769f6a81822f909e6a52306de7c2306820730a29d80",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/prepare-human-decision-loop.json": "1c16118534665475f800bb0153f4b10484cde035c544e47e15825b9df6449139",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/prepare-human-decision.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/synthesize-definition-loop.json": "328d19c03f306fe58db91ad510c5f5463c4ae571ff91b68ad0e275f13c36040d",
+  "runs/8d072e06-07b3-4cf1-8fb1-c319d018c61a/1/node-outputs/synthesize-definition.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sle-work/wi-define-108/decision-request.json": "9c12ac28a166a037339a2647034d1596cebf9c654a74e26a2044ac05a020c957",
+  "sle-work/wi-define-108/definition.md": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+  "sle-work/wi-define-108/readiness.md": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+  "upstream-files/.sle/work/wi-define-108/definition.md": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+  "upstream-files/.sle/work/wi-define-108/readiness.md": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+  "upstream-files-index.json": "5706dc738cb54ea58201e8ff971e647d41883694bf70fa2c152bd26032369ea1"
+}

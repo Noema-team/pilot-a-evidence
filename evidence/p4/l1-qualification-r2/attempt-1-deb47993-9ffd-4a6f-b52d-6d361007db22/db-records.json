@@ -1,0 +1,167 @@
+{
+  "work_items": [
+    {
+      "id": "wi-define-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "define-work",
+      "state": "failed",
+      "priority": 0,
+      "acceptance_criteria_json": "[\"Failure payload keys match across worker and rag-api (aligning the worker to `error_message`/`stage` matches rag-api's persisted fields and avoids a migration).\",\"A failed job persists the worker's actual error message and failing stage.\",\"`retryable` is either sent by the worker or derived deliberately — not defaulted silently.\",\"Contract test covering worker failure → rag-api persistence path.\"]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T16:35:58.924Z",
+      "updated_at": "2026-10-11T16:35:59.151Z",
+      "workflow_parameters_json": null
+    }
+  ],
+  "workflow_runs": [
+    {
+      "run_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+      "workflow_id": "define-work",
+      "work_item_id": "wi-define-108",
+      "status": "halted",
+      "current_step_id": "apply-human-decision",
+      "iteration": 1,
+      "revision": 0,
+      "awaiting_checkpoint": null,
+      "started_at": "2026-10-11T16:35:58.934Z",
+      "updated_at": "2026-10-11T16:35:59.149Z",
+      "resolved_parameters_json": "{}"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "78c9d050-cf64-4a76-9b62-88cbde37b22e",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "type": "checkpoint",
+      "subject_ref_json": "{\"workflowRunId\":\"8d072e06-07b3-4cf1-8fb1-c319d018c61a\",\"workItemId\":\"wi-define-108\",\"stepId\":\"human-decision-checkpoint\",\"targetFactId\":\"f3\"}",
+      "title": "Settle the failure-payload schema field set",
+      "summary": "The readiness review classified the payload-schema field set as a choice only a human can authorize; decide include vs exclude.",
+      "options_json": "[{\"id\":\"include\",\"label\":\"Include\",\"description\":\"Treat the full payload field set as in scope for this increment.\"},{\"id\":\"exclude\",\"label\":\"Exclude\",\"description\":\"Ship the minimal class field; defer the remaining fields.\"}]",
+      "recommended_option_id": null,
+      "recommendation_reason": null,
+      "impact": "medium",
+      "reversibility": "easy",
+      "urgency": "normal",
+      "status": "resolved",
+      "resolution_json": "{\"selectedOptionId\":\"include\",\"rationale\":\"L1 calibration leg: scripted human operator decision (the campaign itself never authors this resolution)\",\"resolvedAt\":\"2026-10-11T16:35:59.077Z\",\"resolvedBy\":\"scripted-human-operator\"}"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "32b794b6-c9a0-445b-8329-bee512998fe0",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+      "step_execution_id": null,
+      "type": "definition",
+      "ref": "definition:obj-108",
+      "path": ".sle/work/wi-define-108/definition.md",
+      "hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "created_at": "2026-10-11T16:35:58.955Z"
+    },
+    {
+      "id": "f8764f24-8461-42ba-bd75-f7e6ca9780ce",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+      "step_execution_id": null,
+      "type": "definition-readiness",
+      "ref": "definition-readiness:obj-108",
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "hash": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+      "created_at": "2026-10-11T16:35:59.017Z"
+    },
+    {
+      "id": "18391053-1f1c-4cbc-982f-0823d5db0481",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+      "step_execution_id": null,
+      "type": "decision-request",
+      "ref": "definition-decision-request:obj-108",
+      "path": ".sle/work/wi-define-108/decision-request.json",
+      "hash": "9c12ac28a166a037339a2647034d1596cebf9c654a74e26a2044ac05a020c957",
+      "created_at": "2026-10-11T16:35:59.052Z"
+    }
+  ],
+  "step_executions": [
+    {
+      "id": "227435df-f98f-4fe4-bb1e-2ffc4d834e66",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "succeeded",
+      "attempt": 1,
+      "started_at": "2026-10-11T16:35:58.934Z",
+      "completed_at": "2026-10-11T16:35:59.077Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": null
+    },
+    {
+      "id": "1abf5333-ed51-4dab-b364-572c3ffe2ee1",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+      "step_id": "apply-human-decision",
+      "executor": "stratum-agent",
+      "state": "failed",
+      "attempt": 1,
+      "started_at": "2026-10-11T16:35:59.077Z",
+      "completed_at": "2026-10-11T16:35:59.150Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": "{\"code\":\"workflow_error\",\"message\":\"Submitted result was rejected by output contract 'decision-application' and result repair is exhausted (2 provider turn(s), 1 result-repair attempt(s)): Your submitted result was rejected by the output contract for 'decision-application'. Reason: the submitted result does not match the required semantic shape — (root): Unrecognized key(s) in object: 'goal', 'facts'\\nRe-submit the complete corrected result in the same required shape. Do not change anything that was not rejected.\"}"
+    }
+  ],
+  "events": [
+    {
+      "id": "6dd5eeaa-4431-4e85-a431-2cd361d6e664",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T16:35:58.934Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "9ee19dbe-274c-4b52-b582-d4102d1d81cd",
+      "schema_version": 1,
+      "type": "decision.requested",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T16:35:59.077Z",
+      "payload_json": "{\"from\":\"needs_decision\",\"decisionId\":\"78c9d050-cf64-4a76-9b62-88cbde37b22e\",\"decisionType\":\"checkpoint\"}"
+    },
+    {
+      "id": "2f30b1ff-2691-48bd-b7e2-fcb40a7b3733",
+      "schema_version": 1,
+      "type": "decision.resolved",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T16:35:59.078Z",
+      "payload_json": "{\"from\":\"running\",\"decisionId\":\"78c9d050-cf64-4a76-9b62-88cbde37b22e\",\"selectedOptionId\":\"include\",\"resumedTo\":\"running\"}"
+    },
+    {
+      "id": "18cf502a-41c1-4538-9b08-164dc95e61c4",
+      "schema_version": 1,
+      "type": "work.state_changed",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T16:35:59.151Z",
+      "payload_json": "{\"from\":\"failed\",\"to\":\"failed\",\"reason\":\"Submitted result was rejected by output contract 'decision-application' and result repair is exhausted (2 provider turn(s), 1 result-repair attempt(s)): Your submitted result was rejected by the output contract for 'decision-application'. Reason: the submitted result does not match the required semantic shape — (root): Unrecognized key(s) in object: 'goal', 'facts'\\nRe-submit the complete corrected result in the same required shape. Do not change anything that was not rejected.\"}"
+    }
+  ]
+}

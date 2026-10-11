@@ -1,0 +1,32 @@
+{
+  "ready": false,
+  "checks": {
+    "R1_halted_state": {
+      "pass": false,
+      "detail": "status=absent cursor=null awaiting=null pending=0 pendingRefStep=null boundaryRefusals=0 buildRequests=0 intermediate=none"
+    },
+    "R2_definition_chain": {
+      "pass": false,
+      "detail": "parse=true finalReadinessPass=false (gaps=1) humanDecisionArtifact=true explorationArtifact=false defineDone=false sourceResolved=false (invalid_definition_source) requiredInputs=5 verified=0 testOutputs=false bad=[docs/cycle-charter.md:row-missing,docs/requirements.md:row-missing,docs/architecture.md:row-missing,docs/plan.md:row-missing,docs/test-plan.md:row-missing]"
+    },
+    "R3_settings_pinned": {
+      "pass": true,
+      "detail": "5 requests, all carry settings_sha256 == frozen: true"
+    },
+    "R4_budget_on_wire": {
+      "pass": true,
+      "detail": "all 5 requests match the frozen budget/effort/model map"
+    },
+    "R5_edit_policy_parameters": {
+      "pass": false,
+      "detail": "editPolicy MISSING from exec workflowParameters"
+    },
+    "R6_wire_integrity": {
+      "pass": true,
+      "detail": "g1=false g2=false parseFailures=0 foreignWire=false requests=5 responses=5 errors=0"
+    }
+  },
+  "failureClass": "definition-human-decision-required",
+  "budgetExhaustedSteps": [],
+  "providerErrorCount": 0
+}

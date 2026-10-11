@@ -73,6 +73,33 @@
     "submit_result": null,
     "structured_schema_name": "definition-readiness"
   },
+  "define-work/refine-definition": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice",
+        "submit_result"
+      ]
+    ],
+    "submit_result": {
+      "schema_top_level_properties": [
+        "acceptance",
+        "bodyMarkdown",
+        "constraints",
+        "facts",
+        "goal",
+        "nonGoals",
+        "requirements"
+      ],
+      "schema_required": [
+        "goal",
+        "facts",
+        "bodyMarkdown"
+      ],
+      "has_creates_property": false
+    }
+  },
   "define-work/prepare-human-decision": {
     "tool_sets": [
       [
@@ -124,6 +151,30 @@
         "whyNotResolvableByReading",
         "requiredWork",
         "completionEvidence"
+      ],
+      "has_creates_property": false
+    }
+  },
+  "define-work/apply-human-decision": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice",
+        "submit_result"
+      ]
+    ],
+    "submit_result": {
+      "schema_top_level_properties": [
+        "acceptance",
+        "bodyMarkdown",
+        "constraints",
+        "factStatement",
+        "nonGoals",
+        "requirements"
+      ],
+      "schema_required": [
+        "bodyMarkdown"
       ],
       "has_creates_property": false
     }

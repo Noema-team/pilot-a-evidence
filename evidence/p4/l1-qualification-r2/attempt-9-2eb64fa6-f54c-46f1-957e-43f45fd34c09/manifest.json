@@ -1,0 +1,33 @@
+{
+  "attemptId": "2eb64fa6-f54c-46f1-957e-43f45fd34c09",
+  "index": 9,
+  "launchId": null,
+  "outcome": "NOT-READY",
+  "failureClass": "definition-exploration-required",
+  "stopDetail": "handoff gate refused: final readiness verdict is not a clean pass (1 classified gaps — route outcome preserved for assessment)",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T16:36:03.252Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "7d06dc82ffa25b27b01355a3794264023b04704892d2439137cc839dd8642ec5",
+  "db_records_sha256": "b3865f9277238a3bcadb668e516accf9259cd1c64b14d7c12ededfad53263e9f",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "7e8dd13c6c811518c525fe62af98e838533d07fbe75e006fa9bd4a0957dbe3e2",
+      "storage_hash": "7e8dd13c6c811518c525fe62af98e838533d07fbe75e006fa9bd4a0957dbe3e2",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 17,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r2/attempt-9-2eb64fa6-f54c-46f1-957e-43f45fd34c09/files.sha256.json",
+  "package_sha256": "30c73c8ed69fbba1b168ed5c93c3acb10dc621821261d9046f9b9493705d7eac"
+}

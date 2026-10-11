@@ -1,0 +1,59 @@
+meta:
+  status: idle
+  cycle: 0
+  version_id: 91ce43fa-df3e-413a-af5a-dd445d7996ef
+  initialized_at: '2026-10-11T16:36:06.296Z'
+  updated_at: '2026-10-11T16:36:06.296Z'
+project:
+  name: student-platform
+  description: Initialized student-platform project
+  type: custom
+remotes:
+  code:
+    type: git
+    url: https://github.com/magtheo/student-platform
+    branch: pilot-a/issue-108
+  issues:
+    type: git
+    url: https://github.com/magtheo/student-platform
+    branch: main
+  docs:
+    url: https://github.com/magtheo/student-platform
+    pending: true
+task_store:
+  type: local
+agents: {}
+discovery:
+  status: not_started
+  mode: full
+  artifacts: []
+  current_round: 0
+  total_rounds: 4
+  current_phase: 0
+  total_phases: 0
+  open_questions_count: 0
+  blocking_questions_count: 0
+cycle:
+  number: 0
+  iteration: 0
+  revision: 0
+  max_iterations: 5
+  planning_depth: standard
+  started_at: '2026-10-11T16:36:06.296Z'
+  outcome: cycling
+  approval_gate: null
+  awaiting_scoping: false
+  awaiting_confirmation: false
+  awaiting_sharding_approval: false
+chat:
+  session_open: false
+  total_exchanges: 0
+  pending_decisions: 0
+artifacts: []
+validation:
+  categories: []
+  gate:
+    mode: all_must_pass
+    last_outcome: halted
+    failed_categories: []
+tags: []

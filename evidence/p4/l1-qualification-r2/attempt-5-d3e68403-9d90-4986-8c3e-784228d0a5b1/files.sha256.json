@@ -1,0 +1,9 @@
+{
+  "db-records.json": "86501966d0b8e8c4a57c4e1b407fbce55d01e256dfac993623806325837a9ec6",
+  "guard-capture.jsonl": "a4334e00efd7dd0a91e004478291f0670390726d5d5f14d55080f18455385ead",
+  "readiness-assessment.json": "a494073b55431a71572f239fd0700da383d8c7ba60360f66ac1fcfbb861fd356",
+  "runs/e60c4dbf-538b-4c0b-9c10-da7a49b285dd/1/manifest.json": "97454b34c93cf3389a528e152aa066d951fcf350b3642ee2b041a4dbc241c91b",
+  "runs/e60c4dbf-538b-4c0b-9c10-da7a49b285dd/1/node-outputs/synthesize-definition-loop.json": "288fa586766a69abccaff7cf4d9ee7a68a035e250b3f437e29154de55b9ca6a6",
+  "runs/e60c4dbf-538b-4c0b-9c10-da7a49b285dd/1/node-outputs/synthesize-definition.md": "d0d5cf0ce9b81f6a7390890a11a1e613a43cd23072a27da2e8a8cd69ece78313",
+  "upstream-files-index.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+}

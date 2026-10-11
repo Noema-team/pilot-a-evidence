@@ -20,7 +20,7 @@
 
 import { execFileSync } from 'node:child_process';
 import {
-  readFileSync, writeFileSync, existsSync, rmSync, mkdirSync, readdirSync, copyFileSync, appendFileSync,
+  readFileSync, writeFileSync, existsSync, rmSync, mkdirSync, readdirSync, copyFileSync, appendFileSync, statSync,
 } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -31,7 +31,7 @@ import {
   FROZEN_SETTINGS_PATH, FROZEN_SETTINGS_SHA256,
   type FrozenSettings, type PinnedShapes,
 } from './p4-step-contracts.mts';
-import { assessReadiness, buildStepRequestsInCapture, type ReadinessAssessment, type UpstreamArtifactRecord } from './p4-readiness.mts';
+import { assessReadiness, buildStepRequestsInCapture, type ReadinessAssessment, type UpstreamArtifactRecord, type RequiredOutputVerification } from './p4-readiness.mts';
 
 export const STRATUM = '/home/theo/Documents/coding/repos/stratum';
 export const ROOT = '/home/theo/Documents/coding/repos/student-platform';
@@ -54,8 +54,98 @@ export const FROZEN_EDIT_POLICY = {
   requiredEditPaths: [WORKER],
 };
 
+// ─── REQUIRED native upstream outputs (the BUILD-input contract) ─────────────
+// Derived from the FROZEN full-build definition: scoping.produce's declared
+// outputArtifact (cycle-charter), design's and plan's authorizedOutputs, and
+// the test step's authorized test directory. Each entry is verified against
+// its EXACT storage row (type+ref), the disk bytes (row hash == disk sha256),
+// and non-emptiness — at the confirm boundary these ARE the BUILD context.
+const REQUIRED_EXEC_OUTPUTS = [
+  { path: 'docs/cycle-charter.md', ref: 'doc:cycle-charter', rowType: 'cycle-charter', stepId: 'scoping.produce' },
+  { path: 'docs/requirements.md', ref: 'produced-file:design:docs/requirements.md', rowType: 'produced-file', stepId: 'design' },
+  { path: 'docs/architecture.md', ref: 'produced-file:design:docs/architecture.md', rowType: 'produced-file', stepId: 'design' },
+  { path: 'docs/plan.md', ref: 'produced-file:plan:docs/plan.md', rowType: 'produced-file', stepId: 'plan' },
+  { path: 'docs/test-plan.md', ref: 'produced-file:plan:docs/test-plan.md', rowType: 'produced-file', stepId: 'plan' },
+];
+const TEST_OUTPUT_DIR_PREFIX = 'apps/ai-server/tests/';
+
+// ─── AUTHORITY: per-step worktree write authorization (review P1 #4) ─────────
+// An out-of-policy upstream disk write is a campaign-terminal AUTHORITY-BYPASS
+// STOP: detected at the stepRunner seam (before/after git-status delta per
+// step), archived BEFORE worktree cleanup, never silently absorbed.
+// Authorization derives from the FROZEN workflow definitions: define-work
+// steps may write only under .sle/; full-build steps only their declared
+// outputArtifact / authorizedOutputs (prefix entries end with '/').
+class P4AuthorityBypassError extends Error {}
+
+async function loadAuthorizedUpstreamWrites(): Promise<{ exact: Map<string, Set<string>>; prefixes: Map<string, string[]> }> {
+  const { FULL_BUILD } = await import(`${STRATUM}/src/workflow/builtins/full-build.js`);
+  const exact = new Map<string, Set<string>>();
+  const prefixes = new Map<string, string[]>();
+  for (const step of FULL_BUILD.steps as Array<{ id: string; authorizedOutputs?: string[]; outputArtifact?: { path?: string } }>) {
+    const set = new Set<string>();
+    const pre: string[] = [];
+    if (step.outputArtifact?.path) set.add(step.outputArtifact.path);
+    for (const p of step.authorizedOutputs ?? []) {
+      if (p.endsWith('/')) pre.push(p); else set.add(p);
+    }
+    exact.set(step.id, set);
+    prefixes.set(step.id, pre);
+  }
+  return { exact, prefixes };
+}
+
+// paths added/modified/deleted in the target worktree vs the pristine baseline
+// (`.sle/` is the engine's own state dir — always authorized, git-invisible
+// to the upstream contract). `-uall` enumerates EVERY untracked file — the
+// default collapses untracked directories into one entry, which would hide
+// individual out-of-policy files.
+function gitWorktreeDelta(): Set<string> {
+  const status = execFileSync('git', ['-C', ROOT, 'status', '--porcelain', '-uall']).toString();
+  const out = new Set<string>();
+  for (const line of status.split('\n')) {
+    const t = line.trim();
+    if (t.length === 0 || t === '?? .sle/') continue;
+    const p = t.startsWith('?? ') ? t.slice(3) : t.slice(3);
+    const path = p.replace(/\/$/, '').split(' -> ').pop() as string;
+    if (path === '.sle' || path.startsWith('.sle/')) continue;
+    out.add(path);
+  }
+  return out;
+}
+
+// returns the out-of-policy paths a step wrote (empty = authorized)
+function authorityViolationsForStep(
+  wf: string,
+  step: string,
+  before: Set<string>,
+  auth: { exact: Map<string, Set<string>>; prefixes: Map<string, string[]> },
+): Array<{ path: string; reason: string }> {
+  const violations: Array<{ path: string; reason: string }> = [];
+  for (const p of gitWorktreeDelta()) {
+    if (before.has(p)) continue; // written before this step ran — not this step's write
+    if (wf === 'define-work') {
+      violations.push({ path: p, reason: 'define-work steps may not write outside .sle/' });
+      continue;
+    }
+    if (wf === 'full-build') {
+      const allowed = auth.exact.get(step) ?? new Set<string>();
+      const prefixes = auth.prefixes.get(step) ?? [];
+      if (allowed.has(p) || prefixes.some((x) => p.startsWith(x))) continue;
+      violations.push({ path: p, reason: `not in ${step}'s authorized outputs [${[...allowed, ...prefixes].join(', ')}]` });
+      continue;
+    }
+    violations.push({ path: p, reason: `workflow ${wf} has no authorized worktree writes` });
+  }
+  return violations;
+}
+
 const sha256File = (p: string): string => createHash('sha256').update(readFileSync(p)).digest('hex');
 const safeRead = (p: string): string => { try { return readFileSync(p, 'utf-8'); } catch { return ''; } };
+const statSize = (p: string): number => { try { return statSync(p).size; } catch { return -1; } };
+// P3-style package identity: sha256 over the canonical (sorted) file-hash map
+const canonicalHashMap = (m: Record<string, string>): string =>
+  createHash('sha256').update(JSON.stringify(Object.keys(m).sort().map((k) => [k, m[k]]))).digest('hex');
 
 // ─── target pristine verification (P3 semantics, read-only) ──────────────────
 export function targetPristine(): boolean {
@@ -186,7 +276,11 @@ interface Stack {
   db: unknown;
 }
 
-async function buildStack(guardedProvider: unknown, active: ActiveStepRef): Promise<Stack> {
+async function buildStack(
+  guardedProvider: unknown,
+  active: ActiveStepRef,
+  opts?: { postStepCheck?: (wf: string, step: string, before: Set<string>) => Array<{ path: string; reason: string }> },
+): Promise<Stack> {
   const { buildAgentRunner } = await import(`${STRATUM}/src/application.js`);
   const { RunArtifactManager } = await import(`${STRATUM}/src/run-artifacts.js`);
   const { AgentStepRunner } = await import(`${STRATUM}/src/execution/agent-step-runner.js`);
@@ -245,7 +339,18 @@ async function buildStack(guardedProvider: unknown, active: ActiveStepRef): Prom
         return async (step: { id: string }, ctx: { workflowId: string; stepId: string }): Promise<unknown> => {
           active.workflowId = String(ctx.workflowId);
           active.stepId = String(ctx.stepId);
-          return (target as { run: (s: unknown, c: unknown) => Promise<unknown> }).run(step, ctx);
+          // AUTHORITY seam: snapshot the worktree BEFORE the step, verify the
+          // step's actual disk writes against the frozen per-step authorization
+          // after it — an out-of-policy write is a campaign-terminal STOP.
+          const before = gitWorktreeDelta();
+          const result = await (target as { run: (s: unknown, c: unknown) => Promise<unknown> }).run(step, ctx);
+          const violations = opts?.postStepCheck?.(String(ctx.workflowId), String(ctx.stepId), before) ?? [];
+          if (violations.length > 0) {
+            throw new P4AuthorityBypassError(
+              `AUTHORITY-BYPASS at ${ctx.workflowId}/${ctx.stepId}: ${violations.map((v) => `${v.path} (${v.reason})`).join('; ')}`,
+            );
+          }
+          return result;
         };
       }
       return Reflect.get(target, prop, receiver);
@@ -319,7 +424,22 @@ export type DriveOutcome =
   | { kind: 'HUMAN_DECISION' } // define-work halted at human-decision-checkpoint
   | { kind: 'COMPLETE' }
   | { kind: 'FAILED'; detail: string }
+  | { kind: 'AUTHORITY_BYPASS'; detail: string }
   | { kind: 'STALLED'; detail: string };
+
+// calibration seams (L1 ONLY — qualification paths never set them):
+//   onExecCheckpoint: invoked at an exec checkpoint BEFORE policy adjudication
+//     (deterministic hook for required-artifact fault injection)
+//   humanDecisionResolution: if present, the HARNESS (acting as the scripted
+//     human operator — a role the campaign itself may never take) resolves the
+//     pending decision through the real ResumeService so downstream native
+//     shapes (apply-human-decision, post-human-readiness-review) can be
+//     observed. Absent = the campaign NEVER approves (default).
+export interface DriveHooks {
+  onExecCheckpoint?: (cursor: string) => Promise<void> | void;
+  onExecCheckpointResolved?: (cursor: string) => Promise<void> | void;
+  humanDecisionResolution?: (pending: { id: string }) => unknown;
+}
 
 const APPROVE_RESOLUTION = (why: string) => ({
   selectedOptionId: 'approve',
@@ -328,7 +448,7 @@ const APPROVE_RESOLUTION = (why: string) => ({
   resolvedBy: 'campaign-policy',
 });
 
-export async function driveWorkflow(stack: Stack, wiId: string, phase: 'define' | 'exec', adjudicated: string[]): Promise<DriveOutcome> {
+export async function driveWorkflow(stack: Stack, wiId: string, phase: 'define' | 'exec', adjudicated: string[], hooks?: DriveHooks): Promise<DriveOutcome> {
   for (let round = 0; round < 400; round++) {
     const run = stack.runRow(wiId);
     if (run) {
@@ -346,13 +466,21 @@ export async function driveWorkflow(stack: Stack, wiId: string, phase: 'define' 
       const cursor = run && run.current_step_id != null ? String(run.current_step_id) : null;
       const p = pending[0] as { id: string };
       if (phase === 'define' && cursor === 'human-decision-checkpoint') {
+        if (hooks?.humanDecisionResolution) {
+          // calibration only: the scripted HUMAN resolves through the real
+          // ResumeService — the campaign itself never authors this resolution
+          await stack.resume(p.id, hooks.humanDecisionResolution({ id: String(p.id) }));
+          continue;
+        }
         return { kind: 'HUMAN_DECISION' }; // NEVER synthetically approved
       }
       if (phase === 'exec') {
         if (cursor === 'confirm') return { kind: 'BOUNDARY' };
         if (cursor === 'scoping.checkpoint' || cursor === 'sharding_approval') {
+          await hooks?.onExecCheckpoint?.(String(cursor));
           await stack.resume(p.id, APPROVE_RESOLUTION(`P4 preregistered determinate policy: ${cursor} approved (well-formed decision, guards passed)`));
           adjudicated.push(String(cursor));
+          await hooks?.onExecCheckpointResolved?.(String(cursor));
           continue;
         }
       }
@@ -396,7 +524,8 @@ async function assembleReadinessInput(stack: Stack, adjudicated: string[], bound
     catch (e) { finalReadiness = { parseError: e instanceof Error ? e.message.slice(0, 200) : String(e), gaps: [] }; }
   }
 
-  // storage-provenanced artifacts: definition + every exec-side produce output
+  // storage-provenanced artifacts: the definition + EVERY produced upstream
+  // output row (definition, cycle-charter, produced-file, applied-*)
   const upstreamArtifacts: UpstreamArtifactRecord[] = [];
   const defRows = stack.artifacts(DEFINE_WI).filter((a) => String(a.type) === 'definition');
   const defRow = defRows[defRows.length - 1] as { path: string; hash: string } | undefined;
@@ -407,18 +536,48 @@ async function assembleReadinessInput(stack: Stack, adjudicated: string[], bound
     diskSha256: existsSync(defPath) ? sha256File(defPath) : null,
     storageHash: defRow ? String(defRow.hash) : null,
     bytes: Buffer.byteLength(definitionText), nonEmpty: definitionText.length > 0,
+    required: true,
   });
-  for (const type of ['scoping', 'design', 'plan', 'test', 'documentation']) {
-    const rows = stack.artifacts(EXEC_WI).filter((a) => String(a.type) === type);
-    const row = rows[rows.length - 1] as { path: string; hash: string } | undefined;
-    if (!row) continue;
+  for (const row of [...stack.artifacts(EXEC_WI)] as Array<{ type: string; ref: string; path: string; hash: string }>) {
+    if (row.type !== 'cycle-charter' && row.type !== 'produced-file' && row.type !== 'applied-edit' && row.type !== 'applied-patch') continue;
     const p = join(ROOT, String(row.path));
     const txt = safeRead(p);
     upstreamArtifacts.push({
-      stepId: type, artifactType: type, ref: String(row.hash), path: p,
+      stepId: String(row.ref).split(':')[1] ?? row.type, artifactType: String(row.type), ref: String(row.ref), path: p,
       existsOnDisk: existsSync(p), diskSha256: existsSync(p) ? sha256File(p) : null,
       storageHash: String(row.hash), bytes: Buffer.byteLength(txt), nonEmpty: txt.length > 0,
+      required: REQUIRED_EXEC_OUTPUTS.some((r) => r.path === String(row.path)),
     });
+  }
+
+  // REQUIRED native BUILD-input verification: exact storage row (type+ref),
+  // row hash == disk sha256, non-empty file. A required output with NO row is
+  // recorded as failed verification — absence can never pass silently.
+  const execRows = stack.artifacts(EXEC_WI) as Array<{ type: string; ref: string; path: string; hash: string }>;
+  const requiredUpstreamOutputs: RequiredOutputVerification[] = REQUIRED_EXEC_OUTPUTS.map((spec) => {
+    const rows = execRows.filter((r) => r.ref === spec.ref && r.type === spec.rowType);
+    const row = rows[rows.length - 1];
+    const abs = join(ROOT, spec.path);
+    const onDisk = row !== undefined && existsSync(abs);
+    const diskSha = onDisk ? sha256File(abs) : null;
+    return {
+      path: spec.path, ref: spec.ref, rowType: spec.rowType, stepId: spec.stepId,
+      rowPresent: row !== undefined,
+      diskPresent: onDisk,
+      hashMatch: row !== undefined && diskSha !== null && String(row.hash) === diskSha,
+      nonEmpty: onDisk && diskSha !== null ? statSize(abs) > 0 : false,
+      diskSha256: diskSha,
+      storageHash: row ? String(row.hash) : null,
+    };
+  });
+  // test outputs: ≥1 produced-file row from the test step under the authorized dir
+  const testRows = execRows.filter((r) => r.type === 'produced-file'
+    && String(r.ref).startsWith(`produced-file:test:${TEST_OUTPUT_DIR_PREFIX}`)
+    && String(r.path).startsWith(TEST_OUTPUT_DIR_PREFIX));
+  let testOutputsPresent = testRows.length > 0;
+  for (const r of testRows) {
+    const abs = join(ROOT, String(r.path));
+    if (!existsSync(abs) || sha256File(abs) !== String(r.hash)) { testOutputsPresent = false; break; }
   }
 
   const humanDecisionArtifactExists = stack.artifacts(DEFINE_WI).some((a) => String(a.type) === 'decision-request')
@@ -445,7 +604,16 @@ async function assembleReadinessInput(stack: Stack, adjudicated: string[], bound
   return {
     input: {
       execRun: { status: String(execRun.status), current_step_id: execRun.current_step_id == null ? null : String(execRun.current_step_id), awaiting_checkpoint: execRun.awaiting_checkpoint },
-      pendingConfirm: (stack.pendingDecisions(EXEC_WI)[0] as { id: string; type: string } | undefined) ?? null,
+      pendingConfirm: (() => {
+        // DecisionRepository returns DOMAIN objects (subjectRef as a parsed
+        // object); raw rows (subject_ref_json) only appear in direct SQL
+        const p = stack.pendingDecisions(EXEC_WI)[0] as { id: string; type: string; subjectRef?: { stepId?: string }; subject_ref_json?: string } | undefined;
+        if (!p) return null;
+        const refStep = p.subjectRef?.stepId
+          ?? (() => { try { return (JSON.parse(String(p.subject_ref_json ?? '{}')) as { stepId?: string }).stepId ?? null; } catch { return null; } })();
+        return { id: String(p.id), type: String(p.type), subjectRefStepId: refStep ?? null };
+      })(),
+      pendingDecisionCount: stack.pendingDecisions(EXEC_WI).length,
       intermediateDecisions: adjudicated.map((s) => ({ stepId: s, how: 'approve-policy' as const })),
       boundaryRefusals,
       buildStepRequestsInCapture: buildStepRequestsInCapture(captureOf()),
@@ -457,6 +625,8 @@ async function assembleReadinessInput(stack: Stack, adjudicated: string[], bound
       explorationArtifactExists,
       definitionSourceResolution,
       upstreamArtifacts,
+      requiredUpstreamOutputs,
+      testOutputsPresent,
       frozenSettingsSha256: FROZEN_SETTINGS_SHA256,
       frozenModel: frozen.model,
       globalMaxTokens: frozen.globalMaxTokens,
@@ -498,7 +668,11 @@ async function evaluateHandoffGate(stack: Stack): Promise<{ ok: boolean; failure
   return { ok: true, failureClass: null, detail: 'final readiness PASS, no HUMAN_DECISION/EXPLORE_AS_WORK artifacts, no pending decisions' };
 }
 
-// ─── per-attempt evidence package ────────────────────────────────────────────
+// ─── per-attempt evidence package (P3-style FULL hash-bound packaging) ───────
+// Every artifact is packaged and hash-bound into files.sha256.json; the
+// package identity is package_sha256 = sha256(canonical(sorted file-hash map)),
+// written into manifest.json. The archive self-verifies after write; an
+// independent verifier (verifyEvidencePackage) is used by the tamper gate.
 export interface AttemptRecord {
   attemptId: string;
   index: number;
@@ -510,9 +684,33 @@ export interface AttemptRecord {
   evidencePackagePath: string | null;
   evidencePackageSha256: string | null;
   assessment: ReadinessAssessment | null;
+  reconstructed?: boolean; // count reconstructed from the campaign ledger — never re-executed
 }
 
-async function archiveAttempt(evidenceDir: string, rec: AttemptRecord, stack: Stack, assessment: ReadinessAssessment | null, definitionText: string, readinessText: string): Promise<{ dir: string; sha256: string }> {
+interface AuthorityViolationRecord { path: string; reason: string; sha256: string | null; bytes: number }
+
+async function collectRuntimeArtifacts(dir: string): Promise<void> {
+  // the engine's raw node outputs + run manifests = the runtime artifact class
+  const runsDir = join(ROOT, '.sle', 'runs');
+  if (!existsSync(runsDir)) return;
+  const dest = join(dir, 'runs');
+  mkdirSync(dest, { recursive: true });
+  for (const runId of readdirSync(runsDir)) {
+    const src = join(runsDir, runId);
+    if (!statSync(src).isDirectory()) continue;
+    copyDir(src, join(dest, runId));
+  }
+}
+
+async function archiveAttempt(
+  evidenceDir: string,
+  rec: AttemptRecord,
+  stack: Stack,
+  assessment: ReadinessAssessment | null,
+  definitionText: string,
+  readinessText: string,
+  opts?: { launchId?: string; authorityViolations?: AuthorityViolationRecord[] },
+): Promise<{ dir: string; sha256: string; packageSha256: string }> {
   const dir = join(evidenceDir, `attempt-${rec.index}-${rec.attemptId}`);
   if (existsSync(dir)) throw new Error(`attempt evidence package already exists (immutable): ${dir}`);
   mkdirSync(dir, { recursive: true });
@@ -527,21 +725,100 @@ async function archiveAttempt(evidenceDir: string, rec: AttemptRecord, stack: St
   writeFileSync(join(dir, 'readiness-assessment.json'), JSON.stringify(assessment ?? { note: 'no assessment (STOP before assessable state)' }, null, 2));
   const srcWork = join(ROOT, '.sle', 'work');
   if (existsSync(srcWork)) copyDir(srcWork, join(dir, 'sle-work'));
+  await collectRuntimeArtifacts(dir);
+  // upstream files FROM THE STORAGE ROWS (storage-provenanced, incl. test
+  // outputs): every produced/declared row's path is copied and hash-bound
+  const upstreamIndex: Array<{ path: string; sha256: string; storage_hash: string; row_type: string; ref: string }> = [];
   const upstreamFilesDir = join(dir, 'upstream-files');
-  for (const doc of ['docs/cycle-charter.md', 'docs/requirements.md', 'docs/architecture.md', 'docs/plan.md', 'docs/test-plan.md']) {
-    const p = join(ROOT, doc);
-    if (existsSync(p)) { mkdirSync(join(upstreamFilesDir, dirname(doc)), { recursive: true }); copyFileSync(p, join(upstreamFilesDir, doc)); }
+  for (const wiId of [DEFINE_WI, EXEC_WI]) {
+    for (const row of stack.artifacts(wiId) as Array<{ type: string; ref: string; path: string; hash: string }>) {
+      if (!['definition', 'definition-readiness', 'decision-application', 'cycle-charter', 'produced-file', 'applied-edit', 'applied-patch'].includes(String(row.type))) continue;
+      const abs = join(ROOT, String(row.path));
+      if (!existsSync(abs)) continue;
+      const dest = join(upstreamFilesDir, String(row.path));
+      mkdirSync(dirname(dest), { recursive: true });
+      copyFileSync(abs, dest);
+      upstreamIndex.push({ path: String(row.path), sha256: sha256File(dest), storage_hash: String(row.hash), row_type: String(row.type), ref: String(row.ref) });
+    }
   }
+  writeFileSync(join(dir, 'upstream-files-index.json'), JSON.stringify(upstreamIndex, null, 2));
   if (definitionText) writeFileSync(join(dir, 'definition.md'), definitionText);
   if (readinessText) writeFileSync(join(dir, 'readiness.md'), readinessText);
+  // authority violations are archived BEFORE worktree cleanup: the violating
+  // bytes are preserved inside the package as evidence
+  if (opts?.authorityViolations?.length) {
+    for (const v of opts.authorityViolations) {
+      const abs = join(ROOT, v.path);
+      if (!existsSync(abs)) continue;
+      const dest = join(dir, 'authority-violations', v.path);
+      mkdirSync(dirname(dest), { recursive: true });
+      copyFileSync(abs, dest);
+    }
+    writeFileSync(join(dir, 'authority-violations.json'), JSON.stringify(opts.authorityViolations, null, 2));
+  }
+  // hash-bind EVERY packaged file, then compute the package identity
+  const fileHashes: Record<string, string> = {};
+  const walk = (base: string, rel = ''): void => {
+    for (const e of readdirSync(join(base, rel), { withFileTypes: true })) {
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) walk(base, r);
+      else fileHashes[r] = sha256File(join(base, r));
+    }
+  };
+  walk(dir);
+  const packageSha256 = canonicalHashMap(fileHashes);
+  writeFileSync(join(dir, 'files.sha256.json'), JSON.stringify(fileHashes, null, 2));
   const manifest = {
-    attemptId: rec.attemptId, index: rec.index, outcome: rec.outcome, failureClass: rec.failureClass,
+    attemptId: rec.attemptId, index: rec.index, launchId: opts?.launchId ?? null,
+    outcome: rec.outcome, failureClass: rec.failureClass, stopDetail: rec.stopDetail?.slice(0, 500) ?? null,
     target_pristine: targetPristine(), archived_at_utc: new Date().toISOString(),
-    capture_sha256: sha256File(join(dir, 'guard-capture.jsonl')),
+    settings_sha256: FROZEN_SETTINGS_SHA256,
+    capture_sha256: fileHashes['guard-capture.jsonl'] ?? null,
+    db_records_sha256: fileHashes['db-records.json'] ?? null,
+    upstream_files: upstreamIndex,
+    authority_violations: opts?.authorityViolations?.map((v) => ({ path: v.path, reason: v.reason })) ?? [],
+    package_file_count: Object.keys(fileHashes).length,
+    package_files_sha256: `${dir}/files.sha256.json`,
+    package_sha256: packageSha256,
   };
   writeFileSync(join(dir, 'manifest.json'), JSON.stringify(manifest, null, 2));
-  if (sha256File(join(dir, 'guard-capture.jsonl')) !== manifest.capture_sha256) throw new Error('evidence self-verification failed');
-  return { dir, sha256: manifest.capture_sha256 };
+  // post-write self-verification: the package must verify cleanly at birth
+  const verdict = verifyEvidencePackage(dir);
+  if (!verdict.ok) throw new Error(`evidence package failed self-verification: ${verdict.violations.join('; ')}`);
+  return { dir, sha256: fileHashes['guard-capture.jsonl'] ?? '', packageSha256 };
+}
+
+// independent package verifier: recomputes every file hash against
+// files.sha256.json and the package identity against manifest.json
+export function verifyEvidencePackage(dir: string): { ok: boolean; violations: string[] } {
+  const violations: string[] = [];
+  const hashPath = join(dir, 'files.sha256.json');
+  const manifestPath = join(dir, 'manifest.json');
+  if (!existsSync(hashPath) || !existsSync(manifestPath)) return { ok: false, violations: ['missing files.sha256.json or manifest.json'] };
+  const fileHashes = JSON.parse(readFileSync(hashPath, 'utf-8')) as Record<string, string>;
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as { package_sha256: string; package_file_count: number };
+  for (const [rel, expected] of Object.entries(fileHashes)) {
+    const abs = join(dir, rel);
+    if (!existsSync(abs)) { violations.push(`missing packaged file: ${rel}`); continue; }
+    const actual = sha256File(abs);
+    if (actual !== expected) violations.push(`hash mismatch: ${rel}`);
+  }
+  // no unexpected extra files (except the two metadata files themselves)
+  const walk = (rel = ''): void => {
+    for (const e of readdirSync(join(dir, rel), { withFileTypes: true })) {
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) walk(r);
+      else if (r !== 'files.sha256.json' && r !== 'manifest.json' && !(r in fileHashes)) violations.push(`unbound extra file: ${r}`);
+    }
+  };
+  walk();
+  // package identity: the manifest's package_sha256 must equal the identity
+  // of the archived file-hash map (any drift in the map's contents or the
+  // manifest itself breaks this binding)
+  const identity = canonicalHashMap(fileHashes);
+  if (identity !== manifest.package_sha256) violations.push(`package identity mismatch (manifest ${manifest.package_sha256.slice(0, 12)} != recomputed ${identity.slice(0, 12)})`);
+  if (Object.keys(fileHashes).length !== manifest.package_file_count) violations.push(`file count mismatch: ${Object.keys(fileHashes).length} != ${manifest.package_file_count}`);
+  return { ok: violations.length === 0, violations };
 }
 
 function copyDir(src: string, dest: string): void {
@@ -558,7 +835,12 @@ export async function runP4Attempt(
   innerProvider: unknown,
   evidenceDir: string,
   shapes: PinnedShapes,
-  opts?: { captureToolSchemas?: boolean; onActive?: (active: ActiveStepRef) => void },
+  opts?: {
+    captureToolSchemas?: boolean;
+    onActive?: (active: ActiveStepRef) => void;
+    launchId?: string;
+    hooks?: DriveHooks;
+  },
 ): Promise<AttemptRecord> {
   const attemptId = randomUUID();
   const frozen = loadFrozenSettings();
@@ -577,22 +859,54 @@ export async function runP4Attempt(
     attemptId, index, outcome: 'STOPPED', failureClass: 'guard-stop', stopDetail: detail,
     evaluable: false, capturePath, evidencePackagePath: null, evidencePackageSha256: null, assessment: null,
   });
+  const authorityStop = (detail: string): AttemptRecord => ({
+    attemptId, index, outcome: 'STOPPED', failureClass: 'authority-bypass', stopDetail: detail,
+    evaluable: false, capturePath, evidencePackagePath: null, evidencePackageSha256: null, assessment: null,
+  });
+
+  // AUTHORITY: per-step worktree write authorization (frozen workflow-derived).
+  // Violations are recorded WITH the file's bytes still on disk so the archive
+  // can preserve them BEFORE worktree cleanup.
+  const auth = await loadAuthorizedUpstreamWrites();
+  const authorityViolations: AuthorityViolationRecord[] = [];
 
   let stack: Stack;
   try {
-    stack = await buildStack(provider, active);
+    stack = await buildStack(provider, active, {
+      postStepCheck: (wf, step, before) => {
+        const violations = authorityViolationsForStep(wf, step, before, auth);
+        for (const v of violations) {
+          const abs = join(ROOT, v.path);
+          authorityViolations.push({
+            path: v.path, reason: v.reason,
+            sha256: existsSync(abs) ? sha256File(abs) : null,
+            bytes: existsSync(abs) ? statSize(abs) : 0,
+          });
+        }
+        return violations;
+      },
+    });
   } catch (e) {
     if (e instanceof ConfigGuardViolation) return guardStop(e.message);
     throw e;
   }
+  // AUTHORITY-BYPASS STOP: the engine catches step-level exceptions, so the
+  // typed error may never reach drive()'s catch — the recorded violations are
+  // the authoritative signal. Checked after every phase; archived BEFORE
+  // worktree cleanup (the violating bytes travel inside the package).
+  const authorityStopOfRecord = (): AttemptRecord | null => {
+    if (authorityViolations.length === 0) return null;
+    return authorityStop(`AUTHORITY-BYPASS: ${authorityViolations.map((v) => `${v.path} (${v.reason})`).join('; ')}`);
+  };
   const adjudicated: string[] = [];
   let boundaryRefusals = 0;
 
   const archive = async (rec: AttemptRecord, assessment: ReadinessAssessment | null): Promise<AttemptRecord> => {
     let out: AttemptRecord;
     try {
-      const pkg = await archiveAttempt(evidenceDir, rec, stack, assessment, safeRead(join(ROOT, '.sle', 'work', DEFINE_WI, 'definition.md')), safeRead(join(ROOT, '.sle', 'work', DEFINE_WI, 'readiness.md')));
-      out = { ...rec, evidencePackagePath: pkg.dir, evidencePackageSha256: pkg.sha256 };
+      const pkg = await archiveAttempt(evidenceDir, rec, stack, assessment, safeRead(join(ROOT, '.sle', 'work', DEFINE_WI, 'definition.md')), safeRead(join(ROOT, '.sle', 'work', DEFINE_WI, 'readiness.md')), { launchId: opts?.launchId, authorityViolations: [...authorityViolations] });
+      // package identity (not just the capture) is the durable evidence handle
+      out = { ...rec, evidencePackagePath: pkg.dir, evidencePackageSha256: pkg.packageSha256 };
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       out = { ...rec, outcome: 'STOPPED' as const, failureClass: 'evidence-archive-failure', stopDetail: `archive failed (${msg}); original stopDetail: ${rec.stopDetail ?? 'none'}`, evaluable: false };
@@ -605,18 +919,21 @@ export async function runP4Attempt(
     return out;
   };
 
-  // drive with procedure-class handling: guard violations = STOP (consume
-  // nothing); unexpected engine errors = INCOMPLETE (§10: archived as
-  // interrupted, never classified, resume continues the terminal condition).
-  // NOTE: the engine catches step-level provider exceptions and records them
-  // as step failures — so a guard STOP that fired mid-step surfaces as a
-  // FAILED drive, not a thrown violation. The campaign therefore derives the
-  // STOP from the CAPTURE (any g1 STOP record = campaign-terminal, wherever
-  // it surfaced), never from the exception path alone.
+  // drive with procedure-class handling: guard violations AND authority
+  // bypasses = STOP (consume nothing); unexpected engine errors = INCOMPLETE
+  // (§10: archived as interrupted, never classified, resume continues the
+  // terminal condition). NOTE: the engine catches step-level provider
+  // exceptions and records them as step failures — so a guard STOP that fired
+  // mid-step surfaces as a FAILED drive, not a thrown violation. The campaign
+  // therefore derives the STOP from the CAPTURE (any g1 STOP record =
+  // campaign-terminal, wherever it surfaced), never from the exception path
+  // alone. The AUTHORITY-BYPASS is different: it throws at the stepRunner
+  // seam AFTER the step completed, so it arrives here as a typed error.
   const drive = async (wiId: string, phase: 'define' | 'exec'): Promise<DriveOutcome | { kind: 'GUARD_STOP'; detail: string } | { kind: 'INTERRUPTED'; detail: string }> => {
     try {
-      return await driveWorkflow(stack, wiId, phase, adjudicated);
+      return await driveWorkflow(stack, wiId, phase, adjudicated, opts?.hooks);
     } catch (e) {
+      if (e instanceof P4AuthorityBypassError) return { kind: 'AUTHORITY_BYPASS', detail: e.message };
       if (e instanceof ConfigGuardViolation) return { kind: 'GUARD_STOP', detail: e.message };
       return { kind: 'INTERRUPTED', detail: e instanceof Error ? `${e.name}: ${e.message.slice(0, 300)}` : String(e) };
     }
@@ -625,7 +942,10 @@ export async function runP4Attempt(
   // ── phase 1: define-work ────────────────────────────────────────────────────
   const defineOutcome = await drive(DEFINE_WI, 'define');
 
+  const defineAuthority = authorityStopOfRecord();
+  if (defineAuthority) return archive(defineAuthority, null);
   if (defineOutcome.kind === 'GUARD_STOP') return guardStop(defineOutcome.detail);
+  if (defineOutcome.kind === 'AUTHORITY_BYPASS') return archive(authorityStop(defineOutcome.detail), null);
   {
     const cls = captureOf();
     if (cls.g1 || cls.g2) {
@@ -671,6 +991,15 @@ export async function runP4Attempt(
   const execOutcome = await drive(EXEC_WI, 'exec');
 
   if (execOutcome.kind === 'GUARD_STOP') return guardStop(execOutcome.detail);
+  const execAuthority = authorityStopOfRecord();
+  if (execAuthority) {
+    // archive BEFORE cleanup — the violating bytes travel inside the package
+    return archive(execAuthority, null);
+  }
+  if (execOutcome.kind === 'AUTHORITY_BYPASS') {
+    // archive BEFORE cleanup — the violating bytes travel inside the package
+    return archive(authorityStop(execOutcome.detail), null);
+  }
   {
     const cls = captureOf();
     if (cls.g1 || cls.g2) {
@@ -711,9 +1040,11 @@ export interface LedgerEntry {
   event: 'campaign-start' | 'attempt-start' | 'attempt-counted' | 'attempt-incomplete' | 'attempt-stopped' | 'campaign-terminal';
   attemptId?: string;
   index?: number;
+  launchId?: string;
   outcome?: string;
   failureClass?: string | null;
   detail?: string | null;
+  evaluable?: boolean;
   evidencePackageSha256?: string | null;
 }
 
@@ -723,17 +1054,52 @@ export function appendLedger(evidenceDir: string, entry: LedgerEntry): void {
 }
 
 // §10 — declare ledger-orphaned launches (attempt-start without a terminal
-// event) incomplete; idempotent.
+// event) incomplete; idempotent, keyed by slot index (all terminal events
+// carry the slot index).
 export function reconcileLedgerOnResume(evidenceDir: string): void {
   const entries = readLedger(evidenceDir);
-  const terminal = new Set(entries.filter((e) => ['attempt-counted', 'attempt-incomplete', 'attempt-stopped'].includes(e.event)).map((e) => `${e.event}:${e.index}`));
   for (const e of entries) {
     if (e.event !== 'attempt-start' || e.index === undefined) continue;
     if (!entries.some((t) => t.index === e.index && ['attempt-counted', 'attempt-incomplete', 'attempt-stopped'].includes(t.event))) {
-      appendLedger(evidenceDir, { ts: new Date().toISOString(), event: 'attempt-incomplete', index: e.index, detail: 'declared incomplete by resume: launch had no terminal event (process death)' });
+      appendLedger(evidenceDir, { ts: new Date().toISOString(), event: 'attempt-incomplete', attemptId: e.attemptId, index: e.index, launchId: e.launchId, detail: 'declared incomplete by resume: launch had no terminal event (process death)' });
     }
   }
-  void terminal;
+}
+
+// durable count reconstruction: the resuming process rebuilds its counted
+// slots FROM THE LEDGER (never re-executing, never double-counting)
+export interface ReconstructedCount {
+  attempts: AttemptRecord[];
+  readyCount: number;
+  evaluableCount: number;
+  maxIndex: number;
+  priorStop: LedgerEntry | null;
+}
+
+export function reconstructCountedSlots(evidenceDir: string): ReconstructedCount {
+  const entries = readLedger(evidenceDir);
+  const attempts: AttemptRecord[] = [];
+  let readyCount = 0;
+  let evaluableCount = 0;
+  let maxIndex = 0;
+  let priorStop: LedgerEntry | null = null;
+  for (const e of entries) {
+    if (e.index !== undefined && e.index > maxIndex) maxIndex = e.index;
+    if (e.event !== 'attempt-counted' || !e.attemptId || e.index === undefined) continue;
+    const outcome = e.outcome as AttemptRecord['outcome'];
+    if (outcome === 'READY') readyCount++;
+    if (e.evaluable !== false) evaluableCount++;
+    attempts.push({
+      attemptId: e.attemptId, index: e.index, outcome, failureClass: e.failureClass ?? null,
+      stopDetail: e.detail ?? null, evaluable: e.evaluable !== false, capturePath: '',
+      evidencePackagePath: null, evidencePackageSha256: e.evidencePackageSha256 ?? null,
+      assessment: null, reconstructed: true,
+    });
+    void outcome;
+  }
+  const stops = entries.filter((e) => e.event === 'attempt-stopped');
+  if (stops.length > 0) priorStop = stops[stops.length - 1];
+  return { attempts, readyCount, evaluableCount, maxIndex, priorStop };
 }
 
 export function readLedger(evidenceDir: string): LedgerEntry[] {
@@ -748,16 +1114,18 @@ export interface CampaignResult {
   evaluableCount: number;
   supported: boolean | null; // null = campaign did not reach a terminal verdict
   terminal: string;
+  launchId: string;
 }
 
 // innerProviderFactory(launchIndex) supplies a FRESH inner provider per
 // launch (L1: scripted; L3: the real resolved provider). Resume-from-ledger
-// (§10): counted attempts are retained (never re-run/double-counted); an
+// (§10): counted attempts are RECONSTRUCTED from the ledger (retained, never
+// re-run, never double-counted); each launch carries a UNIQUE launchId; an
 // INCOMPLETE launch consumes NOTHING and the loop CONTINUES (that is the
 // resume — a fresh process re-invoking this function reads the ledger and
-// proceeds toward the same preregistered terminal condition). STOPPED
-// terminates the campaign (procedure class). The launch cap bounds the loop
-// so repeated interrupts cannot spin forever.
+// proceeds toward the same preregistered terminal condition). STOPPED is
+// sticky: a resume after a prior campaign-terminal STOP refuses to launch.
+// The launch cap bounds the loop so repeated interrupts cannot spin forever.
 export async function runP4Campaign(opts: {
   evidenceDir: string;
   shapes: PinnedShapes;
@@ -766,15 +1134,20 @@ export async function runP4Campaign(opts: {
   readyThreshold?: number;
   captureToolSchemas?: boolean;
   onActive?: (active: { stepId: string | null }) => void;
+  hooks?: DriveHooks;
+  launchId?: string;
 }): Promise<CampaignResult> {
   const maxAttempts = opts.maxAttempts ?? MAX_ATTEMPTS;
   const threshold = opts.readyThreshold ?? READY_THRESHOLD;
+  const launchId = opts.launchId ?? randomUUID();
   const launchCap = maxAttempts + 2;
   // §10 resume: a prior process death leaves attempt-start entries without a
   // terminal event — the RESUMING process declares them incomplete (archived
   // runtime capture was preserved by the dead process's attempt; the launch
-  // consumed nothing). Counted attempts stay counted.
+  // consumed nothing). Counted attempts stay counted — and are RECONSTRUCTED
+  // here so the terminal condition is computed over the durable count.
   reconcileLedgerOnResume(opts.evidenceDir);
+  const prior = reconstructCountedSlots(opts.evidenceDir);
   // archive any interrupted runtime remnants, then restore the worktree —
   // the resuming campaign never inherits a dead attempt's runtime state
   const sle = join(ROOT, '.sle');
@@ -783,24 +1156,37 @@ export async function runP4Campaign(opts: {
     try {
       const { cpSync } = await import('node:fs');
       cpSync(sle, interruptedDir, { recursive: true });
-      appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'attempt-incomplete', detail: `interrupted runtime archived to ${interruptedDir}` });
+      appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'attempt-incomplete', launchId, detail: `interrupted runtime archived to ${interruptedDir}` });
     } catch { /* archival best-effort; the wipe below still discards */ }
   }
   if (!cleanupTargetWorktree()) {
-    return { attempts, readyCount: 0, evaluableCount: 0, supported: null, terminal: 'STOPPED: worktree could not be restored at resume' };
+    return { attempts: prior.attempts, readyCount: prior.readyCount, evaluableCount: prior.evaluableCount, supported: null, terminal: 'STOPPED: worktree could not be restored at resume', launchId };
   }
-  appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-start' });
-  const attempts: AttemptRecord[] = [];
-  let readyCount = 0;
-  let evaluableCount = 0;
-  for (let launched = 1; launched <= launchCap; launched++) {
-    appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'attempt-start', index: launched });
+  if (prior.priorStop) {
+    // sticky procedure-class terminal: a stopped campaign stays stopped
+    appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-terminal', launchId, detail: `sticky STOP from prior launch: ${prior.priorStop.failureClass ?? ''} ${prior.priorStop.detail?.slice(0, 150) ?? ''}` });
+    return { attempts: prior.attempts, readyCount: prior.readyCount, evaluableCount: prior.evaluableCount, supported: null, terminal: `STOPPED (sticky): ${prior.priorStop.failureClass ?? ''} ${prior.priorStop.detail?.slice(0, 150) ?? ''}`, launchId };
+  }
+  appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-start', launchId, detail: `resuming with ${prior.attempts.length} reconstructed counted slot(s)` });
+  // the terminal condition is evaluated over the DURABLE count: if the
+  // reconstructed slots already satisfy it, no further attempt is launched
+  // (never execute beyond the preregistered N)
+  if (prior.evaluableCount >= maxAttempts || prior.readyCount + (maxAttempts - prior.evaluableCount) < threshold) {
+    const supported = prior.evaluableCount >= threshold ? prior.readyCount >= threshold : null;
+    appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-terminal', launchId, detail: `ready=${prior.readyCount} evaluable=${prior.evaluableCount} supported=${String(supported)} (satisfied by reconstructed slots — no further launch)` });
+    return { attempts: prior.attempts, readyCount: prior.readyCount, evaluableCount: prior.evaluableCount, supported, terminal: `complete: ready=${prior.readyCount}/${prior.evaluableCount} (threshold ${threshold})`, launchId };
+  }
+  const attempts = [...prior.attempts];
+  let readyCount = prior.readyCount;
+  let evaluableCount = prior.evaluableCount;
+  for (let launched = prior.maxIndex + 1; launched <= prior.maxIndex + launchCap; launched++) {
+    appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'attempt-start', index: launched, launchId });
     let rec: AttemptRecord;
     try {
-      rec = await runP4Attempt(launched, opts.innerProviderFactory(launched), opts.evidenceDir, opts.shapes, { captureToolSchemas: opts.captureToolSchemas, onActive: opts.onActive });
+      rec = await runP4Attempt(launched, opts.innerProviderFactory(launched), opts.evidenceDir, opts.shapes, { captureToolSchemas: opts.captureToolSchemas, onActive: opts.onActive, launchId, hooks: opts.hooks });
     } catch (e) {
-      appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'attempt-incomplete', index: launched, detail: e instanceof Error ? e.message.slice(0, 300) : String(e) });
-      return { attempts, readyCount, evaluableCount, supported: null, terminal: `INTERRUPTED at launch ${launched}: ${e instanceof Error ? e.message.slice(0, 200) : String(e)}` };
+      appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'attempt-incomplete', index: launched, launchId, detail: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      return { attempts, readyCount, evaluableCount, supported: null, terminal: `INTERRUPTED at launch ${launched}: ${e instanceof Error ? e.message.slice(0, 200) : String(e)}`, launchId };
     }
     attempts.push(rec);
     if (rec.outcome === 'READY') readyCount++;
@@ -808,17 +1194,18 @@ export async function runP4Campaign(opts: {
     appendLedger(opts.evidenceDir, {
       ts: new Date().toISOString(),
       event: rec.outcome === 'INCOMPLETE' ? 'attempt-incomplete' : rec.outcome === 'STOPPED' ? 'attempt-stopped' : 'attempt-counted',
-      attemptId: rec.attemptId, index: launched, outcome: rec.outcome, failureClass: rec.failureClass,
+      attemptId: rec.attemptId, index: launched, launchId, outcome: rec.outcome, failureClass: rec.failureClass,
+      evaluable: rec.evaluable,
       detail: rec.stopDetail?.slice(0, 300) ?? null, evidencePackageSha256: rec.evidencePackageSha256,
     });
     if (rec.outcome === 'STOPPED') {
-      return { attempts, readyCount, evaluableCount, supported: null, terminal: `STOPPED: ${rec.failureClass ?? ''} ${rec.stopDetail?.slice(0, 200) ?? ''}` };
+      return { attempts, readyCount, evaluableCount, supported: null, terminal: `STOPPED: ${rec.failureClass ?? ''} ${rec.stopDetail?.slice(0, 200) ?? ''}`, launchId };
     }
     if (rec.outcome === 'INCOMPLETE') continue; // §10: consumed nothing — resume
     if (evaluableCount >= maxAttempts) break;
     if (readyCount + (maxAttempts - evaluableCount) < threshold) break;
   }
   const supported = evaluableCount >= threshold ? readyCount >= threshold : null;
-  appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-terminal', detail: `ready=${readyCount} evaluable=${evaluableCount} supported=${String(supported)}` });
-  return { attempts, readyCount, evaluableCount, supported, terminal: `complete: ready=${readyCount}/${evaluableCount} (threshold ${threshold})` };
+  appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-terminal', launchId, detail: `ready=${readyCount} evaluable=${evaluableCount} supported=${String(supported)}` });
+  return { attempts, readyCount, evaluableCount, supported, terminal: `complete: ready=${readyCount}/${evaluableCount} (threshold ${threshold})`, launchId };
 }

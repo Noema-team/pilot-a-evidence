@@ -1,45 +1,49 @@
-// P4 L1 QUALIFIER — offline operational qualification (charter v1.1 §3 L1):
-// the REAL two-WorkItem production path (native define-work + full-build
+// P4 L1 QUALIFIER (r2) — offline operational qualification (charter v1.1 §3
+// L1): the REAL two-WorkItem production path (native define-work + full-build
 // engines, real runners/services/repositories, real definition-source
 // validation) driven by SCRIPTED providers. Zero network traffic.
 //
-// Gates (final architecture review, corrections 1–4):
-//   A  READY path end-to-end + request-shape calibration (pins
-//      evidence/p4/p4-step-shapes.json from OBSERVED production shapes)
-//   B  full attempt isolation: fresh DB/state, repository-visible artifact
-//      isolation, frozen settings preserved across attempts (correction 4)
-//   C  CONFIG-DRIFT: mid-attempt settings mutation → guard per-call
-//      re-verification → campaign-terminal STOP (consumes nothing)
-//   C2 the P2 request shape (runner transmitting 16384 against the frozen
-//      32768 map) → guard STOP before any model call (direct mechanism test)
-//   D  stale pinned shapes (wrong tool surface) → fail-closed STOP
+// r2 — implementation-review corrections (additive: prior L1 evidence in
+// l1-qualification/ is preserved untouched):
+//   A  READY path end-to-end + request-shape calibration, now covering the
+//      legitimate reachable native route shapes (refine-definition route,
+//      apply-human-decision + post-human-readiness-review via a SCRIPTED
+//      HUMAN operator through the real ResumeService) without weakening the
+//      wire contract (the guard validates every call in every leg)
+//   B  full attempt isolation (correction 4)
+//   C  CONFIG-DRIFT mid-attempt → campaign-terminal STOP
+//   C2 the P2 request shape refused pre-call
+//   D  stale pinned shapes → fail-closed STOP
+//   E2 REQUIRED-native-BUILD-input verification: missing artifact (row
+//      present, disk absent) and corrupted artifact (row hash != disk bytes)
+//      both fail closed — R2 names the path (review P1 #1)
 //   F1 budget exhaustion at the CORRECT frozen budget → evaluable NOT-READY
-//      budget-exhaustion-upstream (never censored, never a STOP)
-//   F2 HUMAN_DECISION route → halt at human-decision-checkpoint, decision
-//      left pending, NOT-READY; NO synthetic approval (correction 2)
-//   F3 EXPLORE_AS_WORK route → committed definition carries an exploration
-//      need → NOT-READY definition-exploration-required (correction 2)
-//   F4 disk-corrupted definition after commit → provenance/authority fails
-//      closed (corrections 2+3)
-//   G  §10 kill-and-resume: interrupt mid-exec → INCOMPLETE (consumes
-//      nothing); the campaign RESUMES and completes the terminal condition
-//   H  code-inspection: exactly ONE settings write (init) in the campaign
-//      path; BUILD is never dispatched
+//   F2 HUMAN_DECISION route → decision left PENDING, NOT-READY (no approval)
+//   F3 EXPLORE_AS_WORK route → does NOT qualify
+//   F4 disk-corrupted definition → provenance/authority fails closed
+//   T  post-archive TAMPER: full-package verifier detects a flipped byte
+//      outside the archive (review P1 #3)
+//   AUTH out-of-policy upstream disk write → AUTHORITY-BYPASS STOP archived
+//      BEFORE worktree cleanup (review P1 #4)
+//   G  §10 SIGKILL after slot 1 counted, crash during slot 2 → the resume
+//      RECONSTRUCTS the counted slot from the ledger: no re-execution, no
+//      double-count (review P1 #2)
+//   H  code-inspection: exactly ONE settings write (init); BUILD never driven
 //
 // Usage: npx tsx evidence/p4/p4-l1-qualifier.mts  (from the stratum repo)
 
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, cpSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { CaptureRecord } from '../p3/config-guard.mts';
 import {
-  runP4Attempt, runP4Campaign, readLedger, targetPristine,
+  runP4Attempt, runP4Campaign, readLedger, targetPristine, verifyEvidencePackage,
   ROOT, DEFINE_WI,
   type AttemptRecord,
 } from './p4-campaign.mts';
 import { DEFAULT_SHAPES, calibrationShapes, loadFrozenSettings, type PinnedShapes } from './p4-step-contracts.mts';
 
 const EVIDENCE = '/home/theo/Documents/coding/repos/pilot-a/evidence';
-const L1_DIR = `${EVIDENCE}/p4/l1-qualification`;
+const L1_DIR = `${EVIDENCE}/p4/l1-qualification-r2`;
 const SHAPES_PATH = `${EVIDENCE}/p4/p4-step-shapes.json`;
 
 const results: Array<{ gate: string; pass: boolean; detail: string }> = [];
@@ -109,10 +113,7 @@ const p1rRun = `${EVIDENCE}/p1-r/p1-r-1/91342881-eb32-47ff-8dfb-d8a7115dd371/nod
 const archivedText = (name: string): string => readFileSync(join(p1rRun, name), 'utf-8');
 
 // definition semantic value — matches the projected definition contract
-// EXACTLY (observed on the production wire in calibration: required
-// goal/facts/bodyMarkdown; facts items {id,statement,status,source} with
-// additionalProperties:false; constraints {description,type}; acceptance
-// [{description,met?}])
+// EXACTLY (observed on the production wire in calibration)
 const DEFINITION_VALUE = () => ({
   goal: 'Add a structured failure-payload contract to the RAG worker service so callers can distinguish failure classes programmatically.',
   facts: [
@@ -137,6 +138,14 @@ const DEFINITION_VALUE = () => ({
   ],
   bodyMarkdown: '# Definition — Worker failure-payload contract\n\nThe bounded scope is the RAG worker service failure responses. See the canonical state for goal, ledger, constraints, requirements, non-goals, and acceptance.',
 });
+// the definition AFTER the scripted human decision (f3 := DECIDED) — the same
+// canonical contract, only the ledger row changes
+const DEFINITION_AFTER_HUMAN = () => ({
+  ...DEFINITION_VALUE(),
+  facts: DEFINITION_VALUE().facts.map((f) => (f.id === 'f3'
+    ? { ...f, status: 'DECIDED', source: 'decision' }
+    : f)),
+});
 
 // observed readiness-review contract (calibration capture): required
 // verdict + gaps + bodyMarkdown; gap items require target/description/
@@ -147,10 +156,7 @@ const READINESS_FAIL = (classification: string, factId: string) => ({
   gaps: [{ target: 'scope question', factId, description: 'a gap for route calibration', classification, reason: 'L1 calibration route', closure: 'n/a' }],
   bodyMarkdown: 'Review failed with a classified gap for route calibration. (L1 scripted review.)',
 });
-// route artifact payloads — exact contract shapes (escalation-contracts.ts):
-// decision-request {type, targetFactId, title, summary, options[{id,label,
-// description}]}; exploration-need {targetFactId, question,
-// whyNotResolvableByReading, requiredWork, completionEvidence}
+// route artifact payloads — exact contract shapes (escalation-contracts.ts)
 const DECISION_REQUEST_VALUE = () => ({
   type: 'definition-scope',
   targetFactId: 'f3',
@@ -208,6 +214,54 @@ function exploreRouteBehaviors() {
     structured: (step) => (step !== null && step.endsWith('readiness-review') ? READINESS_FAIL('EXPLORE_AS_WORK', 'f3') : undefined),
   });
 }
+// refine route: the FIRST review fails with a CAN_RESOLVE gap (resolvable by
+// reading — refine-definition is the native route); the SECOND review passes
+function refineRouteBehaviors() {
+  return scriptedProvider({
+    multiTurn: (step) => {
+      if (step === 'synthesize-definition' || step === 'refine-definition') {
+        return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DEFINITION_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
+      }
+      if (step === 'scoping.produce') return mt({ text: archivedText('scoping.produce.md'), tokens_used: 512 });
+      if (step === 'design') return mt({ text: archivedText('design.md'), tokens_used: 512 });
+      if (step === 'plan') return mt({ text: archivedText('plan.md'), tokens_used: 512 });
+      if (step === 'test') return mt({ text: archivedText('test.md'), tokens_used: 512 });
+      return undefined;
+    },
+    structured: (step, _params, calls) => {
+      if (step !== null && step.endsWith('readiness-review')) {
+        const reviewCalls = calls.filter((c) => c.wire === 'completeStructured').length;
+        return reviewCalls <= 1 ? READINESS_FAIL('CAN_RESOLVE', 'f3') : READINESS_PASS();
+      }
+      return undefined;
+    },
+  });
+}
+// human-RESOLUTION calibration leg: the review fails HUMAN_DECISION, the
+// harness (as the scripted human operator) resolves the pending decision
+// through the real ResumeService, and the downstream native shapes
+// (apply-human-decision, post-human-readiness-review) are observed
+function humanResolutionBehaviors() {
+  return scriptedProvider({
+    multiTurn: (step) => {
+      if (step === 'synthesize-definition' || step === 'apply-human-decision') {
+        return mt({
+          stop_reason: 'tool_use', text: '', wire_observation: { finish_reason: 'tool_calls' },
+          tool_uses: submitToolUse(step === 'apply-human-decision' ? DEFINITION_AFTER_HUMAN() : DEFINITION_VALUE()),
+        });
+      }
+      if (step === 'prepare-human-decision') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DECISION_REQUEST_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
+      return undefined;
+    },
+    structured: (step, _params, calls) => {
+      if (step !== null && step.endsWith('readiness-review')) {
+        const reviewCalls = calls.filter((c) => c.wire === 'completeStructured').length;
+        return reviewCalls <= 1 ? READINESS_FAIL('HUMAN_DECISION', 'f3') : READINESS_PASS();
+      }
+      return undefined;
+    },
+  });
+}
 
 // dump the last teaching message for calibration when a gate fails
 function lastUserText(calls: ScriptedCall[]): string {
@@ -217,6 +271,38 @@ function lastUserText(calls: ScriptedCall[]): string {
     if (last) return typeof last.content === 'string' ? last.content.slice(0, 1200) : JSON.stringify(last.content).slice(0, 1200);
   }
   return '(no messages captured)';
+}
+
+// ─── shape extraction from a calibration capture ─────────────────────────────
+function extractShapes(shapes: PinnedShapes, capturePath: string): number {
+  const cap = readFileSync(capturePath, 'utf-8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l) as CaptureRecord);
+  let added = 0;
+  for (const x of cap) {
+    if (x.kind !== 'request' || x.guard_verdict !== 'PASS' || x.wire !== 'completeMultiTurn') continue;
+    const key = `${String(x.workflow_id)}/${String(x.step)}`;
+    if (shapes[key]) continue;
+    const defs = (x.tool_definitions ?? []) as Array<{ name: string; input_schema?: { properties?: Record<string, unknown>; required?: string[] } }>;
+    const names = defs.map((t) => t.name).sort();
+    const submit = defs.find((t) => t.name === 'submit_result');
+    shapes[key] = {
+      tool_sets: [names],
+      submit_result: submit
+        ? {
+            schema_top_level_properties: Object.keys(submit.input_schema?.properties ?? {}).sort(),
+            schema_required: submit.input_schema?.required ?? [],
+            has_creates_property: false,
+          }
+        : null,
+    };
+    added++;
+  }
+  for (const x of cap) {
+    if (x.kind !== 'request' || x.wire !== 'completeStructured') continue;
+    const key = `${String(x.workflow_id)}/${String(x.step)}`;
+    shapes[key] = shapes[key] ?? { tool_sets: [[]], submit_result: null };
+    shapes[key].structured_schema_name = (x.structured_schema_name as string | null) ?? undefined;
+  }
+  return added;
 }
 
 // ─── gates ───────────────────────────────────────────────────────────────────
@@ -234,73 +320,80 @@ async function gateA(): Promise<PinnedShapes> {
     report('A.calibration', false, `calibration attempt did not complete: ${rec1.outcome} ${rec1.stopDetail ?? ''} lastTeaching=${lastUserText(h1.calls)}`);
     return DEFAULT_SHAPES;
   }
-  const capture = readFileSync(join(rec1.evidencePackagePath, 'guard-capture.jsonl'), 'utf-8')
-    .split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l) as CaptureRecord);
   const shapes: PinnedShapes = {};
-  for (const r of capture) {
-    if (r.kind !== 'request' || r.guard_verdict !== 'PASS' || r.wire !== 'completeMultiTurn') continue;
-    const key = `${String(r.workflow_id)}/${String(r.step)}`;
-    const defs = (r.tool_definitions ?? []) as Array<{ name: string; input_schema?: { properties?: Record<string, unknown>; required?: string[] } }>;
-    const names = defs.map((t) => t.name).sort();
-    const submit = defs.find((t) => t.name === 'submit_result');
-    shapes[key] = {
-      tool_sets: [names],
-      submit_result: submit
-        ? {
-            schema_top_level_properties: Object.keys(submit.input_schema?.properties ?? {}).sort(),
-            schema_required: submit.input_schema?.required ?? [],
-            has_creates_property: false,
-          }
-        : null,
-    };
-  }
-  for (const r of capture) {
-    if (r.kind !== 'request' || r.wire !== 'completeStructured') continue;
-    const key = `${String(r.workflow_id)}/${String(r.step)}`;
-    shapes[key] = shapes[key] ?? { tool_sets: [[]], submit_result: null };
-    shapes[key].structured_schema_name = (r.structured_schema_name as string | null) ?? undefined;
-  }
+  extractShapes(shapes, join(rec1.evidencePackagePath, 'guard-capture.jsonl'));
   writeFileSync(SHAPES_PATH, JSON.stringify(shapes, null, 2));
-  const calSteps = Object.keys(shapes).join(', ');
-  report('A.calibration', Object.keys(shapes).length > 0, `observed+attempt1=${rec1.outcome}; pinned ${Object.keys(shapes).length} step shapes [${calSteps}] → ${SHAPES_PATH}`);
+  report('A.calibration', Object.keys(shapes).length > 0 && rec1.outcome === 'READY',
+    `observed+attempt1=${rec1.outcome}; pinned ${Object.keys(shapes).length} step shapes [${Object.keys(shapes).join(', ')}] → ${SHAPES_PATH}`);
 
-  // phase 1b/1c — calibration legs for the ROUTE steps the happy path never
-  // reaches: the human-decision route (prepare-human-decision) and the
-  // explore route (record-exploration-need). Observed, pinned, merged.
-  for (const leg of [
-    { name: 'human-route', behaviors: humanRouteBehaviors() },
-    { name: 'explore-route', behaviors: exploreRouteBehaviors() },
-  ]) {
-    const h = leg.behaviors;
-    const r = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), { captureToolSchemas: true, onActive: h.bind });
-    if (r.evidencePackagePath === null) {
-      report(`A.calibration.${leg.name}`, false, `leg did not complete: ${r.outcome} ${r.stopDetail ?? ''} lastTeaching=${lastUserText(h.calls)}`);
-      continue;
-    }
-    const cap = readFileSync(join(r.evidencePackagePath, 'guard-capture.jsonl'), 'utf-8')
-      .split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l) as CaptureRecord);
-    let added = 0;
-    for (const x of cap) {
-      if (x.kind !== 'request' || x.guard_verdict !== 'PASS' || x.wire !== 'completeMultiTurn') continue;
-      const key = `${String(x.workflow_id)}/${String(x.step)}`;
-      if (shapes[key]) continue;
-      const defs = (x.tool_definitions ?? []) as Array<{ name: string; input_schema?: { properties?: Record<string, unknown>; required?: string[] } }>;
-      const names = defs.map((t) => t.name).sort();
-      const submit = defs.find((t) => t.name === 'submit_result');
-      shapes[key] = {
-        tool_sets: [names],
-        submit_result: submit
-          ? {
-              schema_top_level_properties: Object.keys(submit.input_schema?.properties ?? {}).sort(),
-              schema_required: submit.input_schema?.required ?? [],
-              has_creates_property: false,
-            }
-          : null,
-      };
-      added++;
-    }
+  // phase 1b/1c/1d/1e — calibration legs for the legitimate reachable native
+  // route shapes the happy path never reaches: the refine route (CAN_RESOLVE
+  // → refine-definition → re-review, a full READY attempt through a second
+  // native route), the human-decision route (prepare-human-decision), the
+  // explore route (record-exploration-need), and the human-RESOLUTION leg
+  // (apply-human-decision + post-human-readiness-review, driven by a SCRIPTED
+  // HUMAN operator through the real ResumeService — the campaign itself never
+  // authors that resolution). Every call in every leg is guard-validated.
+  const legs: Array<{ name: string; run: () => Promise<{ rec: AttemptRecord; calls: ScriptedCall[]; added: number }>; expect: string }> = [
+    {
+      name: 'refine-route',
+      run: async () => {
+        const h = refineRouteBehaviors();
+        const rec = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), { captureToolSchemas: true, onActive: h.bind });
+        const added = rec.evidencePackagePath ? extractShapes(shapes, join(rec.evidencePackagePath, 'guard-capture.jsonl')) : 0;
+        return { rec, calls: h.calls, added };
+      },
+      expect: 'READY',
+    },
+    {
+      name: 'human-route',
+      run: async () => {
+        const h = humanRouteBehaviors();
+        const rec = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), { captureToolSchemas: true, onActive: h.bind });
+        const added = rec.evidencePackagePath ? extractShapes(shapes, join(rec.evidencePackagePath, 'guard-capture.jsonl')) : 0;
+        return { rec, calls: h.calls, added };
+      },
+      expect: 'NOT-READY',
+    },
+    {
+      name: 'explore-route',
+      run: async () => {
+        const h = exploreRouteBehaviors();
+        const rec = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), { captureToolSchemas: true, onActive: h.bind });
+        const added = rec.evidencePackagePath ? extractShapes(shapes, join(rec.evidencePackagePath, 'guard-capture.jsonl')) : 0;
+        return { rec, calls: h.calls, added };
+      },
+      expect: 'NOT-READY',
+    },
+    {
+      name: 'human-resolution',
+      run: async () => {
+        const h = humanResolutionBehaviors();
+        const rec = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), {
+          captureToolSchemas: true, onActive: h.bind,
+          hooks: {
+            // the scripted HUMAN OPERATOR resolves through the real
+            // ResumeService — a calibration act, never a campaign policy
+            humanDecisionResolution: () => ({
+              selectedOptionId: 'include',
+              rationale: 'L1 calibration leg: scripted human operator decision (the campaign itself never authors this resolution)',
+              resolvedAt: new Date().toISOString(),
+              resolvedBy: 'scripted-human-operator',
+            }),
+          },
+        });
+        const added = rec.evidencePackagePath ? extractShapes(shapes, join(rec.evidencePackagePath, 'guard-capture.jsonl')) : 0;
+        return { rec, calls: h.calls, added };
+      },
+      expect: 'NOT-READY',
+    },
+  ];
+  for (const leg of legs) {
+    const { rec, calls, added } = await leg.run();
     writeFileSync(SHAPES_PATH, JSON.stringify(shapes, null, 2));
-    report(`A.calibration.${leg.name}`, added > 0, `leg outcome=${r.outcome} class=${r.failureClass ?? ''}; pinned +${added} route step shapes (total ${Object.keys(shapes).length})`);
+    const ok = rec.outcome === leg.expect && (leg.expect === 'READY' ? rec.assessment?.ready === true : true);
+    report(`A.calibration.${leg.name}`, ok && (leg.expect === 'READY' ? added >= 0 : added > 0 || shapes['define-work/refine-definition'] !== undefined),
+      `leg outcome=${rec.outcome} class=${rec.failureClass ?? ''} (expected ${leg.expect}); shapes now ${Object.keys(shapes).length}${calls.length ? `; scripted calls=${calls.length}` : ''}${ok ? '' : ` lastTeaching=${lastUserText(calls)}`}`);
   }
 
   // phase 2 — STRICT: re-run the READY path under the pinned shapes; every
@@ -312,8 +405,11 @@ async function gateA(): Promise<PinnedShapes> {
     return shapes;
   }
   const allPass = Object.values(rec2.assessment!.checks).every((x) => x.pass);
+  const r1 = rec2.assessment!.checks.R1_halted_state;
+  const r1Concrete = r1.pass && r1.detail.includes('status=halted') && r1.detail.includes('pendingRefStep=confirm');
   const wires = [...new Set(h2.calls.map((x) => x.wire))].join(',');
-  report('A.ready-path', allPass, `READY under PINNED shapes; R1–R6 all pass; scripted calls=${h2.calls.length} wires=[${wires}]`);
+  report('A.ready-path', allPass && r1Concrete,
+    `READY under PINNED shapes; R1–R6 all pass; R1 asserts the ACTUAL state [${r1.detail.slice(0, 110)}]; scripted calls=${h2.calls.length} wires=[${wires}]`);
   return shapes;
 }
 
@@ -399,6 +495,31 @@ async function gateD(shapes: PinnedShapes): Promise<void> {
   report('D.unpinned-shape-stop', ok, `outcome=${rec.outcome} class=${rec.failureClass} scripted calls for the step=${reached} (fail-closed request validation BEFORE any model call)`);
 }
 
+async function gateE2(shapes: PinnedShapes): Promise<void> {
+  // REQUIRED-native-BUILD-input verification (review P1 #1): a required
+  // upstream output that is MISSING on disk (storage row present) or
+  // CORRUPTED (disk bytes != row hash) must fail readiness closed, naming
+  // the path. Fault injection fires right after the scoping.checkpoint
+  // RESOLVES (the approve itself READS the charter, so the fault must come
+  // after it) and before design/plan/test — none of which rewrite the
+  // charter — so the corruption survives to the boundary assessment.
+  const legs: Array<{ name: string; mutate: () => void; expect: string }> = [
+    { name: 'missing-artifact', mutate: () => rmSync(join(ROOT, 'docs', 'cycle-charter.md')), expect: 'disk-missing' },
+    { name: 'corrupted-artifact', mutate: () => writeFileSync(join(ROOT, 'docs', 'cycle-charter.md'), 'CORRUPTED BY L1 GATE E2'), expect: 'hash-mismatch' },
+  ];
+  for (const leg of legs) {
+    const h = happyBehaviors();
+    const rec = await runP4Attempt(6, h.provider, L1_DIR, shapes, {
+      onActive: h.bind,
+      hooks: { onExecCheckpointResolved: async (cursor) => { if (cursor === 'scoping.checkpoint') leg.mutate(); } },
+    });
+    const r2 = rec.assessment?.checks.R2_definition_chain;
+    const ok = rec.outcome === 'NOT-READY' && rec.failureClass === 'build-inputs-incomplete'
+      && r2?.pass === false && (r2.detail ?? '').includes(`docs/cycle-charter.md:${leg.expect}`);
+    report(`E2.${leg.name}`, ok, `outcome=${rec.outcome} class=${rec.failureClass} R2=${String(r2?.pass)} (${(r2?.detail ?? '').slice(0, 170)}) — the required-output verifier fails closed and names the artifact`);
+  }
+}
+
 async function gateF1(shapes: PinnedShapes): Promise<void> {
   const h = scriptedProvider({
     multiTurn: (step) => {
@@ -409,14 +530,14 @@ async function gateF1(shapes: PinnedShapes): Promise<void> {
     },
     structured: (step) => (step !== null && step.endsWith('readiness-review') ? READINESS_PASS() : undefined),
   });
-  const rec = await runP4Attempt(6, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const rec = await runP4Attempt(7, h.provider, L1_DIR, shapes, { onActive: h.bind });
   report('F1.budget-exhaustion-not-ready', rec.outcome === 'NOT-READY' && rec.failureClass === 'budget-exhaustion-upstream' && rec.evaluable === true,
     `outcome=${rec.outcome} class=${rec.failureClass} evaluable=${rec.evaluable} — genuine length terminus at the CORRECT budget = model-attributable NOT-READY, never a STOP`);
 }
 
 async function gateF2(shapes: PinnedShapes): Promise<void> {
   const h = humanRouteBehaviors();
-  const rec = await runP4Attempt(7, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const rec = await runP4Attempt(8, h.provider, L1_DIR, shapes, { onActive: h.bind });
   const db = rec.evidencePackagePath ? (JSON.parse(readFileSync(join(rec.evidencePackagePath, 'db-records.json'), 'utf-8')) as { decisions?: Array<{ status: string }> }) : null;
   const pending = (db?.decisions ?? []).filter((x) => x.status === 'pending').length;
   report('F2.human-decision-pending', rec.outcome === 'NOT-READY' && rec.failureClass === 'definition-human-decision-required' && pending >= 1,
@@ -425,7 +546,7 @@ async function gateF2(shapes: PinnedShapes): Promise<void> {
 
 async function gateF3(shapes: PinnedShapes): Promise<void> {
   const h = exploreRouteBehaviors();
-  const rec = await runP4Attempt(8, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const rec = await runP4Attempt(9, h.provider, L1_DIR, shapes, { onActive: h.bind });
   report('F3.explore-not-ready', rec.outcome === 'NOT-READY' && rec.failureClass === 'definition-exploration-required',
     `outcome=${rec.outcome} class=${rec.failureClass} — a committed definition reached via the explore route does NOT qualify (final readiness outcome verified, not just parse+resolve)`);
 }
@@ -449,10 +570,70 @@ async function gateF4(shapes: PinnedShapes): Promise<void> {
     },
     structured: (step) => (step !== null && step.endsWith('readiness-review') ? READINESS_PASS() : undefined),
   });
-  const rec = await runP4Attempt(9, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const rec = await runP4Attempt(10, h.provider, L1_DIR, shapes, { onActive: h.bind });
   const r2 = rec.assessment?.checks.R2_definition_chain;
   report('F4.authority-invalid', rec.outcome === 'NOT-READY' && r2?.pass === false,
     `outcome=${rec.outcome} class=${rec.failureClass ?? ''} R2=${String(r2?.pass)} (${(r2?.detail ?? '').slice(0, 140)}) — provenance/disk-integrity/admissibility fails closed`);
+}
+
+async function gateTAMPER(shapes: PinnedShapes): Promise<void> {
+  // post-archive tamper test (review P1 #3): the full-package verifier must
+  // (a) verify the pristine READY package and (b) detect a single flipped
+  // byte in a tampered COPY (existing evidence is never modified)
+  const h = happyBehaviors();
+  const rec = await runP4Attempt(11, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const pkg = rec.evidencePackagePath;
+  if (!pkg || rec.outcome !== 'READY') {
+    report('T.post-archive-tamper', false, `no READY package to test (outcome=${rec.outcome})`);
+    return;
+  }
+  const pristine = verifyEvidencePackage(pkg);
+  const tampon = '/tmp/opencode/p4-tamper-copy';
+  rmSync(tampon, { recursive: true, force: true });
+  cpSync(pkg, tampon, { recursive: true });
+  appendFileSync(join(tampon, 'readiness-assessment.json'), ' ');
+  const tampered = verifyEvidencePackage(tampon);
+  rmSync(tampon, { recursive: true, force: true });
+  const ok = pristine.ok && !tampered.ok && tampered.violations.some((v) => v.includes('readiness-assessment.json'));
+  report('T.post-archive-tamper', ok,
+    `pristine ok=${pristine.ok}; tampered copy detected=[${tampered.violations.slice(0, 2).join(' | ').slice(0, 120)}] — full-package hash binding (files.sha256.json + package identity) catches post-archive edits`);
+}
+
+async function gateAUTH(shapes: PinnedShapes): Promise<void> {
+  // AUTHORITY-BYPASS (review P1 #4): an out-of-policy upstream disk write
+  // (docs/rogue.md authored inside the design step) must STOP the campaign,
+  // archive the violating bytes BEFORE worktree cleanup, and leave the
+  // worktree pristine afterwards.
+  const h = scriptedProvider({
+    multiTurn: (step) => {
+      if (step === 'synthesize-definition') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DEFINITION_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
+      if (step === 'design') {
+        if (!existsSync(join(ROOT, 'docs', 'rogue.md'))) {
+          writeFileSync(join(ROOT, 'docs', 'rogue.md'), '# out-of-policy write authored inside the design step (L1 gate AUTH)\n');
+        }
+        return mt({ text: archivedText('design.md'), tokens_used: 512 });
+      }
+      if (step === 'scoping.produce') return mt({ text: archivedText('scoping.produce.md'), tokens_used: 512 });
+      if (step === 'plan') return mt({ text: archivedText('plan.md'), tokens_used: 512 });
+      if (step === 'test') return mt({ text: archivedText('test.md'), tokens_used: 512 });
+      return undefined;
+    },
+    structured: (step) => (step !== null && step.endsWith('readiness-review') ? READINESS_PASS() : undefined),
+  });
+  const rec = await runP4Attempt(12, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const pkg = rec.evidencePackagePath;
+  let violationArchived = false;
+  let verdict = { ok: false, violations: ['no package'] as string[] };
+  if (pkg) {
+    const violationsFile = join(pkg, 'authority-violations.json');
+    violationArchived = existsSync(violationsFile) && existsSync(join(pkg, 'authority-violations', 'docs', 'rogue.md'))
+      && (JSON.parse(readFileSync(violationsFile, 'utf-8')) as Array<{ path: string }>).some((v) => v.path === 'docs/rogue.md');
+    verdict = verifyEvidencePackage(pkg);
+  }
+  const ok = rec.outcome === 'STOPPED' && rec.failureClass === 'authority-bypass'
+    && violationArchived && verdict.ok && targetPristine();
+  report('AUTH.authority-bypass-stop', ok,
+    `outcome=${rec.outcome} class=${rec.failureClass} rogueWriteArchived=${violationArchived} packageVerifies=${verdict.ok} worktreePristine=${targetPristine()} — out-of-policy write STOPs the campaign; violating bytes archived BEFORE cleanup`);
 }
 
 async function gateG(shapes: PinnedShapes): Promise<void> {
@@ -460,25 +641,48 @@ async function gateG(shapes: PinnedShapes): Promise<void> {
   rmSync(campaignDir, { recursive: true, force: true });
   mkdirSync(campaignDir, { recursive: true });
   const { spawnSync } = await import('node:child_process');
-  const childArgs = (killAt: number) => [
+  const childArgs = (mode: string) => [
     'tsx', `${EVIDENCE}/p4/p4-l1-resume-child.mts`,
-    '--evidence-dir', campaignDir, '--kill-at', String(killAt),
-    '--attempts', '2', '--threshold', '2',
+    '--evidence-dir', campaignDir, '--attempts', '2', '--threshold', '2',
+    ...(mode ? ['--' + mode] : []),
   ];
-  // launch 1: real SIGKILL mid-attempt (the 3rd provider call, inside design)
-  const k = spawnSync('npx', childArgs(3), { cwd: '/home/theo/Documents/coding/repos/stratum', encoding: 'utf-8', timeout: 300000 });
+  // launch 1: REAL SIGKILL after slot 1 is COUNTED and slot 2 has launched
+  // (crash DURING slot 2) — the child kills its own process at exactly that
+  // ledger state; the parent observes the signal death
+  const k = spawnSync('npx', childArgs('kill-after-counted'), { cwd: '/home/theo/Documents/coding/repos/stratum', encoding: 'utf-8', timeout: 420000 });
   const killed = k.status !== 0 || k.signal === 'SIGKILL';
-  // launch 2: the RESUME — same campaign dir, no kill
-  const r = spawnSync('npx', childArgs(0), { cwd: '/home/theo/Documents/coding/repos/stratum', encoding: 'utf-8', timeout: 600000 });
+  // capture slot 1's package identity BEFORE the resume
+  const preLedger = readLedger(campaignDir);
+  const slot1 = preLedger.find((e) => e.event === 'attempt-counted' && e.index === 1);
+  const slot2Started = preLedger.some((e) => e.event === 'attempt-start' && e.index === 2);
+  const slot2Counted = preLedger.some((e) => e.event === 'attempt-counted' && e.index === 2);
+  let slot1Dir: string | null = null;
+  let slot1Sha = slot1?.evidencePackageSha256 ?? null;
+  if (slot1?.attemptId) {
+    slot1Dir = join(campaignDir, `attempt-1-${slot1.attemptId}`);
+    if (slot1Dir && existsSync(join(slot1Dir, 'manifest.json'))) {
+      slot1Sha = (JSON.parse(readFileSync(join(slot1Dir, 'manifest.json'), 'utf-8')) as { package_sha256: string }).package_sha256;
+    }
+  }
+  // launch 2: the RESUME — same campaign dir, fresh process
+  const r = spawnSync('npx', childArgs(''), { cwd: '/home/theo/Documents/coding/repos/stratum', encoding: 'utf-8', timeout: 600000 });
   const ledger = readLedger(campaignDir);
-  const incomplete = ledger.filter((l) => l.event === 'attempt-incomplete');
-  const counted = ledger.filter((l) => l.event === 'attempt-counted');
-  const resumed = r.stdout.includes('supported=true') || r.stdout.includes('threshold 2');
-  void resumed;
-  const ok = killed && incomplete.length >= 1 && counted.length >= 2 && counted.every((l) => l.outcome === 'READY');
+  const counted = ledger.filter((e) => e.event === 'attempt-counted');
+  const incomplete = ledger.filter((e) => e.event === 'attempt-incomplete');
+  const countedIdx = counted.map((e) => e.index).sort();
+  const slot1Once = counted.filter((e) => e.index === 1).length === 1;
+  const slot1DirAfter = slot1?.attemptId ? join(campaignDir, `attempt-1-${slot1.attemptId}`) : null;
+  const slot1ShaAfter = slot1DirAfter && existsSync(join(slot1DirAfter, 'manifest.json'))
+    ? (JSON.parse(readFileSync(join(slot1DirAfter, 'manifest.json'), 'utf-8')) as { package_sha256: string }).package_sha256
+    : null;
+  const slot1Untouched = slot1Sha !== null && slot1ShaAfter === slot1Sha && slot1DirAfter !== null && verifyEvidencePackage(slot1DirAfter).ok;
   const terminalLine = (r.stdout.trim().split('\n').pop() ?? '').slice(0, 90);
+  const resumedOk = terminalLine.includes('ready=2/2') && terminalLine.includes('threshold 2');
+  const ok = killed && slot1 !== undefined && slot2Started && !slot2Counted
+    && slot1Once && slot1Untouched
+    && countedIdx.join(',') === '1,3' && incomplete.length >= 1 && resumedOk;
   report('G.kill-and-resume', ok,
-    `killed=${killed} resumeTerminal="${terminalLine}" ledger incomplete=${incomplete.length} counted=${counted.length} allReady=${counted.every((l) => l.outcome === 'READY')} — a real process death consumed nothing; the resume declared it incomplete and completed the terminal condition`);
+    `killed=${killed} slot1Counted=${slot1 !== undefined} crashDuringSlot2=${slot2Started && !slot2Counted} countedIdx=[${countedIdx.join(',')}] slot1Once=${slot1Once} slot1Untouched=${slot1Untouched} incomplete=${incomplete.length} resumeTerminal="${terminalLine}" — the resume RECONSTRUCTED slot 1 from the ledger (no re-execution, no double-count) and completed the terminal condition`);
 }
 
 function gateH(): void {
@@ -493,7 +697,7 @@ function gateH(): void {
 // ─── main ────────────────────────────────────────────────────────────────────
 async function main(): Promise<void> {
   if (!targetPristine()) throw new Error('target not pristine — L1 refuses to run');
-  console.log('=== P4 L1 qualification (offline; zero network traffic) ===');
+  console.log('=== P4 L1 qualification r2 (offline; zero network traffic) ===');
   gateH();
   const shapes = await gateA();
   if (results.find((r) => r.gate === 'A.ready-path')?.pass) {
@@ -501,17 +705,20 @@ async function main(): Promise<void> {
     await gateC(shapes);
     await gateC2();
     await gateD(shapes);
+    await gateE2(shapes);
     await gateF1(shapes);
     await gateF2(shapes);
     await gateF3(shapes);
     await gateF4(shapes);
+    await gateTAMPER(shapes);
+    await gateAUTH(shapes);
     await gateG(shapes);
   } else {
     console.log('Gate A failed — remaining gates skipped (fix the READY path first).');
   }
   const passed = results.filter((r) => r.pass).length;
-  console.log(`=== L1: ${passed}/${results.length} gates passed ===`);
-  writeFileSync(`${EVIDENCE}/p4/p4-l1-qualification-output.txt`, JSON.stringify({ finished_at_utc: new Date().toISOString(), results }, null, 2));
+  console.log(`=== L1 r2: ${passed}/${results.length} gates passed ===`);
+  writeFileSync(`${EVIDENCE}/p4/p4-l1-qualification-output-r2.txt`, JSON.stringify({ finished_at_utc: new Date().toISOString(), results }, null, 2));
   if (passed !== results.length) process.exitCode = 1;
 }
 

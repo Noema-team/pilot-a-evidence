@@ -1,0 +1,9 @@
+{
+  "node_id": "plan",
+  "result_transport": "textual-sle-output",
+  "turns_taken": 1,
+  "tool_calls": [],
+  "wire_observation": {
+    "finish_reason": "stop"
+  }
+}

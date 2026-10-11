@@ -8,7 +8,7 @@
 // handled by the campaign BEFORE assessment):
 //   budget-exhaustion-upstream > provider-error-unresolved > workflow-abandoned
 //   > definition-human-decision-required > definition-exploration-required
-//   > authority-invalid > malformed-state
+//   > build-inputs-incomplete > authority-invalid > malformed-state
 
 import type { CaptureClassification, CaptureRecord } from '../p3/config-guard.mts';
 
@@ -22,6 +22,30 @@ export interface UpstreamArtifactRecord {
   storageHash: string | null; // artifacts.hash row
   bytes: number;
   nonEmpty: boolean;
+  required: boolean; // part of the REQUIRED native BUILD-input set (missing = R2 failure even with no row)
+}
+
+// ONE required native upstream output, verified by the driver (I/O) against
+// its exact storage row: the row must exist with the expected type+ref, the
+// row hash must equal the disk sha256, and the file must be non-empty.
+export interface RequiredOutputVerification {
+  path: string; // repo-relative
+  ref: string; // exact artifacts.ref
+  rowType: string; // exact artifacts.type
+  stepId: string; // producing step
+  rowPresent: boolean;
+  diskPresent: boolean;
+  hashMatch: boolean; // row.hash === disk sha256
+  nonEmpty: boolean;
+  diskSha256: string | null;
+  storageHash: string | null;
+}
+
+export interface RequiredOutputSpec {
+  path: string;
+  ref: string;
+  rowType: string;
+  stepId: string;
 }
 
 export interface DefinitionParseOutcome {
@@ -39,9 +63,10 @@ export interface DefinitionSourceOutcome {
 }
 
 export interface ReadinessInput {
-  // R1 — the actual halted state
+  // R1 — the actual halted/pending state (asserted, not assumed)
   execRun: { status: string; current_step_id: string | null; awaiting_checkpoint: unknown };
-  pendingConfirm: { id: string; type: string } | null;
+  pendingConfirm: { id: string; type: string; subjectRefStepId: string | null } | null;
+  pendingDecisionCount: number; // ALL pending decisions on the exec WI
   intermediateDecisions: Array<{ stepId: string; how: 'approve-policy' | 'skipped-legitimately' }>;
   boundaryRefusals: number;
   buildStepRequestsInCapture: number;
@@ -54,7 +79,9 @@ export interface ReadinessInput {
   humanDecisionArtifactExists: boolean;
   explorationArtifactExists: boolean;
   definitionSourceResolution: DefinitionSourceOutcome;
-  upstreamArtifacts: UpstreamArtifactRecord[]; // definition + exec-side outputs
+  upstreamArtifacts: UpstreamArtifactRecord[]; // definition + every produced upstream output
+  requiredUpstreamOutputs: RequiredOutputVerification[]; // the REQUIRED native BUILD-input set
+  testOutputsPresent: boolean; // ≥1 produced-file row from the test step under the authorized test dir
 
   // R3/R4 — configuration + budgets, re-verified FROM THE EVIDENCE
   frozenSettingsSha256: string;
@@ -99,17 +126,30 @@ const canonical = (v: unknown): string => JSON.stringify(v);
 export function assessReadiness(input: ReadinessInput): ReadinessAssessment {
   const checks: Record<string, CheckResult> = {};
 
-  // ── R1: the actual halted-at-confirm / pending-decision state ──────────────
+  // ── R1: the ACTUAL halted-at-confirm / pending-decision state ───────────────
+  // Asserts the real terminal state, not the drive loop's belief: the exec run
+  // must be HALTED at the confirm checkpoint, exactly ONE decision pending,
+  // that decision's subjectRef.stepId === run.awaiting_checkpoint === 'confirm',
+  // the confirm boundary never passed (no refusals, zero BUILD requests), and
+  // every intermediate checkpoint was resolved by the preregistered policy.
+  const r1Halted = input.execRun.status === 'halted';
   const r1Cursor = input.execRun.current_step_id === 'confirm';
+  const r1Awaiting = String(input.execRun.awaiting_checkpoint ?? '') === 'confirm';
   const r1Pending = input.pendingConfirm !== null;
+  const r1PendingAligned = input.pendingConfirm?.subjectRefStepId === 'confirm';
+  const r1Single = input.pendingDecisionCount === 1;
   const r1NotPassed = input.boundaryRefusals === 0 && input.buildStepRequestsInCapture === 0;
   const r1Intermediate = input.intermediateDecisions.every((d) => d.how === 'approve-policy' || d.how === 'skipped-legitimately');
   checks.R1_halted_state = {
-    pass: r1Cursor && r1Pending && r1NotPassed && r1Intermediate,
-    detail: `cursor=${input.execRun.current_step_id} status=${input.execRun.status} pendingConfirm=${r1Pending} boundaryRefusals=${input.boundaryRefusals} buildRequests=${input.buildStepRequestsInCapture} intermediate=${input.intermediateDecisions.map((d) => `${d.stepId}:${d.how}`).join(',') || 'none'}`,
+    pass: r1Halted && r1Cursor && r1Awaiting && r1Pending && r1PendingAligned && r1Single && r1NotPassed && r1Intermediate,
+    detail: `status=${input.execRun.status} cursor=${input.execRun.current_step_id} awaiting=${String(input.execRun.awaiting_checkpoint)} pending=${input.pendingDecisionCount} pendingRefStep=${input.pendingConfirm?.subjectRefStepId ?? 'null'} boundaryRefusals=${input.boundaryRefusals} buildRequests=${input.buildStepRequestsInCapture} intermediate=${input.intermediateDecisions.map((d) => `${d.stepId}:${d.how}`).join(',') || 'none'}`,
   };
 
-  // ── R2: definition chain, provenance, readability, BUILD-context admissibility
+  // ── R2: definition chain, provenance, readability, BUILD-input verification ─
+  // The completed source WorkItem qualifies ONLY if the final readiness outcome
+  // is a clean pass AND the REQUIRED native upstream outputs are verified:
+  // every required storage row present with the exact type+ref, row hash ==
+  // disk sha256, file non-empty, plus ≥1 test output from the test step.
   const defArt = input.upstreamArtifacts.find((a) => a.artifactType === 'definition');
   const r2Parse = input.definitionParse.ok;
   const r2FinalReadiness = input.finalReadiness.parseError === null && input.finalReadiness.gaps.length === 0;
@@ -122,11 +162,13 @@ export function assessReadiness(input: ReadinessInput): ReadinessAssessment {
     && defArt.existsOnDisk
     && defArt.diskSha256 === input.definitionSourceResolution.resolvedSha256
     && defArt.storageHash === defArt.diskSha256;
-  // upstream artifact integrity: storage provenance + disk bytes + non-empty
+  // REQUIRED native BUILD-input verification (missing OR corrupted fails closed)
+  const badRequired = input.requiredUpstreamOutputs.filter((o) => !o.rowPresent || !o.diskPresent || !o.hashMatch || !o.nonEmpty);
   const badArtifacts = input.upstreamArtifacts.filter((a) => !a.existsOnDisk || !a.nonEmpty || (a.storageHash !== null && a.storageHash !== a.diskSha256));
+  const r2InputsOk = badRequired.length === 0 && input.testOutputsPresent;
   checks.R2_definition_chain = {
-    pass: r2Parse && r2FinalReadiness && r2NoHuman && r2NoExplore && r2DefineDone && r2Source && badArtifacts.length === 0,
-    detail: `parse=${r2Parse} finalReadinessPass=${r2FinalReadiness} (gaps=${input.finalReadiness.gaps.length}${input.finalReadiness.parseError ? ` parseError=${input.finalReadiness.parseError}` : ''}) humanDecisionArtifact=${input.humanDecisionArtifactExists} explorationArtifact=${input.explorationArtifactExists} defineDone=${r2DefineDone} sourceResolved=${input.definitionSourceResolution.ok}${input.definitionSourceResolution.failureCode ? ` (${input.definitionSourceResolution.failureCode})` : ''} artifactsIntegrity=${badArtifacts.length === 0}${badArtifacts.length ? ` bad=[${badArtifacts.map((a) => a.stepId).join(',')}]` : ''}`,
+    pass: r2Parse && r2FinalReadiness && r2NoHuman && r2NoExplore && r2DefineDone && r2Source && r2InputsOk && badArtifacts.length === 0,
+    detail: `parse=${r2Parse} finalReadinessPass=${r2FinalReadiness} (gaps=${input.finalReadiness.gaps.length}${input.finalReadiness.parseError ? ` parseError=${input.finalReadiness.parseError}` : ''}) humanDecisionArtifact=${input.humanDecisionArtifactExists} explorationArtifact=${input.explorationArtifactExists} defineDone=${r2DefineDone} sourceResolved=${input.definitionSourceResolution.ok}${input.definitionSourceResolution.failureCode ? ` (${input.definitionSourceResolution.failureCode})` : ''} requiredInputs=${input.requiredUpstreamOutputs.length} verified=${input.requiredUpstreamOutputs.length - badRequired.length} testOutputs=${input.testOutputsPresent}${badRequired.length ? ` bad=[${badRequired.map((o) => `${o.path}${!o.rowPresent ? ':row-missing' : !o.diskPresent ? ':disk-missing' : !o.hashMatch ? ':hash-mismatch' : ':empty'}`).join(',')}]` : ''}${badArtifacts.length ? ` badRows=[${badArtifacts.map((a) => a.stepId).join(',')}]` : ''}`,
   };
 
   // ── R3: settings pinned and verified at EVERY actual request ────────────────
@@ -194,6 +236,7 @@ export function assessReadiness(input: ReadinessInput): ReadinessAssessment {
     else if (input.execRun.status === 'failed' || input.defineRun.status === 'failed') failureClass = 'workflow-abandoned';
     else if (input.humanDecisionArtifactExists) failureClass = 'definition-human-decision-required';
     else if (input.explorationArtifactExists) failureClass = 'definition-exploration-required';
+    else if (badRequired.length > 0 || !input.testOutputsPresent) failureClass = 'build-inputs-incomplete';
     else if (!input.definitionSourceResolution.ok || !input.definitionParse.ok) failureClass = 'authority-invalid';
     else failureClass = 'malformed-state';
   }

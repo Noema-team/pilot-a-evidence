@@ -1,0 +1,16 @@
+[
+  {
+    "path": ".sle/work/wi-define-108/definition.md",
+    "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+    "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+    "row_type": "definition",
+    "ref": "definition:obj-108"
+  },
+  {
+    "path": ".sle/work/wi-define-108/readiness.md",
+    "sha256": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+    "storage_hash": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+    "row_type": "definition-readiness",
+    "ref": "definition-readiness:obj-108"
+  }
+]

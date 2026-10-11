@@ -1,0 +1,16 @@
+{
+  "node_id": "apply-human-decision",
+  "failed": true,
+  "result_transport": "submit-result",
+  "turns_taken": 2,
+  "tool_calls": [],
+  "stop_reason": "tool_use",
+  "text_length": 0,
+  "wire_observation": {
+    "finish_reason": "tool_calls"
+  },
+  "rejected_result": {
+    "argument_bytes": 1396,
+    "repair_instruction": "Your submitted result was rejected by the output contract for 'decision-application'. Reason: the submitted result does not match the required semantic shape — (root): Unrecognized key(s) in object: 'goal', 'facts'\nRe-submit the complete corrected result in the same required shape. Do not change anything that was not rejected."
+  }
+}

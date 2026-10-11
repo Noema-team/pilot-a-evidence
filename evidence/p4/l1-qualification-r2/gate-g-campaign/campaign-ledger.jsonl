@@ -1,0 +1,11 @@
+{"ts":"2026-10-11T16:36:05.340Z","event":"attempt-incomplete","launchId":"62085d73-82ab-438f-98d8-c6b340f5d8e9","detail":"interrupted runtime archived to /home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r2/gate-g-campaign/interrupted-runtime-2026-10-11T16-36-05-336Z"}
+{"ts":"2026-10-11T16:36:05.381Z","event":"campaign-start","launchId":"62085d73-82ab-438f-98d8-c6b340f5d8e9","detail":"resuming with 0 reconstructed counted slot(s)"}
+{"ts":"2026-10-11T16:36:05.381Z","event":"attempt-start","index":1,"launchId":"62085d73-82ab-438f-98d8-c6b340f5d8e9"}
+{"ts":"2026-10-11T16:36:06.243Z","event":"attempt-counted","attemptId":"fc2b6261-c1f5-4348-abe5-7da9dbe9c2a5","index":1,"launchId":"62085d73-82ab-438f-98d8-c6b340f5d8e9","outcome":"READY","failureClass":null,"evaluable":true,"detail":null,"evidencePackageSha256":"c366eed6227b27d99d21b8966c39f8b4254a9104b76ff6c138f134cc0dca4113"}
+{"ts":"2026-10-11T16:36:06.243Z","event":"attempt-start","index":2,"launchId":"62085d73-82ab-438f-98d8-c6b340f5d8e9"}
+{"ts":"2026-10-11T16:36:08.267Z","event":"attempt-incomplete","index":2,"launchId":"62085d73-82ab-438f-98d8-c6b340f5d8e9","detail":"declared incomplete by resume: launch had no terminal event (process death)"}
+{"ts":"2026-10-11T16:36:08.269Z","event":"attempt-incomplete","launchId":"b8cdec06-276e-4253-b079-0a2e64b939a5","detail":"interrupted runtime archived to /home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r2/gate-g-campaign/interrupted-runtime-2026-10-11T16-36-08-268Z"}
+{"ts":"2026-10-11T16:36:08.304Z","event":"campaign-start","launchId":"b8cdec06-276e-4253-b079-0a2e64b939a5","detail":"resuming with 1 reconstructed counted slot(s)"}
+{"ts":"2026-10-11T16:36:08.304Z","event":"attempt-start","index":3,"launchId":"b8cdec06-276e-4253-b079-0a2e64b939a5"}
+{"ts":"2026-10-11T16:36:13.220Z","event":"attempt-counted","attemptId":"c3539cb1-c479-407d-a94d-09018a824002","index":3,"launchId":"b8cdec06-276e-4253-b079-0a2e64b939a5","outcome":"READY","failureClass":null,"evaluable":true,"detail":null,"evidencePackageSha256":"eb950758ce58e17023bedbe3a3495ab51d10c4198f2f8b4297201fb149dec0f9"}
+{"ts":"2026-10-11T16:36:13.220Z","event":"campaign-terminal","launchId":"b8cdec06-276e-4253-b079-0a2e64b939a5","detail":"ready=2 evaluable=2 supported=true"}

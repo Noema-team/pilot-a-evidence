@@ -1,0 +1,75 @@
+{
+  "attemptId": "fc2b6261-c1f5-4348-abe5-7da9dbe9c2a5",
+  "index": 1,
+  "launchId": "62085d73-82ab-438f-98d8-c6b340f5d8e9",
+  "outcome": "READY",
+  "failureClass": null,
+  "stopDetail": null,
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T16:36:06.182Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "25d8709614fbb25745a7f458f57c3eea4fcd48ad920a4ce31ff4ff379a395816",
+  "db_records_sha256": "3f9a59c2011ee4234b51f9018d32375e014a339cd1437a0c140b137d5a2c8475",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "c0ba7719de9bb3863b048b836d4fdb38ecd6f37cb823a5cac237ee8f8f06a4c2",
+      "storage_hash": "c0ba7719de9bb3863b048b836d4fdb38ecd6f37cb823a5cac237ee8f8f06a4c2",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    },
+    {
+      "path": "docs/requirements.md",
+      "sha256": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "storage_hash": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/requirements.md"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "storage_hash": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/architecture.md"
+    },
+    {
+      "path": "docs/plan.md",
+      "sha256": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "storage_hash": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "row_type": "produced-file",
+      "ref": "produced-file:plan:docs/plan.md"
+    },
+    {
+      "path": "docs/test-plan.md",
+      "sha256": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "storage_hash": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "row_type": "produced-file",
+      "ref": "produced-file:plan:docs/test-plan.md"
+    },
+    {
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "sha256": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "storage_hash": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "row_type": "produced-file",
+      "ref": "produced-file:test:apps/ai-server/tests/integration/test_worker_failure_payload_contract.py"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 29,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r2/gate-g-campaign/attempt-1-fc2b6261-c1f5-4348-abe5-7da9dbe9c2a5/files.sha256.json",
+  "package_sha256": "c366eed6227b27d99d21b8966c39f8b4254a9104b76ff6c138f134cc0dca4113"
+}

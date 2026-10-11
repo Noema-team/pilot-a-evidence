@@ -1,0 +1,84 @@
+{
+  "cycle_id": "c885b73a-7ac4-4d45-a93e-0a20f2ad892f",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-10-11T16:35:58.231Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "synthesize-definition",
+      "status": "complete",
+      "artifacts_written": [
+        ".sle/work/wi-define-108/definition.md"
+      ],
+      "started_at": "2026-10-11T16:35:58.232Z",
+      "turns_taken": 1,
+      "tool_calls": 0,
+      "completed_at": "2026-10-11T16:35:58.294Z"
+    },
+    {
+      "id": "refine-definition",
+      "status": "skipped",
+      "artifacts_written": [],
+      "completed_at": "2026-10-11T16:35:58.297Z",
+      "skip_reason": "condition_not_met"
+    },
+    {
+      "id": "definition-readiness-review",
+      "status": "complete",
+      "artifacts_written": [
+        ".sle/work/wi-define-108/readiness.md"
+      ],
+      "started_at": "2026-10-11T16:35:58.297Z",
+      "completed_at": "2026-10-11T16:35:58.350Z"
+    },
+    {
+      "id": "apply-deferred-gaps",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "post-defer-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "prepare-human-decision",
+      "status": "complete",
+      "artifacts_written": [
+        ".sle/work/wi-define-108/decision-request.json"
+      ],
+      "started_at": "2026-10-11T16:35:58.351Z",
+      "turns_taken": 1,
+      "tool_calls": 0,
+      "completed_at": "2026-10-11T16:35:58.410Z"
+    },
+    {
+      "id": "human-decision-checkpoint",
+      "status": "running",
+      "artifacts_written": [],
+      "started_at": "2026-10-11T16:35:58.412Z"
+    },
+    {
+      "id": "apply-human-decision",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "post-human-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "record-exploration-need",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "commit",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

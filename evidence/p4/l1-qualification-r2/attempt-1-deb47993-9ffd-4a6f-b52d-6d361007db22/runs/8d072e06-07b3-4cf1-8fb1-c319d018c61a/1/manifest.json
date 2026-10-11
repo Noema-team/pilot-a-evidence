@@ -1,0 +1,87 @@
+{
+  "cycle_id": "8d072e06-07b3-4cf1-8fb1-c319d018c61a",
+  "cycle_number": 1,
+  "iteration": 1,
+  "planning_depth": "minimal",
+  "started_at": "2026-10-11T16:35:58.935Z",
+  "outcome": "in_progress",
+  "nodes": [
+    {
+      "id": "synthesize-definition",
+      "status": "complete",
+      "artifacts_written": [
+        ".sle/work/wi-define-108/definition.md"
+      ],
+      "started_at": "2026-10-11T16:35:58.936Z",
+      "turns_taken": 1,
+      "tool_calls": 0,
+      "completed_at": "2026-10-11T16:35:58.974Z"
+    },
+    {
+      "id": "refine-definition",
+      "status": "skipped",
+      "artifacts_written": [],
+      "completed_at": "2026-10-11T16:35:58.976Z",
+      "skip_reason": "condition_not_met"
+    },
+    {
+      "id": "definition-readiness-review",
+      "status": "complete",
+      "artifacts_written": [
+        ".sle/work/wi-define-108/readiness.md"
+      ],
+      "started_at": "2026-10-11T16:35:58.977Z",
+      "completed_at": "2026-10-11T16:35:59.035Z"
+    },
+    {
+      "id": "apply-deferred-gaps",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "post-defer-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "prepare-human-decision",
+      "status": "complete",
+      "artifacts_written": [
+        ".sle/work/wi-define-108/decision-request.json"
+      ],
+      "started_at": "2026-10-11T16:35:59.036Z",
+      "turns_taken": 1,
+      "tool_calls": 0,
+      "completed_at": "2026-10-11T16:35:59.074Z"
+    },
+    {
+      "id": "human-decision-checkpoint",
+      "status": "running",
+      "artifacts_written": [],
+      "started_at": "2026-10-11T16:35:59.076Z"
+    },
+    {
+      "id": "apply-human-decision",
+      "status": "failed",
+      "artifacts_written": [],
+      "started_at": "2026-10-11T16:35:59.078Z",
+      "completed_at": "2026-10-11T16:35:59.148Z",
+      "duration_ms": 9
+    },
+    {
+      "id": "post-human-readiness-review",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "record-exploration-need",
+      "status": "pending",
+      "artifacts_written": []
+    },
+    {
+      "id": "commit",
+      "status": "pending",
+      "artifacts_written": []
+    }
+  ]
+}

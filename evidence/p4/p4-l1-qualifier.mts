@@ -43,7 +43,7 @@ import {
 import { DEFAULT_SHAPES, calibrationShapes, loadFrozenSettings, type PinnedShapes } from './p4-step-contracts.mts';
 
 const EVIDENCE = '/home/theo/Documents/coding/repos/pilot-a/evidence';
-const L1_DIR = `${EVIDENCE}/p4/l1-qualification-r2`;
+const L1_DIR = `${EVIDENCE}/p4/l1-qualification-r3`;
 const SHAPES_PATH = `${EVIDENCE}/p4/p4-step-shapes.json`;
 
 const results: Array<{ gate: string; pass: boolean; detail: string }> = [];
@@ -138,12 +138,28 @@ const DEFINITION_VALUE = () => ({
   ],
   bodyMarkdown: '# Definition — Worker failure-payload contract\n\nThe bounded scope is the RAG worker service failure responses. See the canonical state for goal, ledger, constraints, requirements, non-goals, and acceptance.',
 });
-// the definition AFTER the scripted human decision (f3 := DECIDED) — the same
-// canonical contract, only the ledger row changes
-const DEFINITION_AFTER_HUMAN = () => ({
+// the definition AFTER the human decision is NOT authored by the test: the
+// apply-human-decision step submits only a narrow DECISION_APPLICATION_PROPOSAL
+// and the native deterministic contract performs the ledger transition.
+
+// the decision-application PROPOSAL (the apply-human-decision submit surface):
+// deliberately narrow — no goal, no facts; the deterministic contract performs
+// the ledger transition on the resolved Decision's authority (DDR-036)
+const DECISION_APPLICATION_PROPOSAL = () => ({
+  factStatement: 'The failure-payload schema field set is FIXED by the human decision (option "include"): the full payload field set is in scope for this increment.',
+  requirements: [
+    'The worker returns a structured JSON failure payload with a machine-readable failure class on handled failures.',
+    'The payload carries the full decided field set (include option).',
+    'Existing success responses remain unchanged.',
+  ],
+  bodyMarkdown: 'Records the human decision: the payload field set is in scope (option include). Other open questions remain for their own routes.',
+});
+// the definition with f3 DEFERRED (the apply-deferred-gaps submit surface IS
+// the full definition contract — the step converts DEFER gaps to DEFERRED)
+const DEFINITION_DEFERRED = () => ({
   ...DEFINITION_VALUE(),
   facts: DEFINITION_VALUE().facts.map((f) => (f.id === 'f3'
-    ? { ...f, status: 'DECIDED', source: 'decision' }
+    ? { ...f, status: 'DEFERRED' }
     : f)),
 });
 
@@ -239,17 +255,15 @@ function refineRouteBehaviors() {
 }
 // human-RESOLUTION calibration leg: the review fails HUMAN_DECISION, the
 // harness (as the scripted human operator) resolves the pending decision
-// through the real ResumeService, and the downstream native shapes
-// (apply-human-decision, post-human-readiness-review) are observed
+// through the real ResumeService, the decision-application proposal is
+// applied through the native deterministic contract, and the downstream
+// native shapes (apply-human-decision, post-human-readiness-review) are
+// observed
 function humanResolutionBehaviors() {
   return scriptedProvider({
     multiTurn: (step) => {
-      if (step === 'synthesize-definition' || step === 'apply-human-decision') {
-        return mt({
-          stop_reason: 'tool_use', text: '', wire_observation: { finish_reason: 'tool_calls' },
-          tool_uses: submitToolUse(step === 'apply-human-decision' ? DEFINITION_AFTER_HUMAN() : DEFINITION_VALUE()),
-        });
-      }
+      if (step === 'synthesize-definition') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DEFINITION_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
+      if (step === 'apply-human-decision') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DECISION_APPLICATION_PROPOSAL()), wire_observation: { finish_reason: 'tool_calls' } });
       if (step === 'prepare-human-decision') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DECISION_REQUEST_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
       return undefined;
     },
@@ -257,6 +271,34 @@ function humanResolutionBehaviors() {
       if (step !== null && step.endsWith('readiness-review')) {
         const reviewCalls = calls.filter((c) => c.wire === 'completeStructured').length;
         return reviewCalls <= 1 ? READINESS_FAIL('HUMAN_DECISION', 'f3') : READINESS_PASS();
+      }
+      return undefined;
+    },
+  });
+}
+// DEFER route: the review fails with a DEFER-classified gap; the native
+// apply-deferred-gaps step converts the gap to DEFERRED in the fact ledger;
+// the post-defer-readiness-review then passes — a legitimate native route to
+// a READY definition (explicit recorded exclusion from scope)
+function deferRouteBehaviors() {
+  return scriptedProvider({
+    multiTurn: (step) => {
+      if (step === 'synthesize-definition' || step === 'apply-deferred-gaps') {
+        return mt({
+          stop_reason: 'tool_use', text: '', wire_observation: { finish_reason: 'tool_calls' },
+          tool_uses: submitToolUse(step === 'apply-deferred-gaps' ? DEFINITION_DEFERRED() : DEFINITION_VALUE()),
+        });
+      }
+      if (step === 'scoping.produce') return mt({ text: archivedText('scoping.produce.md'), tokens_used: 512 });
+      if (step === 'design') return mt({ text: archivedText('design.md'), tokens_used: 512 });
+      if (step === 'plan') return mt({ text: archivedText('plan.md'), tokens_used: 512 });
+      if (step === 'test') return mt({ text: archivedText('test.md'), tokens_used: 512 });
+      return undefined;
+    },
+    structured: (step, _params, calls) => {
+      if (step !== null && step.endsWith('readiness-review')) {
+        const reviewCalls = calls.filter((c) => c.wire === 'completeStructured').length;
+        return reviewCalls <= 1 ? READINESS_FAIL('DEFER', 'f3') : READINESS_PASS();
       }
       return undefined;
     },
@@ -339,6 +381,16 @@ async function gateA(): Promise<PinnedShapes> {
       name: 'refine-route',
       run: async () => {
         const h = refineRouteBehaviors();
+        const rec = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), { captureToolSchemas: true, onActive: h.bind });
+        const added = rec.evidencePackagePath ? extractShapes(shapes, join(rec.evidencePackagePath, 'guard-capture.jsonl')) : 0;
+        return { rec, calls: h.calls, added };
+      },
+      expect: 'READY',
+    },
+    {
+      name: 'defer-route',
+      run: async () => {
+        const h = deferRouteBehaviors();
         const rec = await runP4Attempt(1, h.provider, L1_DIR, calibrationShapes(), { captureToolSchemas: true, onActive: h.bind });
         const added = rec.evidencePackagePath ? extractShapes(shapes, join(rec.evidencePackagePath, 'guard-capture.jsonl')) : 0;
         return { rec, calls: h.calls, added };
@@ -685,6 +737,94 @@ async function gateG(shapes: PinnedShapes): Promise<void> {
     `killed=${killed} slot1Counted=${slot1 !== undefined} crashDuringSlot2=${slot2Started && !slot2Counted} countedIdx=[${countedIdx.join(',')}] slot1Once=${slot1Once} slot1Untouched=${slot1Untouched} incomplete=${incomplete.length} resumeTerminal="${terminalLine}" — the resume RECONSTRUCTED slot 1 from the ledger (no re-execution, no double-count) and completed the terminal condition`);
 }
 
+async function gateAUTH2(shapes: PinnedShapes): Promise<void> {
+  // pre-freeze correction A: unauthorized REWRITES of already-dirty paths,
+  // detected by before/after CONTENT identities. The design step (authorized
+  // for docs/requirements.md + docs/architecture.md only) rewrites
+  // docs/cycle-charter.md — a path that is ALREADY DIRTY (written by
+  // scoping.produce, untracked). Note the engine's own role ceilings already
+  // drop unauthorized doc sections (defense layer 1); this gate exercises the
+  // campaign-level backstop at the provider boundary, where no section
+  // machinery mediates the write.
+  const h = scriptedProvider({
+    multiTurn: (step) => {
+      if (step === 'synthesize-definition') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DEFINITION_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
+      if (step === 'scoping.produce') return mt({ text: archivedText('scoping.produce.md'), tokens_used: 512 });
+      if (step === 'design') {
+        const charter = readFileSync(join(ROOT, 'docs', 'cycle-charter.md'), 'utf-8');
+        writeFileSync(join(ROOT, 'docs', 'cycle-charter.md'), `${charter}\n<!-- unauthorized rewrite authored inside the design step (L1 gate AUTH2) -->\n`);
+        return mt({ text: archivedText('design.md'), tokens_used: 512 });
+      }
+      if (step === 'plan') return mt({ text: archivedText('plan.md'), tokens_used: 512 });
+      if (step === 'test') return mt({ text: archivedText('test.md'), tokens_used: 512 });
+      return undefined;
+    },
+    structured: (step) => (step !== null && step.endsWith('readiness-review') ? READINESS_PASS() : undefined),
+  });
+  const rec = await runP4Attempt(13, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const pkg = rec.evidencePackagePath;
+  let reasonSaysRewrite = false;
+  if (pkg && existsSync(join(pkg, 'authority-violations.json'))) {
+    const v = JSON.parse(readFileSync(join(pkg, 'authority-violations.json'), 'utf-8')) as Array<{ path: string; reason: string }>;
+    reasonSaysRewrite = v.some((x) => x.path === 'docs/cycle-charter.md' && x.reason.includes('unauthorized rewrite of already-dirty path'));
+  }
+  const ok = rec.outcome === 'STOPPED' && rec.failureClass === 'authority-bypass' && reasonSaysRewrite && targetPristine();
+  report('AUTH2.dirty-rewrite-stop', ok,
+    `outcome=${rec.outcome} class=${rec.failureClass} rewriteNamed=${reasonSaysRewrite} worktreePristine=${targetPristine()} — a rewrite of an ALREADY-DIRTY path by an unauthorized step is detected via before/after content identities (campaign backstop; the engine's role ceilings are the first layer)`);
+}
+
+async function gateAUTHEXC(shapes: PinnedShapes): Promise<void> {
+  // pre-freeze correction A (exception path): the out-of-policy write happens
+  // and THEN the step throws — the authority check must still record the
+  // violations and the campaign must still STOP and archive them.
+  const h = scriptedProvider({
+    multiTurn: (step) => {
+      if (step === 'synthesize-definition') return mt({ stop_reason: 'tool_use', text: '', tool_uses: submitToolUse(DEFINITION_VALUE()), wire_observation: { finish_reason: 'tool_calls' } });
+      if (step === 'scoping.produce') return mt({ text: archivedText('scoping.produce.md'), tokens_used: 512 });
+      if (step === 'design') {
+        writeFileSync(join(ROOT, 'docs', 'rogue-exc.md'), 'out-of-policy write immediately followed by a step exception (L1 gate AUTH-EXC)\n');
+        throw new Error('scripted step exception AFTER the out-of-policy write (L1 gate AUTH-EXC)');
+      }
+      return undefined;
+    },
+    structured: (step) => (step !== null && step.endsWith('readiness-review') ? READINESS_PASS() : undefined),
+  });
+  const rec = await runP4Attempt(14, h.provider, L1_DIR, shapes, { onActive: h.bind });
+  const pkg = rec.evidencePackagePath;
+  const archived = pkg !== null && existsSync(join(pkg, 'authority-violations', 'docs', 'rogue-exc.md'));
+  const ok = rec.outcome === 'STOPPED' && rec.failureClass === 'authority-bypass' && archived && targetPristine();
+  report('AUTHEXC.exception-path-stop', ok,
+    `outcome=${rec.outcome} class=${rec.failureClass} violatingBytesArchived=${archived} worktreePristine=${targetPristine()} — the authority check runs on the EXCEPTION path too (write-then-throw is still a STOP)`);
+}
+
+async function gateG2(): Promise<void> {
+  // pre-freeze correction C: retained counted-slot package identities are
+  // verified and CONFLICTING ledger counts are rejected during recovery
+  // (fail closed — the resume never launches on disputed evidence).
+  const srcDir = join(L1_DIR, 'gate-g-campaign');
+  const fixture = join(L1_DIR, 'gate-g2-fixture');
+  rmSync(fixture, { recursive: true, force: true });
+  mkdirSync(fixture, { recursive: true });
+  cpSync(srcDir, fixture, { recursive: true });
+  const { reconstructCountedSlots } = await import('./p4-campaign.mts');
+  const baseline = reconstructCountedSlots(fixture);
+  const baselineClean = baseline.conflicts.length === 0 && baseline.attempts.length >= 1;
+  // (a) tamper a RETAINED package -> identity verification must reject
+  const retained = baseline.attempts[0];
+  const pkgDir = join(fixture, `attempt-${retained.index}-${retained.attemptId}`);
+  appendFileSync(join(pkgDir, 'readiness-assessment.json'), ' ');
+  const tampered = reconstructCountedSlots(fixture);
+  rmSync(join(pkgDir, 'readiness-assessment.json'));
+  cpSync(join(srcDir, `attempt-${retained.index}-${retained.attemptId}`, 'readiness-assessment.json'), join(pkgDir, 'readiness-assessment.json'));
+  const tamperRejected = tampered.conflicts.length > 0 && tampered.conflicts.some((c) => c.includes('does not verify') || c.includes('identity'));
+  // (b) duplicate counted slot -> conflicting ledger counts must reject
+  appendFileSync(join(fixture, 'campaign-ledger.jsonl'), `${JSON.stringify({ ts: new Date().toISOString(), event: 'attempt-counted', attemptId: 'duplicate-slot-entry', index: retained.index, outcome: 'READY', evaluable: true, evidencePackageSha256: retained.evidencePackageSha256 })}\n`);
+  const duplicated = reconstructCountedSlots(fixture);
+  const duplicateRejected = duplicated.conflicts.some((c) => c.includes('counted twice'));
+  report('G2.ledger-conflict-rejection', baselineClean && tamperRejected && duplicateRejected,
+    `baselineConflicts=${baseline.conflicts.length} tamperRejected=${tamperRejected} duplicateRejected=${duplicateRejected} — retained package identities verified, conflicting counts fail closed`);
+}
+
 function gateH(): void {
   const src = readFileSync(`${EVIDENCE}/p4/p4-campaign.mts`, 'utf-8');
   const settingsWrites = [...src.matchAll(/writeFileSync\([^)]*settings/g)].length;
@@ -697,7 +837,7 @@ function gateH(): void {
 // ─── main ────────────────────────────────────────────────────────────────────
 async function main(): Promise<void> {
   if (!targetPristine()) throw new Error('target not pristine — L1 refuses to run');
-  console.log('=== P4 L1 qualification r2 (offline; zero network traffic) ===');
+  console.log('=== P4 L1 qualification r3 (offline; zero network traffic) ===');
   gateH();
   const shapes = await gateA();
   if (results.find((r) => r.gate === 'A.ready-path')?.pass) {
@@ -712,13 +852,16 @@ async function main(): Promise<void> {
     await gateF4(shapes);
     await gateTAMPER(shapes);
     await gateAUTH(shapes);
+    await gateAUTH2(shapes);
+    await gateAUTHEXC(shapes);
     await gateG(shapes);
+    await gateG2();
   } else {
     console.log('Gate A failed — remaining gates skipped (fix the READY path first).');
   }
   const passed = results.filter((r) => r.pass).length;
-  console.log(`=== L1 r2: ${passed}/${results.length} gates passed ===`);
-  writeFileSync(`${EVIDENCE}/p4/p4-l1-qualification-output-r2.txt`, JSON.stringify({ finished_at_utc: new Date().toISOString(), results }, null, 2));
+  console.log(`=== L1 r3: ${passed}/${results.length} gates passed ===`);
+  writeFileSync(`${EVIDENCE}/p4/p4-l1-qualification-output-r3.txt`, JSON.stringify({ finished_at_utc: new Date().toISOString(), results }, null, 2));
   if (passed !== results.length) process.exitCode = 1;
 }
 

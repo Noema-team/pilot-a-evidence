@@ -1,5 +1,5 @@
 {
- "artifact": "P4 DRAFT PREREGISTRATION v3.1 — NOT FROZEN. Additive revision after the P4 implementation review: L1-r2 offline qualification COMPLETE (20/20 gates, 2026-10-11T16:36:13Z). Companion to p4-design-draft.md v3.1 (§14). Prior L1 evidence (l1-qualification/, 14/14) preserved untouched. Awaiting review before L2 provider traffic; no scientific freeze; no L3 authorization.",
+ "artifact": "P4 DRAFT PREREGISTRATION v3.2 — NOT FROZEN. L2 operational round EXECUTED (OPERATIONAL-CAP-STOP, honestly reported incl. one disclosed execution incident) and all three pre-freeze corrections implemented + proven offline (L1-r3 24/24 gates). READY FOR INDEPENDENT SCIENTIFIC-FREEZE REVIEW — no freeze applied, no L3.",
  "experiment": "P4",
  "title": "Autonomous upstream reliability — can the real Stratum workflows + real LLM produce a valid BUILD-entry state without fixture replay?",
  "research_question": "Can the real Stratum workflow, using a real LLM rather than scripted upstream fixture replay, consistently produce a valid BUILD-entry state?",
@@ -77,7 +77,7 @@
  },
  "reuse": "native workflow registry entries (define-work, full-build), engine + decision repos, resolveDefinitionSource + definition-artifact parser, config-guard capture, evidence packaging, ledger + adjudicators, restoration, qualification patterns; NEW thin code: campaign lifecycle driver (launch both workflows, create execution WI with definitionSource ref, adjudicate checkpoints per the fixed policy), R1-R6 readiness function (pure), clean-init/reset + ledger-resume in the runner; NO changes to stratum 9f298f2 or frozen P3 artifacts",
  "stop_rules": "immediate campaign-terminal STOP on CONFIG-DRIFT, budget-wire-mismatch, AUTHORITY-BYPASS (per-step scoping per correction 3), guard STOP, or evidence-archive failure — P3 STOP shape; on any STOP: archive, journal, return to operator",
- "execution_status": "L1-r2 COMPLETE — STOPPED before L2 provider traffic, scientific freeze, and L3. No live GO.",
+ "execution_status": "L2 EXECUTED (OPERATIONAL-CAP-STOP) + pre-freeze corrections r3 COMPLETE — STOPPED for independent scientific-freeze review. No freeze applied, no L3.",
  "review_rulings_applied": [
   "R4 wire mismatch -> campaign-terminal procedure STOP, never model-attributed NOT-READY",
   "native define-work + full-build workflows, not a custom upstream pipeline",
@@ -144,5 +144,36 @@
    ]
   },
   "frozen_untouched": "stratum 9f298f2 and all P3 artifacts byte-unchanged; target worktree pristine after qualification (only ?? .sle/)"
+ },
+ "l2_operational_round": {
+  "directive": "operator L2 GO: one bounded real-provider round, maximum 6 real-provider calls; L3 HOLD",
+  "evidence_namespace": "evidence/p4/l2-qualification/ (separate operational namespace; no P4 trial counted)",
+  "pre_dial": "offline executable-path verification (attempt-0: scripted provider through the real engine under pinned shapes -> READY, R1-R6 all pass) + provider identity + key presence + pre-dial accounting realCalls=0",
+  "result": {
+   "verdict": "OPERATIONAL-CAP-STOP (preregistered endpoint, reported as-is)",
+   "real_dials": 6,
+   "cap": 6,
+   "cap_enforced_pre_dial": true,
+   "wire_exercised": "define-work produce (completeMultiTurn) with real traffic: 6 turns, guard PASS on every request, usage observed (tokens 4857->11321), stop_reason=tool_use",
+   "wire_not_reached": "structured-review and upstream-producer wires were NOT reached: the real model spent all 6 turns in repository investigation without submitting the definition; the 7th request was captured and refused pre-dial (traffic cap)",
+   "frozen_treatment": "UNCHANGED — no retries, no prompt adaptation, single round"
+  },
+  "execution_incident_disclosure": "the l2 module self-executes on import; an import-based syntax check inadvertently ran a first full round before the intended invocation; the first round's evidence dir was overwritten by the second invocation's rmSync; surviving complete evidence = the second invocation; total real dials across both invocations ~12-14 (all within each round's 6-call cap, all guard-captured at the time); NO third round was run",
+  "report": "evidence/p4/l2-qualification/l2-report.json (regenerated offline from the archived capture via --report-only; per-call request/response/error pairing corrected)"
+ },
+ "pre_freeze_corrections_r3": {
+  "A_unauthorized_rewrites_and_exception_paths": "authorityViolationsForStep now compares BEFORE/AFTER CONTENT IDENTITIES per step: new paths, rewrites of already-dirty paths (content sha changed), and deletions — each authorized only per the frozen workflow definitions; the stepRunner seam runs the check on SUCCESS AND EXCEPTION paths (violations recorded, then the original error propagates; attempt-level stop derives from the recorded violations). Gates AUTH2.dirty-rewrite-stop + AUTHEXC.exception-path-stop PASS. Observation: the engine's role ceilings already drop unauthorized doc sections (defense layer 1); the campaign check is the documented backstop.",
+  "B_remaining_definition_routes": "DEFER route calibrated end-to-end (apply-deferred-gaps -> post-defer-readiness-review -> READY through the legitimate native defer semantics) and the human-resolution chain fixed to submit the NARROW DecisionApplicationProposal so apply-human-decision -> post-human-readiness-review is genuinely reached; 13 shapes pinned; no tool authority broadened (calibration legs run under calibrationShapes with the same guard)",
+  "C_retained_identities_and_conflicting_counts": "reconstructCountedSlots verifies each retained counted slot's package identity (manifest.package_sha256 == ledger entry, full verifyEvidencePackage) and rejects duplicate counted indexes; any conflict is a fail-closed LEDGER-CONFLICT stop (the resume never launches on disputed evidence). Gate G2.ledger-conflict-rejection PASS (baseline clean, tampered retained package rejected, duplicate counted slot rejected)."
+ },
+ "l1_r3_result": {
+  "gates_passed": 24,
+  "gates_total": 24,
+  "output": "evidence/p4/p4-l1-qualification-output-r3.txt",
+  "evidence_dir": "evidence/p4/l1-qualification-r3/",
+  "prior_evidence_preserved": [
+   "evidence/p4/l1-qualification/ (14/14)",
+   "evidence/p4/l1-qualification-r2/ (20/20)"
+  ]
  }
 }

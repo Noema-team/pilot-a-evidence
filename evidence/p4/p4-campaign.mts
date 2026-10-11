@@ -95,47 +95,67 @@ async function loadAuthorizedUpstreamWrites(): Promise<{ exact: Map<string, Set<
   return { exact, prefixes };
 }
 
-// paths added/modified/deleted in the target worktree vs the pristine baseline
-// (`.sle/` is the engine's own state dir — always authorized, git-invisible
-// to the upstream contract). `-uall` enumerates EVERY untracked file — the
-// default collapses untracked directories into one entry, which would hide
-// individual out-of-policy files.
-function gitWorktreeDelta(): Set<string> {
+// content identities for every dirty path in the target worktree
+// (sha256 of current bytes; null for a deleted path). `-uall` enumerates
+// EVERY untracked file — the default collapses untracked directories into
+// one entry, which would hide individual out-of-policy files.
+function gitWorktreeContentMap(): Map<string, string | null> {
   const status = execFileSync('git', ['-C', ROOT, 'status', '--porcelain', '-uall']).toString();
-  const out = new Set<string>();
+  const out = new Map<string, string | null>();
   for (const line of status.split('\n')) {
     const t = line.trim();
     if (t.length === 0 || t === '?? .sle/') continue;
     const p = t.startsWith('?? ') ? t.slice(3) : t.slice(3);
     const path = p.replace(/\/$/, '').split(' -> ').pop() as string;
     if (path === '.sle' || path.startsWith('.sle/')) continue;
-    out.add(path);
+    const abs = join(ROOT, path);
+    out.set(path, existsSync(abs) ? sha256File(abs) : null);
   }
   return out;
 }
 
-// returns the out-of-policy paths a step wrote (empty = authorized)
+// returns the out-of-policy paths a step wrote, using BEFORE/AFTER CONTENT
+// IDENTITIES: a NEW path, a REWRITE of an already-dirty path (content sha
+// changed), or a DELETION of a dirty path — each authorized only if the step
+// (per the frozen workflow definitions) may write that path.
 function authorityViolationsForStep(
   wf: string,
   step: string,
-  before: Set<string>,
+  before: Map<string, string | null>,
   auth: { exact: Map<string, Set<string>>; prefixes: Map<string, string[]> },
 ): Array<{ path: string; reason: string }> {
+  const after = gitWorktreeContentMap();
   const violations: Array<{ path: string; reason: string }> = [];
-  for (const p of gitWorktreeDelta()) {
-    if (before.has(p)) continue; // written before this step ran — not this step's write
-    if (wf === 'define-work') {
-      violations.push({ path: p, reason: 'define-work steps may not write outside .sle/' });
-      continue;
-    }
+  const classify = (p: string): string | null => {
+    if (wf === 'define-work') return 'define-work steps may not write outside .sle/';
     if (wf === 'full-build') {
       const allowed = auth.exact.get(step) ?? new Set<string>();
       const prefixes = auth.prefixes.get(step) ?? [];
-      if (allowed.has(p) || prefixes.some((x) => p.startsWith(x))) continue;
-      violations.push({ path: p, reason: `not in ${step}'s authorized outputs [${[...allowed, ...prefixes].join(', ')}]` });
-      continue;
+      if (allowed.has(p) || prefixes.some((x) => p.startsWith(x))) return null;
+      return `not in ${step}'s authorized outputs [${[...allowed, ...prefixes].join(', ')}]`;
     }
-    violations.push({ path: p, reason: `workflow ${wf} has no authorized worktree writes` });
+    return `workflow ${wf} has no authorized worktree writes`;
+  };
+  const kindOf = (p: string): string => {
+    const b = before.get(p);
+    const a = after.get(p);
+    if (b === undefined) return 'unauthorized write';
+    if (a === undefined || a === null) return 'unauthorized deletion of already-dirty path';
+    if (b === null || b !== a) return 'unauthorized rewrite of already-dirty path (before/after content identity mismatch)';
+    return 'unchanged'; // present before and after with identical bytes — not this step's write
+  };
+  for (const [p] of after) {
+    const kind = kindOf(p);
+    if (kind === 'unchanged') continue;
+    const why = classify(p);
+    if (why) violations.push({ path: p, reason: `${kind}: ${why}` });
+  }
+  // deletions remove the path from the after map — scan before-entries too
+  for (const [p, b] of before) {
+    if (after.has(p) || !before.has(p)) continue;
+    void b;
+    const why = classify(p);
+    if (why) violations.push({ path: p, reason: `unauthorized deletion of already-dirty path: ${why}` });
   }
   return violations;
 }
@@ -279,7 +299,7 @@ interface Stack {
 async function buildStack(
   guardedProvider: unknown,
   active: ActiveStepRef,
-  opts?: { postStepCheck?: (wf: string, step: string, before: Set<string>) => Array<{ path: string; reason: string }> },
+  opts?: { postStepCheck?: (wf: string, step: string, before: Map<string, string | null>) => Array<{ path: string; reason: string }> },
 ): Promise<Stack> {
   const { buildAgentRunner } = await import(`${STRATUM}/src/application.js`);
   const { RunArtifactManager } = await import(`${STRATUM}/src/run-artifacts.js`);
@@ -339,17 +359,29 @@ async function buildStack(
         return async (step: { id: string }, ctx: { workflowId: string; stepId: string }): Promise<unknown> => {
           active.workflowId = String(ctx.workflowId);
           active.stepId = String(ctx.stepId);
-          // AUTHORITY seam: snapshot the worktree BEFORE the step, verify the
-          // step's actual disk writes against the frozen per-step authorization
-          // after it — an out-of-policy write is a campaign-terminal STOP.
-          const before = gitWorktreeDelta();
-          const result = await (target as { run: (s: unknown, c: unknown) => Promise<unknown> }).run(step, ctx);
+          // AUTHORITY seam: snapshot BEFORE/AFTER CONTENT IDENTITIES for the
+          // step's actual disk writes — new paths, rewrites of already-dirty
+          // paths, and deletions, INCLUDING the exception path (the check
+          // runs in finally; violations are recorded, then the original error
+          // still propagates). An out-of-policy write is a campaign-terminal
+          // STOP archived before worktree cleanup.
+          const before = gitWorktreeContentMap();
+          let result: unknown;
+          let thrown: unknown = null;
+          try {
+            result = await (target as { run: (s: unknown, c: unknown) => Promise<unknown> }).run(step, ctx);
+          } catch (e) {
+            thrown = e; // exception path: the authority check still runs below
+          }
           const violations = opts?.postStepCheck?.(String(ctx.workflowId), String(ctx.stepId), before) ?? [];
           if (violations.length > 0) {
+            // the bypass takes precedence: the violations are recorded by the
+            // check itself, and the typed error surfaces where possible
             throw new P4AuthorityBypassError(
               `AUTHORITY-BYPASS at ${ctx.workflowId}/${ctx.stepId}: ${violations.map((v) => `${v.path} (${v.reason})`).join('; ')}`,
             );
           }
+          if (thrown !== null) throw thrown;
           return result;
         };
       }
@@ -1067,13 +1099,18 @@ export function reconcileLedgerOnResume(evidenceDir: string): void {
 }
 
 // durable count reconstruction: the resuming process rebuilds its counted
-// slots FROM THE LEDGER (never re-executing, never double-counting)
+// slots FROM THE LEDGER (never re-executing, never double-counting) — and
+// VERIFIES each retained slot's evidence package identity. A conflicting
+// ledger (duplicate counted indexes) or a retained package whose identity
+// does not verify (missing, tampered, or ledger/package sha disagreement) is
+// a fail-closed conflict: the campaign refuses to launch.
 export interface ReconstructedCount {
   attempts: AttemptRecord[];
   readyCount: number;
   evaluableCount: number;
   maxIndex: number;
   priorStop: LedgerEntry | null;
+  conflicts: string[];
 }
 
 export function reconstructCountedSlots(evidenceDir: string): ReconstructedCount {
@@ -1083,23 +1120,49 @@ export function reconstructCountedSlots(evidenceDir: string): ReconstructedCount
   let evaluableCount = 0;
   let maxIndex = 0;
   let priorStop: LedgerEntry | null = null;
+  const conflicts: string[] = [];
+  const seenCountedIndexes = new Map<number, string>();
   for (const e of entries) {
     if (e.index !== undefined && e.index > maxIndex) maxIndex = e.index;
     if (e.event !== 'attempt-counted' || !e.attemptId || e.index === undefined) continue;
+    // conflicting ledger counts: the same slot counted twice
+    const priorAttempt = seenCountedIndexes.get(e.index);
+    if (priorAttempt !== undefined) {
+      conflicts.push(`ledger conflict: slot ${e.index} counted twice (${priorAttempt} and ${e.attemptId})`);
+      continue;
+    }
+    seenCountedIndexes.set(e.index, e.attemptId);
+    // retained package identity verification (fail closed)
+    const pkgDir = join(evidenceDir, `attempt-${e.index}-${e.attemptId}`);
+    let identityOk = false;
+    let identityDetail = 'package absent';
+    if (existsSync(join(pkgDir, 'manifest.json'))) {
+      const manifest = JSON.parse(readFileSync(join(pkgDir, 'manifest.json'), 'utf-8')) as { package_sha256: string };
+      if (e.evidencePackageSha256 != null && manifest.package_sha256 !== e.evidencePackageSha256) {
+        identityDetail = `package identity ${manifest.package_sha256.slice(0, 12)} != ledger ${String(e.evidencePackageSha256).slice(0, 12)}`;
+      } else {
+        const verdict = verifyEvidencePackage(pkgDir);
+        identityOk = verdict.ok;
+        if (!verdict.ok) identityDetail = `package does not verify: ${verdict.violations.slice(0, 2).join('; ')}`;
+      }
+    }
+    if (!identityOk) {
+      conflicts.push(`retained slot ${e.index} (${e.attemptId}): ${identityDetail}`);
+      continue;
+    }
     const outcome = e.outcome as AttemptRecord['outcome'];
     if (outcome === 'READY') readyCount++;
     if (e.evaluable !== false) evaluableCount++;
     attempts.push({
       attemptId: e.attemptId, index: e.index, outcome, failureClass: e.failureClass ?? null,
       stopDetail: e.detail ?? null, evaluable: e.evaluable !== false, capturePath: '',
-      evidencePackagePath: null, evidencePackageSha256: e.evidencePackageSha256 ?? null,
+      evidencePackagePath: pkgDir, evidencePackageSha256: e.evidencePackageSha256 ?? null,
       assessment: null, reconstructed: true,
     });
-    void outcome;
   }
   const stops = entries.filter((e) => e.event === 'attempt-stopped');
   if (stops.length > 0) priorStop = stops[stops.length - 1];
-  return { attempts, readyCount, evaluableCount, maxIndex, priorStop };
+  return { attempts, readyCount, evaluableCount, maxIndex, priorStop, conflicts };
 }
 
 export function readLedger(evidenceDir: string): LedgerEntry[] {
@@ -1148,6 +1211,12 @@ export async function runP4Campaign(opts: {
   // here so the terminal condition is computed over the durable count.
   reconcileLedgerOnResume(opts.evidenceDir);
   const prior = reconstructCountedSlots(opts.evidenceDir);
+  if (prior.conflicts.length > 0) {
+    // fail closed: conflicting ledger counts or unverified retained packages
+    // refuse the resume — the campaign never launches on disputed evidence
+    appendLedger(opts.evidenceDir, { ts: new Date().toISOString(), event: 'campaign-terminal', launchId, detail: `LEDGER-CONFLICT: ${prior.conflicts.slice(0, 3).join(' | ')}` });
+    return { attempts: prior.attempts, readyCount: 0, evaluableCount: 0, supported: null, terminal: `STOPPED: ledger-conflict — ${prior.conflicts.slice(0, 3).join(' | ')}`, launchId };
+  }
   // archive any interrupted runtime remnants, then restore the worktree —
   // the resuming campaign never inherits a dead attempt's runtime state
   const sle = join(ROOT, '.sle');

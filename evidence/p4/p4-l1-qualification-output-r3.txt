@@ -1,0 +1,125 @@
+{
+  "finished_at_utc": "2026-10-11T17:31:01.982Z",
+  "results": [
+    {
+      "gate": "H.code-inspection",
+      "pass": true,
+      "detail": "settings writes=1 (init-only inside installFrozenSettings) present=true build never dispatched=true"
+    },
+    {
+      "gate": "A.calibration",
+      "pass": true,
+      "detail": "observed+attempt1=READY; pinned 6 step shapes [define-work/synthesize-definition, full-build/scoping.produce, full-build/design, full-build/plan, full-build/test, define-work/definition-readiness-review] → /home/theo/Documents/coding/repos/pilot-a/evidence/p4/p4-step-shapes.json"
+    },
+    {
+      "gate": "A.calibration.refine-route",
+      "pass": true,
+      "detail": "leg outcome=READY class= (expected READY); shapes now 7; scripted calls=8"
+    },
+    {
+      "gate": "A.calibration.defer-route",
+      "pass": true,
+      "detail": "leg outcome=READY class= (expected READY); shapes now 9; scripted calls=8"
+    },
+    {
+      "gate": "A.calibration.human-route",
+      "pass": true,
+      "detail": "leg outcome=NOT-READY class=definition-human-decision-required (expected NOT-READY); shapes now 10; scripted calls=3"
+    },
+    {
+      "gate": "A.calibration.explore-route",
+      "pass": true,
+      "detail": "leg outcome=NOT-READY class=definition-exploration-required (expected NOT-READY); shapes now 11; scripted calls=3"
+    },
+    {
+      "gate": "A.calibration.human-resolution",
+      "pass": true,
+      "detail": "leg outcome=NOT-READY class=definition-human-decision-required (expected NOT-READY); shapes now 13; scripted calls=5"
+    },
+    {
+      "gate": "A.ready-path",
+      "pass": true,
+      "detail": "READY under PINNED shapes; R1–R6 all pass; R1 asserts the ACTUAL state [status=halted cursor=confirm awaiting=confirm pending=1 pendingRefStep=confirm boundaryRefusals=0 buildRequest]; scripted calls=6 wires=[completeMultiTurn,completeStructured]"
+    },
+    {
+      "gate": "B.isolation",
+      "pass": true,
+      "detail": "attempt2=READY workItems=[wi-define-108,wi-exec-108] (fresh DB: ONLY this attempt's rows) pristine before=true after=true settings=5634b2e8"
+    },
+    {
+      "gate": "C.config-drift-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=guard-stop stepFailureSaysSettings=true — mid-attempt drift (the exact P2 seed() output) STOPs the campaign (fail-closed evidence + settings violation)"
+    },
+    {
+      "gate": "C2.budget-wire-stop",
+      "pass": true,
+      "detail": "P2-shaped request (16384 vs frozen 32768 for full-build/design) refused pre-call; inner provider reached=false"
+    },
+    {
+      "gate": "D.unpinned-shape-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=guard-stop scripted calls for the step=0 (fail-closed request validation BEFORE any model call)"
+    },
+    {
+      "gate": "E2.missing-artifact",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=build-inputs-incomplete R2=false (parse=true finalReadinessPass=true (gaps=0) humanDecisionArtifact=false explorationArtifact=false defineDone=true sourceResolved=true requiredInputs=5 verified=4 testOutp) — the required-output verifier fails closed and names the artifact"
+    },
+    {
+      "gate": "E2.corrupted-artifact",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=build-inputs-incomplete R2=false (parse=true finalReadinessPass=true (gaps=0) humanDecisionArtifact=false explorationArtifact=false defineDone=true sourceResolved=true requiredInputs=5 verified=4 testOutp) — the required-output verifier fails closed and names the artifact"
+    },
+    {
+      "gate": "F1.budget-exhaustion-not-ready",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=budget-exhaustion-upstream evaluable=true — genuine length terminus at the CORRECT budget = model-attributable NOT-READY, never a STOP"
+    },
+    {
+      "gate": "F2.human-decision-pending",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=definition-human-decision-required pendingDecisions=1 — the semantic human question is NEVER synthetically approved"
+    },
+    {
+      "gate": "F3.explore-not-ready",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=definition-exploration-required — a committed definition reached via the explore route does NOT qualify (final readiness outcome verified, not just parse+resolve)"
+    },
+    {
+      "gate": "F4.authority-invalid",
+      "pass": true,
+      "detail": "outcome=NOT-READY class=build-inputs-incomplete R2=false (parse=false finalReadinessPass=true (gaps=0) humanDecisionArtifact=false explorationArtifact=false defineDone=true sourceResolved=false (def) — provenance/disk-integrity/admissibility fails closed"
+    },
+    {
+      "gate": "T.post-archive-tamper",
+      "pass": true,
+      "detail": "pristine ok=true; tampered copy detected=[hash mismatch: readiness-assessment.json] — full-package hash binding (files.sha256.json + package identity) catches post-archive edits"
+    },
+    {
+      "gate": "AUTH.authority-bypass-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=authority-bypass rogueWriteArchived=true packageVerifies=true worktreePristine=true — out-of-policy write STOPs the campaign; violating bytes archived BEFORE cleanup"
+    },
+    {
+      "gate": "AUTH2.dirty-rewrite-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=authority-bypass rewriteNamed=true worktreePristine=true — a rewrite of an ALREADY-DIRTY path by an unauthorized step is detected via before/after content identities (campaign backstop; the engine's role ceilings are the first layer)"
+    },
+    {
+      "gate": "AUTHEXC.exception-path-stop",
+      "pass": true,
+      "detail": "outcome=STOPPED class=authority-bypass violatingBytesArchived=true worktreePristine=true — the authority check runs on the EXCEPTION path too (write-then-throw is still a STOP)"
+    },
+    {
+      "gate": "G.kill-and-resume",
+      "pass": true,
+      "detail": "killed=true slot1Counted=true crashDuringSlot2=true countedIdx=[1,3] slot1Once=true slot1Untouched=true incomplete=3 resumeTerminal=\"child terminal: complete: ready=2/2 (threshold 2)\" — the resume RECONSTRUCTED slot 1 from the ledger (no re-execution, no double-count) and completed the terminal condition"
+    },
+    {
+      "gate": "G2.ledger-conflict-rejection",
+      "pass": true,
+      "detail": "baselineConflicts=0 tamperRejected=true duplicateRejected=true — retained package identities verified, conflicting counts fail closed"
+    }
+  ]
+}

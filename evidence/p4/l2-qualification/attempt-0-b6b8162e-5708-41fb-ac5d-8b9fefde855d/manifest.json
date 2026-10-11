@@ -1,0 +1,75 @@
+{
+  "attemptId": "b6b8162e-5708-41fb-ac5d-8b9fefde855d",
+  "index": 0,
+  "launchId": "p4-l2-preflight",
+  "outcome": "READY",
+  "failureClass": null,
+  "stopDetail": null,
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T17:24:59.686Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "f0c8940ffdd59cfbb70ad9c6b370313e8ccc4fad02639c0275aa5196b44c642a",
+  "db_records_sha256": "f79ee2e8ce457402248cc14ecc2f3fb4f99818eb1387255f34f4b986b95fb169",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "c0ba7719de9bb3863b048b836d4fdb38ecd6f37cb823a5cac237ee8f8f06a4c2",
+      "storage_hash": "c0ba7719de9bb3863b048b836d4fdb38ecd6f37cb823a5cac237ee8f8f06a4c2",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "8225bb157482ffa3cef56719bdd1d040e78015eb83ba05c276428c9e3e6d6550",
+      "storage_hash": "8225bb157482ffa3cef56719bdd1d040e78015eb83ba05c276428c9e3e6d6550",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    },
+    {
+      "path": "docs/requirements.md",
+      "sha256": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "storage_hash": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/requirements.md"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "storage_hash": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/architecture.md"
+    },
+    {
+      "path": "docs/plan.md",
+      "sha256": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "storage_hash": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "row_type": "produced-file",
+      "ref": "produced-file:plan:docs/plan.md"
+    },
+    {
+      "path": "docs/test-plan.md",
+      "sha256": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "storage_hash": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "row_type": "produced-file",
+      "ref": "produced-file:plan:docs/test-plan.md"
+    },
+    {
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "sha256": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "storage_hash": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "row_type": "produced-file",
+      "ref": "produced-file:test:apps/ai-server/tests/integration/test_worker_failure_payload_contract.py"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 29,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l2-qualification/attempt-0-b6b8162e-5708-41fb-ac5d-8b9fefde855d/files.sha256.json",
+  "package_sha256": "36ee22e686dcb260093c2aedf7ea4a5611542a81f9984cd15cfab7b1000b8594"
+}

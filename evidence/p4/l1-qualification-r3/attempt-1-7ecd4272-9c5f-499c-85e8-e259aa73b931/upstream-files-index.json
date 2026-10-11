@@ -1,0 +1,30 @@
+[
+  {
+    "path": ".sle/work/wi-define-108/definition.md",
+    "sha256": "205f1ebe5a24fdf324428ab14711c9d72407ac29597a60b324bea72cae6c13d6",
+    "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+    "row_type": "definition",
+    "ref": "definition:obj-108"
+  },
+  {
+    "path": ".sle/work/wi-define-108/readiness.md",
+    "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+    "storage_hash": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+    "row_type": "definition-readiness",
+    "ref": "definition-readiness:obj-108"
+  },
+  {
+    "path": ".sle/work/wi-define-108/definition.md",
+    "sha256": "205f1ebe5a24fdf324428ab14711c9d72407ac29597a60b324bea72cae6c13d6",
+    "storage_hash": "205f1ebe5a24fdf324428ab14711c9d72407ac29597a60b324bea72cae6c13d6",
+    "row_type": "decision-application",
+    "ref": "definition:obj-108"
+  },
+  {
+    "path": ".sle/work/wi-define-108/readiness.md",
+    "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+    "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+    "row_type": "definition-readiness",
+    "ref": "definition-readiness:obj-108"
+  }
+]

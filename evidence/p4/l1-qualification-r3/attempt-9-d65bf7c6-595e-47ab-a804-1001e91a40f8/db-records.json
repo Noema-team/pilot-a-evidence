@@ -1,0 +1,113 @@
+{
+  "work_items": [
+    {
+      "id": "wi-define-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "define-work",
+      "state": "in_review",
+      "priority": 0,
+      "acceptance_criteria_json": "[\"Failure payload keys match across worker and rag-api (aligning the worker to `error_message`/`stage` matches rag-api's persisted fields and avoids a migration).\",\"A failed job persists the worker's actual error message and failing stage.\",\"`retryable` is either sent by the worker or derived deliberately — not defaulted silently.\",\"Contract test covering worker failure → rag-api persistence path.\"]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T17:30:49.963Z",
+      "updated_at": "2026-10-11T17:30:50.241Z",
+      "workflow_parameters_json": null
+    }
+  ],
+  "workflow_runs": [
+    {
+      "run_id": "ccef8978-9d19-43db-a504-67a924901641",
+      "workflow_id": "define-work",
+      "work_item_id": "wi-define-108",
+      "status": "complete",
+      "current_step_id": "commit",
+      "iteration": 1,
+      "revision": 0,
+      "awaiting_checkpoint": null,
+      "started_at": "2026-10-11T17:30:49.992Z",
+      "updated_at": "2026-10-11T17:30:50.241Z",
+      "resolved_parameters_json": "{}"
+    }
+  ],
+  "decisions": [],
+  "artifacts": [
+    {
+      "id": "d2b29375-6774-4b7e-b77f-b4e89118eef0",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "ccef8978-9d19-43db-a504-67a924901641",
+      "step_execution_id": null,
+      "type": "definition",
+      "ref": "definition:obj-108",
+      "path": ".sle/work/wi-define-108/definition.md",
+      "hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "created_at": "2026-10-11T17:30:50.039Z"
+    },
+    {
+      "id": "fae0099a-35d7-4861-bbfa-e09450d36c25",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "ccef8978-9d19-43db-a504-67a924901641",
+      "step_execution_id": null,
+      "type": "definition-readiness",
+      "ref": "definition-readiness:obj-108",
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "hash": "7e8dd13c6c811518c525fe62af98e838533d07fbe75e006fa9bd4a0957dbe3e2",
+      "created_at": "2026-10-11T17:30:50.130Z"
+    },
+    {
+      "id": "3c7a64b2-b350-464f-a769-7dfff033f2e3",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "ccef8978-9d19-43db-a504-67a924901641",
+      "step_execution_id": null,
+      "type": "exploration-need",
+      "ref": "exploration-need:obj-108",
+      "path": ".sle/work/wi-define-108/exploration-need.md",
+      "hash": "82bbe4654fbe5ff5daeb093424bf99ad750647f4c7ffcd4c9a0e8928acd11ece",
+      "created_at": "2026-10-11T17:30:50.207Z"
+    }
+  ],
+  "step_executions": [
+    {
+      "id": "cc846d79-4d58-4a36-b9d6-9a06dbdf4dba",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "ccef8978-9d19-43db-a504-67a924901641",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "succeeded",
+      "attempt": 1,
+      "started_at": "2026-10-11T17:30:49.991Z",
+      "completed_at": "2026-10-11T17:30:50.241Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": null
+    }
+  ],
+  "events": [
+    {
+      "id": "c71313f1-ed58-455c-b7cd-c1e9603ecd41",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:49.991Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "bd2182bc-514f-4f64-8152-a0280a11d189",
+      "schema_version": 1,
+      "type": "work.state_changed",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:50.241Z",
+      "payload_json": "{\"from\":\"in_review\",\"to\":\"in_review\"}"
+    }
+  ]
+}

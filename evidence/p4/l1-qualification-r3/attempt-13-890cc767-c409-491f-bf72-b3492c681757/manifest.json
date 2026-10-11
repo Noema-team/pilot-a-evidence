@@ -1,0 +1,59 @@
+{
+  "attemptId": "890cc767-c409-491f-bf72-b3492c681757",
+  "index": 13,
+  "launchId": null,
+  "outcome": "STOPPED",
+  "failureClass": "authority-bypass",
+  "stopDetail": "AUTHORITY-BYPASS: docs/cycle-charter.md (unauthorized rewrite of already-dirty path (before/after content identity mismatch): not in design's authorized outputs [docs/requirements.md, docs/architecture.md])",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T17:30:52.341Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "26b9aa8f401f2ec552ab4275fd178156e900d829895ca6965a32b397df47c3e1",
+  "db_records_sha256": "32b0f9675c93725bb5e34c94ceb0e219741759e7d893ea85593d23ebff50fe06",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "62ef72cda46f4431bf3a5bd6d1416afc0bb07d8d1e9ae71bcc9c5ed1f1d409be",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    },
+    {
+      "path": "docs/requirements.md",
+      "sha256": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "storage_hash": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/requirements.md"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "storage_hash": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/architecture.md"
+    }
+  ],
+  "authority_violations": [
+    {
+      "path": "docs/cycle-charter.md",
+      "reason": "unauthorized rewrite of already-dirty path (before/after content identity mismatch): not in design's authorized outputs [docs/requirements.md, docs/architecture.md]"
+    }
+  ],
+  "package_file_count": 24,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3/attempt-13-890cc767-c409-491f-bf72-b3492c681757/files.sha256.json",
+  "package_sha256": "65a337e782e35f0fcc8b9c65c8a758d57f48265fb7bf8e113f805d1d44116ac2"
+}

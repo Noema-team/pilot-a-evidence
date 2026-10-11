@@ -1,0 +1,1 @@
+{"verdict":"pass","gaps":[],"bodyMarkdown":"All seven readiness dimensions pass. (offline pre-dial verification)"}

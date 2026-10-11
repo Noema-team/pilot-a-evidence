@@ -1,0 +1,328 @@
+{
+  "work_items": [
+    {
+      "id": "wi-define-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "define-work",
+      "state": "completed",
+      "priority": 0,
+      "acceptance_criteria_json": "[\"Failure payload keys match across worker and rag-api (aligning the worker to `error_message`/`stage` matches rag-api's persisted fields and avoids a migration).\",\"A failed job persists the worker's actual error message and failing stage.\",\"`retryable` is either sent by the worker or derived deliberately — not defaulted silently.\",\"Contract test covering worker failure → rag-api persistence path.\"]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T17:30:44.326Z",
+      "updated_at": "2026-10-11T17:30:44.566Z",
+      "workflow_parameters_json": null
+    },
+    {
+      "id": "wi-exec-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "full-build",
+      "state": "needs_decision",
+      "priority": 0,
+      "acceptance_criteria_json": "[]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T17:30:44.567Z",
+      "updated_at": "2026-10-11T17:30:44.828Z",
+      "workflow_parameters_json": "{\"planning_depth\":\"minimal\",\"max_iterations\":5,\"on_cap_hit\":\"halt\",\"definitionSource\":{\"workItemId\":\"wi-define-108\"},\"editPolicy\":{\"appliesToSteps\":[\"build\"],\"allowedEditPaths\":[\"apps/ai-server/rag-worker-service/main.py\"],\"requiredEditPaths\":[\"apps/ai-server/rag-worker-service/main.py\"]}}"
+    }
+  ],
+  "workflow_runs": [
+    {
+      "run_id": "10c801cd-160c-4e31-9db4-478663580bd7",
+      "workflow_id": "define-work",
+      "work_item_id": "wi-define-108",
+      "status": "complete",
+      "current_step_id": "commit",
+      "iteration": 2,
+      "revision": 0,
+      "awaiting_checkpoint": null,
+      "started_at": "2026-10-11T17:30:44.350Z",
+      "updated_at": "2026-10-11T17:30:44.560Z",
+      "resolved_parameters_json": "{}"
+    },
+    {
+      "run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "workflow_id": "full-build",
+      "work_item_id": "wi-exec-108",
+      "status": "halted",
+      "current_step_id": "confirm",
+      "iteration": 1,
+      "revision": 0,
+      "awaiting_checkpoint": "confirm",
+      "started_at": "2026-10-11T17:30:44.571Z",
+      "updated_at": "2026-10-11T17:30:44.827Z",
+      "resolved_parameters_json": "{\"planning_depth\":\"minimal\",\"max_iterations\":5,\"on_cap_hit\":\"halt\",\"definitionSource\":{\"workItemId\":\"wi-define-108\"},\"editPolicy\":{\"appliesToSteps\":[\"build\"],\"allowedEditPaths\":[\"apps/ai-server/rag-worker-service/main.py\"],\"requiredEditPaths\":[\"apps/ai-server/rag-worker-service/main.py\"]}}"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "a0faad3b-f6de-4019-8a6e-77808796a02a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-exec-108",
+      "type": "checkpoint",
+      "subject_ref_json": "{\"workflowRunId\":\"ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a\",\"workItemId\":\"wi-exec-108\",\"stepId\":\"scoping.checkpoint\"}",
+      "title": "Workflow reached a checkpoint",
+      "summary": "Workflow 'full-build' paused at step 'scoping.checkpoint' and requires operator approval to continue.",
+      "options_json": "[{\"id\":\"approve\",\"label\":\"Approve\",\"description\":\"Accept the cycle charter and begin the cycle\"}]",
+      "recommended_option_id": "approve",
+      "recommendation_reason": null,
+      "impact": "medium",
+      "reversibility": "easy",
+      "urgency": "normal",
+      "status": "resolved",
+      "resolution_json": "{\"selectedOptionId\":\"approve\",\"rationale\":\"P4 preregistered determinate policy: scoping.checkpoint approved (well-formed decision, guards passed)\",\"resolvedAt\":\"2026-10-11T17:30:44.658Z\",\"resolvedBy\":\"campaign-policy\"}"
+    },
+    {
+      "id": "9c72a4a5-1fdf-49e1-95e5-087efc209f39",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-exec-108",
+      "type": "checkpoint",
+      "subject_ref_json": "{\"workflowRunId\":\"ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a\",\"workItemId\":\"wi-exec-108\",\"stepId\":\"confirm\"}",
+      "title": "Workflow reached another checkpoint",
+      "summary": "Workflow 'full-build' paused at step 'confirm'.",
+      "options_json": "[{\"id\":\"approve\",\"label\":\"Approve\",\"description\":\"Continue to the build phase\"},{\"id\":\"revise\",\"label\":\"Revise\",\"description\":\"Send back for revision (increments revision counter)\"}]",
+      "recommended_option_id": "approve",
+      "recommendation_reason": null,
+      "impact": "medium",
+      "reversibility": "easy",
+      "urgency": "normal",
+      "status": "pending",
+      "resolution_json": null
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "70589a4f-a644-42ac-8917-0c59df8e7edf",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "10c801cd-160c-4e31-9db4-478663580bd7",
+      "step_execution_id": null,
+      "type": "definition",
+      "ref": "definition:obj-108",
+      "path": ".sle/work/wi-define-108/definition.md",
+      "hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "created_at": "2026-10-11T17:30:44.386Z"
+    },
+    {
+      "id": "e11faee7-50cf-4aed-b278-bdad5c8c67ae",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "10c801cd-160c-4e31-9db4-478663580bd7",
+      "step_execution_id": null,
+      "type": "definition-readiness",
+      "ref": "definition-readiness:obj-108",
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "hash": "e4fc76b20c50af5bbba395c5e1af69f9a92795ccfb4b45d1afade7deae193686",
+      "created_at": "2026-10-11T17:30:44.428Z"
+    },
+    {
+      "id": "32b6ba2c-835f-4c3b-ab0b-c2eec274c583",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "10c801cd-160c-4e31-9db4-478663580bd7",
+      "step_execution_id": null,
+      "type": "definition-readiness",
+      "ref": "definition-readiness:obj-108",
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "created_at": "2026-10-11T17:30:44.523Z"
+    },
+    {
+      "id": "93896726-0d61-4427-9341-1b622e73fce2",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_execution_id": null,
+      "type": "cycle-charter",
+      "ref": "doc:cycle-charter",
+      "path": "docs/cycle-charter.md",
+      "hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "created_at": "2026-10-11T17:30:44.616Z"
+    },
+    {
+      "id": "9b76af59-367a-4071-af11-1f69b869cb32",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_execution_id": null,
+      "type": "produced-file",
+      "ref": "produced-file:design:docs/requirements.md",
+      "path": "docs/requirements.md",
+      "hash": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "created_at": "2026-10-11T17:30:44.698Z"
+    },
+    {
+      "id": "5ad8e11b-c069-4c1e-a7fa-2f819e09da55",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_execution_id": null,
+      "type": "produced-file",
+      "ref": "produced-file:design:docs/architecture.md",
+      "path": "docs/architecture.md",
+      "hash": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "created_at": "2026-10-11T17:30:44.698Z"
+    },
+    {
+      "id": "248eb172-09e8-4ddc-95d7-95bba2b16f6c",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_execution_id": null,
+      "type": "produced-file",
+      "ref": "produced-file:plan:docs/plan.md",
+      "path": "docs/plan.md",
+      "hash": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "created_at": "2026-10-11T17:30:44.742Z"
+    },
+    {
+      "id": "f87aead8-4a2b-4a0d-951f-02480be55b37",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_execution_id": null,
+      "type": "produced-file",
+      "ref": "produced-file:plan:docs/test-plan.md",
+      "path": "docs/test-plan.md",
+      "hash": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "created_at": "2026-10-11T17:30:44.742Z"
+    },
+    {
+      "id": "4d7b835f-dd70-4ead-8f5a-b43e8ef73c2b",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_execution_id": null,
+      "type": "produced-file",
+      "ref": "produced-file:test:apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "hash": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "created_at": "2026-10-11T17:30:44.801Z"
+    }
+  ],
+  "step_executions": [
+    {
+      "id": "9caf4b59-0cac-4b97-88d8-4e7051da9d6d",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "10c801cd-160c-4e31-9db4-478663580bd7",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "succeeded",
+      "attempt": 1,
+      "started_at": "2026-10-11T17:30:44.349Z",
+      "completed_at": "2026-10-11T17:30:44.560Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": null
+    },
+    {
+      "id": "a0b4f4d8-e4d2-4682-b94f-f3900c7fd30e",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "succeeded",
+      "attempt": 1,
+      "started_at": "2026-10-11T17:30:44.568Z",
+      "completed_at": "2026-10-11T17:30:44.658Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": null
+    },
+    {
+      "id": "c78aa083-3dea-4380-8711-6a0a04fb91d3",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": "ca8d6ee9-83e6-4d68-9d2b-e938c1a2f75a",
+      "step_id": "design",
+      "executor": "stratum-agent",
+      "state": "waiting",
+      "attempt": 1,
+      "started_at": "2026-10-11T17:30:44.658Z",
+      "completed_at": "2026-10-11T17:30:44.828Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": null
+    }
+  ],
+  "events": [
+    {
+      "id": "365bb46a-9cc5-4207-9eb9-e95b247932df",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.350Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "3e752116-bb8f-4ed3-9de7-8e0c1f5ccaa3",
+      "schema_version": 1,
+      "type": "work.state_changed",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.560Z",
+      "payload_json": "{\"from\":\"in_review\",\"to\":\"in_review\"}"
+    },
+    {
+      "id": "edf1d58a-a756-4bd5-87a4-ab9e6992b6cb",
+      "schema_version": 1,
+      "type": "work.completed",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.566Z",
+      "payload_json": "{\"from\":\"completed\",\"to\":\"completed\"}"
+    },
+    {
+      "id": "b499b46e-e642-432a-85c4-849e1792b1ea",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.569Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "36046cb0-52be-462b-8d0b-c2538776258b",
+      "schema_version": 1,
+      "type": "decision.requested",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.657Z",
+      "payload_json": "{\"from\":\"needs_decision\",\"decisionId\":\"a0faad3b-f6de-4019-8a6e-77808796a02a\",\"decisionType\":\"checkpoint\"}"
+    },
+    {
+      "id": "d43f1f84-d07d-4cdb-81c3-2af84f4976f9",
+      "schema_version": 1,
+      "type": "decision.resolved",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.668Z",
+      "payload_json": "{\"from\":\"running\",\"decisionId\":\"a0faad3b-f6de-4019-8a6e-77808796a02a\",\"selectedOptionId\":\"approve\",\"resumedTo\":\"running\"}"
+    },
+    {
+      "id": "c24f6ef3-cc80-4070-804f-16e6eff55d72",
+      "schema_version": 1,
+      "type": "decision.requested",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-exec-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:44.828Z",
+      "payload_json": "{\"from\":\"needs_decision\",\"decisionId\":\"9c72a4a5-1fdf-49e1-95e5-087efc209f39\",\"decisionType\":\"checkpoint\"}"
+    }
+  ]
+}

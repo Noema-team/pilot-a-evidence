@@ -100,6 +100,40 @@
       "has_creates_property": false
     }
   },
+  "define-work/apply-deferred-gaps": {
+    "tool_sets": [
+      [
+        "list_directory",
+        "read_file",
+        "read_source_slice",
+        "submit_result"
+      ]
+    ],
+    "submit_result": {
+      "schema_top_level_properties": [
+        "acceptance",
+        "bodyMarkdown",
+        "constraints",
+        "facts",
+        "goal",
+        "nonGoals",
+        "requirements"
+      ],
+      "schema_required": [
+        "goal",
+        "facts",
+        "bodyMarkdown"
+      ],
+      "has_creates_property": false
+    }
+  },
+  "define-work/post-defer-readiness-review": {
+    "tool_sets": [
+      []
+    ],
+    "submit_result": null,
+    "structured_schema_name": "definition-readiness"
+  },
   "define-work/prepare-human-decision": {
     "tool_sets": [
       [
@@ -178,5 +212,12 @@
       ],
       "has_creates_property": false
     }
+  },
+  "define-work/post-human-readiness-review": {
+    "tool_sets": [
+      []
+    ],
+    "submit_result": null,
+    "structured_schema_name": "definition-readiness"
   }
 }

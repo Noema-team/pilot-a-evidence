@@ -1,0 +1,75 @@
+{
+  "attemptId": "3099731d-e082-4fa1-b5de-d40c8ad97022",
+  "index": 6,
+  "launchId": null,
+  "outcome": "NOT-READY",
+  "failureClass": "build-inputs-incomplete",
+  "stopDetail": "{\"R1_halted_state\":{\"pass\":true,\"detail\":\"status=halted cursor=confirm awaiting=confirm pending=1 pendingRefStep=confirm boundaryRefusals=0 buildRequests=0 intermediate=scoping.checkpoint:approve-policy\"},\"R2_definition_chain\":{\"pass\":false,\"detail\":\"parse=true finalReadinessPass=true (gaps=0) humanDecisionArtifact=false explorationArtifact=false defineDone=true sourceResolved=true requiredInputs=5 verified=4 testOutputs=true bad=[docs/cycle-charter.md:hash-mismatch] badRows=[cycle-charter]\"},\"R",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T17:30:49.169Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "0c9f19e14f8e4bba57bd46a91996e5a632aaea2a7399dcda245d5916558a402b",
+  "db_records_sha256": "0107ae5ca7d03d0f39201ac92ebce8397cfc940ff91a02f67fa2c2a655290976",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "bac33a0aa5c8558e988196cb2b073c026726fc47d145523f2b7d93e6b906d085",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    },
+    {
+      "path": "docs/requirements.md",
+      "sha256": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "storage_hash": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/requirements.md"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "storage_hash": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/architecture.md"
+    },
+    {
+      "path": "docs/plan.md",
+      "sha256": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "storage_hash": "e42cdfe656db5fc1cd047963f7edc309d2dc588017e403d517a8f0547500f222",
+      "row_type": "produced-file",
+      "ref": "produced-file:plan:docs/plan.md"
+    },
+    {
+      "path": "docs/test-plan.md",
+      "sha256": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "storage_hash": "1557d1ed7ac9814a7dfd2c105b549d70be7cd77557c95cebfef02031b6e77a4e",
+      "row_type": "produced-file",
+      "ref": "produced-file:plan:docs/test-plan.md"
+    },
+    {
+      "path": "apps/ai-server/tests/integration/test_worker_failure_payload_contract.py",
+      "sha256": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "storage_hash": "ae1aad9690d4c3034679e729a9bbc0c1d27e7c4a45024f2378c252da234f4293",
+      "row_type": "produced-file",
+      "ref": "produced-file:test:apps/ai-server/tests/integration/test_worker_failure_payload_contract.py"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 29,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3/attempt-6-3099731d-e082-4fa1-b5de-d40c8ad97022/files.sha256.json",
+  "package_sha256": "7bff90728f9c9dbbae1b8a860dcc0f2d286e4aa427a4307057a49aa8c02eeb97"
+}

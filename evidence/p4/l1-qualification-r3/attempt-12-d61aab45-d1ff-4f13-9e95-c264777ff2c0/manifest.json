@@ -1,0 +1,59 @@
+{
+  "attemptId": "d61aab45-d1ff-4f13-9e95-c264777ff2c0",
+  "index": 12,
+  "launchId": null,
+  "outcome": "STOPPED",
+  "failureClass": "authority-bypass",
+  "stopDetail": "AUTHORITY-BYPASS: docs/rogue.md (unauthorized write: not in design's authorized outputs [docs/requirements.md, docs/architecture.md])",
+  "target_pristine": false,
+  "archived_at_utc": "2026-10-11T17:30:51.645Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "6173d91246e28764b7f5f651b16207428e7a9fa4917c8f4a5b75c0f891c3a5e9",
+  "db_records_sha256": "995a29e3db3edf5e946c51ebae86ccdb8824f3dd7256c644bc2187b4e1fa6392",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": "docs/cycle-charter.md",
+      "sha256": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "storage_hash": "de0d35a212c80450855aee03952ead750947be10cb20b930742b59b2d1312b62",
+      "row_type": "cycle-charter",
+      "ref": "doc:cycle-charter"
+    },
+    {
+      "path": "docs/requirements.md",
+      "sha256": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "storage_hash": "63294c7f12010412dd80183750ff3b54afe1d1841b870f6a1c4f846eccdb792e",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/requirements.md"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "storage_hash": "ef8f072e69ea5cb6cb9f28079ebc9669c21cdfb321377354b434bcedc1115f57",
+      "row_type": "produced-file",
+      "ref": "produced-file:design:docs/architecture.md"
+    }
+  ],
+  "authority_violations": [
+    {
+      "path": "docs/rogue.md",
+      "reason": "unauthorized write: not in design's authorized outputs [docs/requirements.md, docs/architecture.md]"
+    }
+  ],
+  "package_file_count": 24,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3/attempt-12-d61aab45-d1ff-4f13-9e95-c264777ff2c0/files.sha256.json",
+  "package_sha256": "35266f9a6326e04cbfe574f641bb96e33156c245c03a2d6d48314f605f860c25"
+}

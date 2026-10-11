@@ -1,0 +1,18 @@
+{
+  "attemptId": "b157c92e-e629-45a6-a63a-3f71a3acc7e6",
+  "index": 1,
+  "launchId": "p4-l2-round",
+  "outcome": "NOT-READY",
+  "failureClass": "provider-error-unresolved",
+  "stopDetail": "{\"kind\":\"FAILED\",\"detail\":\"run halted without a pending decision at synthesize-definition\"}",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T17:25:13.126Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "9f92e88d97cde482992d496115657fdc9babcf600051c3a1be1c408917f38f1b",
+  "db_records_sha256": "b540ae4a0bd1cdc542acd65b99b6ab01dead01e6f6ef4297da2a7fc4fb7e4d47",
+  "upstream_files": [],
+  "authority_violations": [],
+  "package_file_count": 7,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l2-qualification/attempt-1-b157c92e-e629-45a6-a63a-3f71a3acc7e6/files.sha256.json",
+  "package_sha256": "a365102e6b9a9acdd8d1599d1d6c33fcdeb85ca8c9f00f78975ff4fc4ca35192"
+}

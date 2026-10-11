@@ -1,0 +1,131 @@
+{
+  "work_items": [
+    {
+      "id": "wi-define-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "define-work",
+      "state": "needs_decision",
+      "priority": 0,
+      "acceptance_criteria_json": "[\"Failure payload keys match across worker and rag-api (aligning the worker to `error_message`/`stage` matches rag-api's persisted fields and avoids a migration).\",\"A failed job persists the worker's actual error message and failing stage.\",\"`retryable` is either sent by the worker or derived deliberately — not defaulted silently.\",\"Contract test covering worker failure → rag-api persistence path.\"]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T17:30:45.741Z",
+      "updated_at": "2026-10-11T17:30:45.954Z",
+      "workflow_parameters_json": null
+    }
+  ],
+  "workflow_runs": [
+    {
+      "run_id": "89f6d398-d8fa-4ebc-baf0-db81f195b51c",
+      "workflow_id": "define-work",
+      "work_item_id": "wi-define-108",
+      "status": "halted",
+      "current_step_id": "human-decision-checkpoint",
+      "iteration": 1,
+      "revision": 0,
+      "awaiting_checkpoint": "human-decision-checkpoint",
+      "started_at": "2026-10-11T17:30:45.774Z",
+      "updated_at": "2026-10-11T17:30:45.953Z",
+      "resolved_parameters_json": "{}"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "8f1b2b6d-3273-419d-8db2-4939f401e996",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "type": "checkpoint",
+      "subject_ref_json": "{\"workflowRunId\":\"89f6d398-d8fa-4ebc-baf0-db81f195b51c\",\"workItemId\":\"wi-define-108\",\"stepId\":\"human-decision-checkpoint\",\"targetFactId\":\"f3\"}",
+      "title": "Settle the failure-payload schema field set",
+      "summary": "The readiness review classified the payload-schema field set as a choice only a human can authorize; decide include vs exclude.",
+      "options_json": "[{\"id\":\"include\",\"label\":\"Include\",\"description\":\"Treat the full payload field set as in scope for this increment.\"},{\"id\":\"exclude\",\"label\":\"Exclude\",\"description\":\"Ship the minimal class field; defer the remaining fields.\"}]",
+      "recommended_option_id": null,
+      "recommendation_reason": null,
+      "impact": "medium",
+      "reversibility": "easy",
+      "urgency": "normal",
+      "status": "pending",
+      "resolution_json": null
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "8aa4c6cb-6cb2-4109-80af-c8e39f26631e",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "89f6d398-d8fa-4ebc-baf0-db81f195b51c",
+      "step_execution_id": null,
+      "type": "definition",
+      "ref": "definition:obj-108",
+      "path": ".sle/work/wi-define-108/definition.md",
+      "hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "created_at": "2026-10-11T17:30:45.820Z"
+    },
+    {
+      "id": "56159571-1e5e-4921-92fb-b261b365c8c0",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "89f6d398-d8fa-4ebc-baf0-db81f195b51c",
+      "step_execution_id": null,
+      "type": "definition-readiness",
+      "ref": "definition-readiness:obj-108",
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "hash": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+      "created_at": "2026-10-11T17:30:45.872Z"
+    },
+    {
+      "id": "295163fa-e11b-47a5-b91a-7e7315d4859f",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "89f6d398-d8fa-4ebc-baf0-db81f195b51c",
+      "step_execution_id": null,
+      "type": "decision-request",
+      "ref": "definition-decision-request:obj-108",
+      "path": ".sle/work/wi-define-108/decision-request.json",
+      "hash": "9c12ac28a166a037339a2647034d1596cebf9c654a74e26a2044ac05a020c957",
+      "created_at": "2026-10-11T17:30:45.920Z"
+    }
+  ],
+  "step_executions": [
+    {
+      "id": "237e48f4-8875-4dce-bb80-302af30f3e57",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "89f6d398-d8fa-4ebc-baf0-db81f195b51c",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "waiting",
+      "attempt": 1,
+      "started_at": "2026-10-11T17:30:45.773Z",
+      "completed_at": "2026-10-11T17:30:45.954Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": null
+    }
+  ],
+  "events": [
+    {
+      "id": "6be82c22-4a69-46d7-8fe6-dde6cb9ef6bc",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:45.774Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "5abfc2e5-0d0b-4372-af40-b748faf12f1e",
+      "schema_version": 1,
+      "type": "decision.requested",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:30:45.954Z",
+      "payload_json": "{\"from\":\"needs_decision\",\"decisionId\":\"8f1b2b6d-3273-419d-8db2-4939f401e996\",\"decisionType\":\"checkpoint\"}"
+    }
+  ]
+}

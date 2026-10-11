@@ -1,0 +1,1 @@
+{"verdict":"pass","gaps":[],"bodyMarkdown":"All seven readiness dimensions pass for the candidate bounded scope. (L1 scripted review.)"}

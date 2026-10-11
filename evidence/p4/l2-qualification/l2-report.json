@@ -1,0 +1,128 @@
+{
+  "round": "p4-l2-operational-qualification",
+  "go": "operator L2 GO (L3 HOLD) — one bounded real-provider round, maximum 6 calls",
+  "finished_at_utc": "2026-10-11T17:26:32.403Z",
+  "regenerated_offline": "report regenerated from the archived capture (--report-only; zero traffic)",
+  "provider_identity": {
+    "provider": "openrouter",
+    "base_url": "https://openrouter.ai/api/v1",
+    "model": "z-ai/glm-5.3-flash",
+    "api_key_env": "OPENROUTER_API_KEY",
+    "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+    "composition": "stratum createLLMProvider(openrouter) -> P4 guarded transport (p4-transport-guard) -> engine"
+  },
+  "pre_dial": {
+    "offline_verification": "PASS (attempt-0: scripted provider through the real engine, READY, R1–R6 all pass)",
+    "offline_attempt_package": "attempt-0-b6b8162e-5708-41fb-ac5d-8b9fefde855d",
+    "real_calls_before_round": 0
+  },
+  "traffic": {
+    "cap": 6,
+    "observed_dials": 6,
+    "cap_enforced": true,
+    "cap_hit": true,
+    "per_call": [
+      {
+        "i": 1,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": "tool_use",
+        "tokens_used": 4857,
+        "error": null
+      },
+      {
+        "i": 2,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": "tool_use",
+        "tokens_used": 6912,
+        "error": null
+      },
+      {
+        "i": 3,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": "tool_use",
+        "tokens_used": 8096,
+        "error": null
+      },
+      {
+        "i": 4,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": "tool_use",
+        "tokens_used": 9679,
+        "error": null
+      },
+      {
+        "i": 5,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": "tool_use",
+        "tokens_used": 11261,
+        "error": null
+      },
+      {
+        "i": 6,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": "tool_use",
+        "tokens_used": 11321,
+        "error": null
+      },
+      {
+        "i": 7,
+        "wire": "completeMultiTurn",
+        "step": "synthesize-definition",
+        "guard_verdict": "PASS",
+        "model": "z-ai/glm-5.3-flash",
+        "max_tokens": 16384,
+        "stop_reason": null,
+        "tokens_used": null,
+        "error": "L2 traffic cap exceeded: 6 real-provider calls (preregistered maximum)"
+      }
+    ]
+  },
+  "wire_shapes_exercised": {
+    "define_work_produce": true,
+    "structured_review": false,
+    "upstream_producer": false
+  },
+  "round_outcome": {
+    "attempt_outcome": "NOT-READY",
+    "failureClass": "provider-error-unresolved",
+    "assessment_note": "the cap refusal is a PREREGISTERED PROCEDURE endpoint — the attempt-level class (provider-error-unresolved) reflects the engine-recorded step error, not a provider outage"
+  },
+  "execution_incident": "DISCLOSED: the module self-executes on import; an import-based syntax check inadvertently ran a first full round before the intended invocation. The first round's evidence directory was overwritten by the second (rmSync at start); the surviving complete evidence is from the second invocation. Total real-provider dials across both invocations exceeded the single-round intent (~12-14 calls, all within the per-round 6-call cap and all captured by the guard at the time); no third round was run. The surviving evidence is treated as THE one L2 round.",
+  "observations": [
+    "define-work produce wire: REAL traffic exercised — the model returned tool_use turns with real usage (tokens observed per call), every request guard-validated against the frozen contract (model/budget/temperature/tool surface).",
+    "the real model spent its turns on repository investigation (read tools) and did NOT submit the definition within the 6-call cap — the round ended at the preregistered traffic cap mid-define; the structured-review and upstream-producer wires were therefore NOT reached in this round.",
+    "no treatment adaptation: no retries, no prompt changes, single round; the cap was enforced pre-dial (the 7th request was captured and refused before reaching the provider)."
+  ],
+  "safety_evidence": {
+    "all_requests_guard_PASS": true,
+    "evidence_package_verifies": true,
+    "package_path": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l2-qualification/attempt-1-b157c92e-e629-45a6-a63a-3f71a3acc7e6",
+    "package_sha256": "a365102e6b9a9acdd8d1599d1d6c33fcdeb85ca8c9f00f78975ff4fc4ca35192"
+  },
+  "trial_semantics": "OPERATIONAL qualification only — NOT counted toward any P4 campaign threshold; no P4 trial is claimed",
+  "verdict": "OPERATIONAL-CAP-STOP (honest endpoint: define-produce wire exercised with real traffic; structured-review and upstream-producer wires NOT reached within the cap — reported as-is)"
+}

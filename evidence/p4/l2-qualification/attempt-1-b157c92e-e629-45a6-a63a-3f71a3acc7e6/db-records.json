@@ -1,0 +1,79 @@
+{
+  "work_items": [
+    {
+      "id": "wi-define-108",
+      "project_id": "proj-pilot-a",
+      "objective_id": "obj-108",
+      "repository_ids_json": "[]",
+      "title": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "goal": "rag-worker → rag-api: failure payload contract mismatch — failures persist without message or stage",
+      "workflow_id": "define-work",
+      "state": "failed",
+      "priority": 0,
+      "acceptance_criteria_json": "[\"Failure payload keys match across worker and rag-api (aligning the worker to `error_message`/`stage` matches rag-api's persisted fields and avoids a migration).\",\"A failed job persists the worker's actual error message and failing stage.\",\"`retryable` is either sent by the worker or derived deliberately — not defaulted silently.\",\"Contract test covering worker failure → rag-api persistence path.\"]",
+      "constraints_json": "[]",
+      "required_evidence_json": "[]",
+      "parent_id": null,
+      "created_at": "2026-10-11T17:24:59.776Z",
+      "updated_at": "2026-10-11T17:25:13.100Z",
+      "workflow_parameters_json": null
+    }
+  ],
+  "workflow_runs": [
+    {
+      "run_id": "04929e01-6b7c-4438-ab22-5fe31a50a1a7",
+      "workflow_id": "define-work",
+      "work_item_id": "wi-define-108",
+      "status": "halted",
+      "current_step_id": "synthesize-definition",
+      "iteration": 1,
+      "revision": 0,
+      "awaiting_checkpoint": null,
+      "started_at": "2026-10-11T17:24:59.789Z",
+      "updated_at": "2026-10-11T17:25:13.099Z",
+      "resolved_parameters_json": "{}"
+    }
+  ],
+  "decisions": [],
+  "artifacts": [],
+  "step_executions": [
+    {
+      "id": "16180dae-bc79-4e58-a670-5e9fca30c2ed",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": "04929e01-6b7c-4438-ab22-5fe31a50a1a7",
+      "step_id": "__start__",
+      "executor": "stratum-agent",
+      "state": "failed",
+      "attempt": 1,
+      "started_at": "2026-10-11T17:24:59.789Z",
+      "completed_at": "2026-10-11T17:25:13.099Z",
+      "cost_json": null,
+      "tokens": null,
+      "failure_json": "{\"code\":\"workflow_error\",\"message\":\"LLM call failed: L2 traffic cap exceeded: 6 real-provider calls (preregistered maximum)\"}"
+    }
+  ],
+  "events": [
+    {
+      "id": "b99b0ca6-f485-4902-9dac-042c450026c3",
+      "schema_version": 1,
+      "type": "work.started",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:24:59.789Z",
+      "payload_json": "{\"from\":\"running\",\"to\":\"running\"}"
+    },
+    {
+      "id": "8ec25bcc-22dd-4436-83a2-10de61de81c6",
+      "schema_version": 1,
+      "type": "work.state_changed",
+      "workspace_id": "ws-pilot-a",
+      "project_id": "proj-pilot-a",
+      "work_item_id": "wi-define-108",
+      "workflow_run_id": null,
+      "occurred_at": "2026-10-11T17:25:13.100Z",
+      "payload_json": "{\"from\":\"failed\",\"to\":\"failed\",\"reason\":\"LLM call failed: L2 traffic cap exceeded: 6 real-provider calls (preregistered maximum)\"}"
+    }
+  ]
+}

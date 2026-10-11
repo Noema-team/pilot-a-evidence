@@ -1,0 +1,47 @@
+{
+  "attemptId": "7ecd4272-9c5f-499c-85e8-e259aa73b931",
+  "index": 1,
+  "launchId": null,
+  "outcome": "NOT-READY",
+  "failureClass": "definition-human-decision-required",
+  "stopDetail": "handoff gate refused: decision-request artifact exists — HUMAN_DECISION is never synthetically approved",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T17:30:46.760Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "1aa7e1886593964415fd03c533ffa715421cd63c852d8a443ed01b373e2e4ebe",
+  "db_records_sha256": "1981b937db02f111024c8541b10b075f2a8d479cd6a9de91a3704b472f8f8484",
+  "upstream_files": [
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "205f1ebe5a24fdf324428ab14711c9d72407ac29597a60b324bea72cae6c13d6",
+      "storage_hash": "6eed9bc762babe3643ac0219e769cff4cf5ececda194781afe2930047b410b7a",
+      "row_type": "definition",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "bde74a6cb674315f1c3155b5d486a0abf5d42f1d94476bca6b5ac54ad76b80c0",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/definition.md",
+      "sha256": "205f1ebe5a24fdf324428ab14711c9d72407ac29597a60b324bea72cae6c13d6",
+      "storage_hash": "205f1ebe5a24fdf324428ab14711c9d72407ac29597a60b324bea72cae6c13d6",
+      "row_type": "decision-application",
+      "ref": "definition:obj-108"
+    },
+    {
+      "path": ".sle/work/wi-define-108/readiness.md",
+      "sha256": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "storage_hash": "a4fcd4d95cc180ec2be1eb9176343aa87bd7fd3301c82f815c065e68b3c7ca30",
+      "row_type": "definition-readiness",
+      "ref": "definition-readiness:obj-108"
+    }
+  ],
+  "authority_violations": [],
+  "package_file_count": 20,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3/attempt-1-7ecd4272-9c5f-499c-85e8-e259aa73b931/files.sha256.json",
+  "package_sha256": "28d6af3effb9a4b533b65fa75485810306e5d351e7b7278a388dd47b6661ad94"
+}

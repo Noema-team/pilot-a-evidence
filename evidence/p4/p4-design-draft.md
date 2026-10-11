@@ -1,6 +1,6 @@
 # P4 DESIGN DRAFT — Autonomous Upstream Reliability
 
-**Status:** DRAFT v3.1 — implementation reviewed; L1-r2 offline qualification 20/20 gates. For review before L2. Not frozen, no L2/L3 authorization. §13 records the v3 as-built; §14 records the r2 corrections.
+**Status:** DRAFT v3.2 — L2 operational round EXECUTED (OPERATIONAL-CAP-STOP, honestly reported); all three pre-freeze corrections implemented + proven (L1-r3 24/24). STOPPED for independent scientific-freeze review. §13 v3 as-built · §14 r2 corrections · §15 L2 round + r3 pre-freeze corrections.
 **Directive:** operator conditional implementation GO (final architecture review): implement + L1 offline qualification only; STOP before L2 provider traffic, freeze, or L3.
 **Predecessor evidence:** P2 forensics, P3 closeout, charter v1.1. Review rulings + four binding corrections applied and BUILT (§13).
 
@@ -174,3 +174,30 @@ The implementation review held L1 for four targeted corrections; all are now BUI
 H · A.calibration (+refine-route, human-route, explore-route, human-resolution legs) · A.ready-path · B.isolation · C.config-drift-stop · C2.budget-wire-stop · D.unpinned-shape-stop · E2.missing-artifact · E2.corrupted-artifact · F1 · F2 · F3 · F4 · T.post-archive-tamper · AUTH.authority-bypass-stop · G.kill-and-resume.
 
 stratum 9f298f2 and all P3 artifacts remain byte-unchanged; the target worktree is pristine after qualification.
+
+---
+
+## 15. L2 OPERATIONAL ROUND + r3 PRE-FREEZE CORRECTIONS (v3.2 addition)
+
+### L2 — one bounded real-provider round (operator GO; max 6 calls)
+
+Evidence namespace: `evidence/p4/l2-qualification/` (separate; NO P4 trial counted). Pre-dial: the executable request-construction path verified OFFLINE (attempt-0: scripted provider through the real engine under pinned shapes → READY, R1–R6 all pass) + provider identity + pre-dial accounting (realCalls=0).
+
+**Result: OPERATIONAL-CAP-STOP** — reported as-is:
+- 6 real dials, all on the **define-work produce wire** (`completeMultiTurn`, `synthesize-definition`); every request guard-validated against the frozen contract; real usage observed (tokens 4857 → 11321, `stop_reason=tool_use`); the transport, request shapes, and budget map behaved exactly as qualified offline.
+- The real model spent all 6 turns in repository **investigation without submitting** the definition; the **7th request was captured and refused pre-dial** (traffic cap). The structured-review and upstream-producer wires were therefore NOT reached in this round. (Real produce steps run 16–20-turn investigation loops per P1-R history — the cap landing mid-define is consistent with that profile.)
+- The frozen treatment was **never adapted**: no retries, no prompt changes, single round.
+
+**Disclosed execution incident:** the L2 module self-executes on import; an import-based syntax check inadvertently ran a first full round before the intended invocation, and the second invocation's `rmSync` overwrote the first round's evidence directory. The surviving complete evidence is the second invocation; total real dials across both invocations exceeded the single-round intent (~12–14, each round within its 6-call cap, all guard-captured at the time). No third round was run. Recorded in `l2-report.json.execution_incident`.
+
+### r3 — the three pre-freeze corrections (offline, all proven)
+
+1. **Unauthorized rewrites of already-dirty paths + exception paths** — the per-step authority check now uses BEFORE/AFTER CONTENT IDENTITIES: new paths, rewrites of already-dirty paths (content sha changed), and deletions, each authorized only per the frozen workflow definitions; the stepRunner seam runs the check on success AND exception paths (violations recorded; the original error still propagates; the attempt-level stop derives from the recorded violations). Gates `AUTH2.dirty-rewrite-stop` + `AUTHEXC.exception-path-stop` PASS. Documented layering: the engine's role ceilings already drop unauthorized doc sections (layer 1); the campaign check is the backstop.
+2. **Remaining native definition routes** — the DEFER route is calibrated end-to-end (`apply-deferred-gaps` → `post-defer-readiness-review` → READY through legitimate native defer semantics), and the human-resolution chain now submits the NARROW `DecisionApplicationProposal` so `apply-human-decision` → `post-human-readiness-review` is genuinely reached (the deterministic contract, not the model, performs the ledger transition). 13 shapes pinned; no tool authority broadened.
+3. **Retained identities + conflicting counts** — `reconstructCountedSlots` verifies each retained counted slot's package identity (manifest `package_sha256` vs ledger entry, full package verification) and rejects duplicate counted indexes; any conflict is a fail-closed `LEDGER-CONFLICT` stop — the resume never launches on disputed evidence. Gate `G2.ledger-conflict-rejection` PASS.
+
+### L1-r3 — 24/24 gates PASS
+
+`evidence/p4/l1-qualification-output-r3.txt`; packages in `l1-qualification-r3/`; prior evidence (r1 14/14, r2 20/20) preserved untouched.
+
+stratum 9f298f2 and all P3 artifacts remain byte-unchanged; the target worktree is pristine.

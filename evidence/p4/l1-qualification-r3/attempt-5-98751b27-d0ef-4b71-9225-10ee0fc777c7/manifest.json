@@ -1,0 +1,18 @@
+{
+  "attemptId": "98751b27-d0ef-4b71-9225-10ee0fc777c7",
+  "index": 5,
+  "launchId": null,
+  "outcome": "STOPPED",
+  "failureClass": "guard-stop",
+  "stopDetail": "guard STOP record(s) in capture during define: [{\"step\":\"synthesize-definition\",\"wire\":\"completeMultiTurn\",\"violations\":[\"tool set [read_file,read_source_slice,list_directory,submit_result] matches none of the frozen shapes [nonexistent_tool]\",\"submit_result offered on a step whose frozen shape declares none\"]}]",
+  "target_pristine": true,
+  "archived_at_utc": "2026-10-11T17:30:48.282Z",
+  "settings_sha256": "5634b2e897eeb56467deae26da0dd9146c36dc192a61ded23196ee21b55925a2",
+  "capture_sha256": "e1f9d1700e7c53120fb0a8693dc1eadb12c53f6e58b6ff0e1ca962db605cde29",
+  "db_records_sha256": "939b0ec15059fc0fdeb06533b93499cc8be43552a380ba52d69add124afbd54d",
+  "upstream_files": [],
+  "authority_violations": [],
+  "package_file_count": 7,
+  "package_files_sha256": "/home/theo/Documents/coding/repos/pilot-a/evidence/p4/l1-qualification-r3/attempt-5-98751b27-d0ef-4b71-9225-10ee0fc777c7/files.sha256.json",
+  "package_sha256": "f3e44c76c897b7bf76b5972e3616e2dbf0ab689818fe17b1710bb7d3c311fcda"
+}
